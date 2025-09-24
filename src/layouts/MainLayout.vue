@@ -1,81 +1,66 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+  <q-layout view="hhh lpR fff">
+    <q-header elevated class="bg-white text-dark">
+      <q-toolbar class="q-py-sm">
+        <q-toolbar-title class="row items-center no-wrap">
+          <img src="/logo.svg" alt="Logo" style="height:28px" class="q-mr-sm" />
+          <span class="text-weight-bold">Ticketpe</span>
+        </q-toolbar-title>
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <div class="gt-sm row items-center q-gutter-md">
+          <q-btn flat label="Recursos" @click="scrollTo('features')" />
+          <q-btn flat label="Como funciona" @click="scrollTo('how')" />
+          <q-btn flat label="Planos" @click="scrollTo('pricing')" />
+          <q-btn flat label="FAQ" @click="scrollTo('faq')" />
+          <q-btn color="primary" unelevated label="Começar agora" @click="scrollTo('cta')" />
+        </div>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-btn class="lt-md" flat round dense icon="menu" @click="rightDrawer = true" />
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer side="right" v-model="rightDrawer" overlay>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        <q-item clickable v-ripple @click="go('features')"><q-item-section>Recursos</q-item-section></q-item>
+        <q-item clickable v-ripple @click="go('how')"><q-item-section>Como funciona</q-item-section></q-item>
+        <q-item clickable v-ripple @click="go('pricing')"><q-item-section>Planos</q-item-section></q-item>
+        <q-item clickable v-ripple @click="go('faq')"><q-item-section>FAQ</q-item-section></q-item>
+        <q-item clickable v-ripple @click="go('cta')"><q-item-section class="text-primary">Começar agora</q-item-section></q-item>
       </q-list>
     </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer class="bg-grey-1 text-grey-8">
+      <div class="row items-center justify-between q-px-lg q-py-md">
+        <div>© {{ new Date().getFullYear() }} Ticketpe — Todos os direitos reservados</div>
+        <div class="row q-gutter-sm">
+          <q-btn flat dense icon="mail" href="mailto:contato@suamarca.com" />
+          <q-btn flat dense icon="smartphone" href="#" />
+          <q-btn flat dense icon="share" href="#" />
+        </div>
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+const rightDrawer = ref(false)
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-]
-
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+function scrollTo (id) {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+function go (id) {
+  rightDrawer.value = false
+  requestAnimationFrame(() => scrollTo(id))
 }
 </script>
+
+<style>
+/* deixa o header “grudar” bonito */
+.q-header { border-bottom: 1px solid #eee; }
+</style>
