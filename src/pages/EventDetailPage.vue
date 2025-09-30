@@ -13,31 +13,16 @@
         />
       </div>
 
-      <q-linear-progress
-        v-if="loading"
-        indeterminate
-        color="warning"
-        class="q-mt-xl"
-      />
+      <q-linear-progress v-if="loading" indeterminate color="warning" class="q-mt-xl" />
 
       <div v-else-if="error" class="event-error text-center">
         <div class="text-h6 text-white q-mb-sm">{{ error }}</div>
-        <q-btn
-          color="warning"
-          text-color="black"
-          label="Voltar para inicio"
-          @click="goHome"
-        />
+        <q-btn color="warning" text-color="black" label="Voltar para inicio" @click="goHome" />
       </div>
 
       <div v-else>
         <div class="event-hero-wrap">
-          <q-img
-            :src="event.image"
-            class="event-hero"
-            ratio="16/9"
-            spinner-color="white"
-          />
+          <q-img :src="event.image" class="event-hero" ratio="16/9" spinner-color="white" />
         </div>
 
         <q-card class="event-card">
@@ -140,11 +125,11 @@ watch(
     if (id && id !== previous) {
       loadEvent(id)
     }
-  }
+  },
 )
 
 // fluxo principal de obtencao de dados
-async function loadEvent (idParam) {
+async function loadEvent(idParam) {
   loading.value = true
   error.value = ''
   event.value = null
@@ -167,7 +152,7 @@ async function loadEvent (idParam) {
 }
 
 // tenta acessar direto e, se falhar, recorre ao filtro por documentId
-async function fetchEventRecord (idParam) {
+async function fetchEventRecord(idParam) {
   if (!idParam) return null
 
   const direct = await tryFetchSingle(idParam)
@@ -182,8 +167,8 @@ async function fetchEventRecord (idParam) {
     params: {
       populate: '*',
       'filters[documentId][$eq]': idParam,
-      'pagination[pageSize]': 1
-    }
+      'pagination[pageSize]': 1,
+    },
   })
 
   const items = Array.isArray(response?.data?.data) ? response.data.data : []
@@ -191,10 +176,10 @@ async function fetchEventRecord (idParam) {
 }
 
 // requisicao defensiva para /festas/:id (string ou numero)
-async function tryFetchSingle (idValue) {
+async function tryFetchSingle(idValue) {
   try {
     const response = await api.get(`/festas/${encodeURIComponent(idValue)}`, {
-      params: { populate: '*' }
+      params: { populate: '*' },
     })
     return response?.data?.data ?? null
   } catch (err) {
@@ -206,7 +191,7 @@ async function tryFetchSingle (idValue) {
 }
 
 // normaliza o payload do Strapi para o template
-function mapEvent (payload) {
+function mapEvent(payload) {
   const record = payload?.attributes ?? payload ?? {}
   const parsedDate = parseDate(record.Data)
   const dateBadge = buildDateBadge(parsedDate)
@@ -216,27 +201,32 @@ function mapEvent (payload) {
     id: String(payload?.id ?? record.documentId ?? dateBadge.code),
     title: record.Nome ?? record.title ?? 'Evento sem nome',
     highlight: record.gatilho ?? record.subtitulo ?? '',
-    description: record.Descricao ?? record.descricao ?? record.description ?? 'Sem descricao disponivel no momento.',
+    description:
+      record.Descricao ??
+      record.descricao ??
+      record.description ??
+      'Sem descricao disponivel no momento.',
     additionalInfo: record.observacoes ?? record.observacao ?? record.Observacao ?? '',
     image: resolveImage(record),
     dateBadge,
     dateLabel: formatDateLabel(parsedDate),
     timeLabel: formatTimeLabel(parsedDate),
-    location: record.Local ?? record.local ?? record.Localizacao ?? record.Cidade ?? 'Local a definir',
+    location:
+      record.Local ?? record.local ?? record.Localizacao ?? record.Cidade ?? 'Local a definir',
     cityState: formatCityState(record.Cidade, record.Estado),
     whatsapp,
     whatsappMessage: record.mensagemWhatsapp ?? record.mensagem ?? DEFAULT_WHATSAPP_MESSAGE,
-    shareUrl: record.link ?? record.url ?? record.site ?? ''
+    shareUrl: record.link ?? record.url ?? record.site ?? '',
   }
 }
 
 // helpers de formato --------------------------------------------------------
-function parseDate (value) {
+function parseDate(value) {
   const date = value ? new Date(value) : null
   return date && !Number.isNaN(date.getTime()) ? date : null
 }
 
-function buildDateBadge (date) {
+function buildDateBadge(date) {
   if (!date) {
     return { month: '--', day: '--', code: Math.random().toString(36).slice(2) }
   }
@@ -247,23 +237,23 @@ function buildDateBadge (date) {
   return { month, day, code: (month + '-' + day).toLowerCase() }
 }
 
-function formatDateLabel (date) {
+function formatDateLabel(date) {
   if (!date) return 'Data a definir'
   return date.toLocaleDateString('pt-BR', {
     weekday: 'long',
     day: '2-digit',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   })
 }
 
-function formatTimeLabel (date) {
+function formatTimeLabel(date) {
   if (!date) return ''
   const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   return `${time} BRT`
 }
 
-function formatCityState (city, state) {
+function formatCityState(city, state) {
   if (!city && !state) return 'Local a definir'
   if (!state) return city
   if (!city) return state
@@ -271,7 +261,7 @@ function formatCityState (city, state) {
 }
 
 // imagem e midias -----------------------------------------------------------
-function resolveImage (record) {
+function resolveImage(record) {
   const gallery = Array.isArray(record?.FOTOSEVENTO) ? record.FOTOSEVENTO : []
   const sources = [
     record?.banner,
@@ -281,7 +271,7 @@ function resolveImage (record) {
     record?.imagemUrl,
     record?.cover,
     record?.capaPrincipal,
-    ...gallery
+    ...gallery,
   ]
 
   for (const source of sources) {
@@ -292,7 +282,7 @@ function resolveImage (record) {
   return DEFAULT_IMAGE
 }
 
-function extractMediaUrl (media) {
+function extractMediaUrl(media) {
   if (!media) return null
   if (typeof media === 'string') return media
   if (Array.isArray(media)) {
@@ -315,14 +305,14 @@ function extractMediaUrl (media) {
   )
 }
 
-function prependHost (url) {
+function prependHost(url) {
   if (!url || typeof url !== 'string') return DEFAULT_IMAGE
   if (url.startsWith('http')) return url
   return 'http://localhost:1337' + url
 }
 
 // utilitarios ---------------------------------------------------------------
-function extractWhatsapp (record) {
+function extractWhatsapp(record) {
   const candidate =
     record.whatsapp ??
     record.Whatsapp ??
@@ -337,7 +327,7 @@ function extractWhatsapp (record) {
   return digits.length >= 10 ? digits : null
 }
 
-function openWhatsapp () {
+function openWhatsapp() {
   if (!event.value) return
 
   const phone = event.value.whatsapp
@@ -350,14 +340,14 @@ function openWhatsapp () {
   }
 }
 
-function shareEvent () {
+function shareEvent() {
   if (!event.value || typeof window === 'undefined') return
 
   const shareUrl = event.value.shareUrl || window.location.href
   const shareData = {
     title: event.value.title,
     text: event.value.description,
-    url: shareUrl
+    url: shareUrl,
   }
 
   if (navigator?.share) {
@@ -367,7 +357,7 @@ function shareEvent () {
   }
 }
 
-function goBack () {
+function goBack() {
   if (typeof window !== 'undefined' && window.history.length > 1) {
     router.back()
   } else {
@@ -375,7 +365,7 @@ function goBack () {
   }
 }
 
-function goHome () {
+function goHome() {
   router.push('/')
 }
 </script>
@@ -412,9 +402,8 @@ function goHome () {
 .event-card {
   background: #1f2937;
   border-radius: 32px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
 }
-
 
 .event-body {
   padding: 32px 36px 40px;
@@ -529,11 +518,10 @@ function goHome () {
   }
 
   .event-card {
-  background: #1f2937;
-  border-radius: 32px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
-}
-
+    background: #1f2937;
+    border-radius: 32px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  }
 
   .event-body {
     padding: 20px;

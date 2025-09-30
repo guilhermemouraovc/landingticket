@@ -1,20 +1,19 @@
-<template> 
+<template>
   <q-layout view="hHh lpR fFf">
     <!-- HEADER -->
     <q-header elevated class="bg-dark-header text-white">
       <q-toolbar class="custom-toolbar">
         <div class="header-inner">
-
           <!-- LOGO -->
           <div class="row items-center">
-            <img src="/logo.svg" alt="Logo" style="width:220px" class="q-mr-sm" />
+            <img src="/logo.svg" alt="Logo" style="width: 220px" class="q-mr-sm" />
           </div>
 
           <!-- MENU DESKTOP -->
           <div class="row items-center gt-sm">
             <q-btn flat label="BLOG" class="text-white text-weight-bold" />
             <q-input
-              class="search-pill q-my-xs"  
+              class="search-pill q-my-xs"
               filled
               rounded
               bg-color="white"
@@ -45,7 +44,6 @@
     <q-page-container>
       <router-view />
     </q-page-container>
-    
   </q-layout>
 </template>
 
@@ -57,7 +55,7 @@ const drawer = ref(false)
 
 <style>
 .bg-dark-header {
-  background-color: #161F2F !important;
+  background-color: #161f2f !important;
 }
 
 /* HEADER: altura total = 26(top) + 48(input) + 26(bottom) = 100px */
@@ -93,15 +91,21 @@ const drawer = ref(false)
 .search-pill .q-field__native {
   padding: 10px 14px;
 }
-.search-pill input { color: #1f2937; }
-.search-pill ::placeholder { color: #6b7280; }
-.search-pill .q-field__append .q-icon { color: #64748b; }
+.search-pill input {
+  color: #1f2937;
+}
+.search-pill ::placeholder {
+  color: #6b7280;
+}
+.search-pill .q-field__append .q-icon {
+  color: #64748b;
+}
 
 /* fundo das áreas */
 .q-page-container {
-  background-color: #2A3447;
+  background-color: #2a3447;
 }
 .q-drawer {
-  background-color: #2A3447;
+  background-color: #2a3447;
 }
 </style>

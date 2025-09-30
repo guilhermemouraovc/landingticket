@@ -45,13 +45,14 @@
     </div>
 
     <!-- Lista horizontal de cards -->
-    <div class="cards-viewport" ref="viewport" @scroll="updateScrollState">
+    <div
+      class="cards-viewport"
+      ref="viewport"
+      @scroll="updateScrollState"
+      :class="{ 'fade-right': showRightFade }"
+    >
       <div class="cards-row">
-        <div
-          v-for="card in items"
-          :key="card.id"
-          class="event-card"
-        >
+        <div v-for="card in items" :key="card.id" class="event-card">
           <q-img
             :src="card.image || defaultImage"
             class="card-image"
@@ -98,25 +99,34 @@ const props = defineProps({
   items: { type: Array, default: () => [] },
   seeAllLabel: { type: String, default: 'Ver Tudo' },
   seeAllLink: { type: [String, Object], default: null },
-  defaultImage: { type: String, default: 'https://via.placeholder.com/400x200?text=Evento' }
+  defaultImage: { type: String, default: 'https://via.placeholder.com/400x200?text=Evento' },
 })
 
 const viewport = ref(null)
 const scrollStep = 420
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
+const showRightFade = ref(true)
+const FADE_SHOW_AT = 24
+const FADE_HIDE_AT = 40
 
-const hasCards = computed(() => props.items.length > 0);
-
-function updateScrollState () {
+const hasCards = computed(() => props.items.length > 0)
+const hasScrolled = ref(false)
+function updateScrollState() {
   const el = viewport.value
   if (!el) return
   const maxScrollLeft = el.scrollWidth - el.clientWidth - 1
   canScrollLeft.value = el.scrollLeft > 0
   canScrollRight.value = el.scrollLeft < maxScrollLeft
+  hasScrolled.value = el.scrollLeft > 0
+  if (showRightFade.value) {
+    if (el.scrollLeft >= FADE_HIDE_AT) showRightFade.value = false
+  } else {
+    if (el.scrollLeft <= FADE_SHOW_AT) showRightFade.value = true
+  }
 }
 
-function scroll (offset) {
+function scroll(offset) {
   const el = viewport.value
   if (!el) return
   el.scrollBy({ left: offset, behavior: 'smooth' })
@@ -127,7 +137,7 @@ watch(
   async () => {
     await nextTick()
     updateScrollState()
-  }
+  },
 )
 
 onMounted(() => {
@@ -189,11 +199,19 @@ onMounted(() => {
 }
 
 .cards-viewport {
-  position: relative;
   overflow-x: auto;
+  position: relative;
   scrollbar-width: none;
+  --fade: 20px; /* largura do fade */
+  scroll-padding-right: var(--fade);
 }
-.cards-viewport::-webkit-scrollbar { display: none; }
+
+.cards-viewport.fade-right {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent 100%);
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent 100%);
+  mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
 
 .cards-row {
   display: flex;
@@ -248,7 +266,3 @@ onMounted(() => {
   margin-top: auto;
 }
 </style>
-
-
-
-
