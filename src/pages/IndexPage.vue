@@ -8,7 +8,6 @@
         infinite
         swipeable
         autoplay
-        arrows
         height="440px"
         control-color="white"
         navigation
@@ -76,7 +75,7 @@
             v-for="c in categories"
             :key="c.label"
             outline
-            rounded
+            square-rounded
             no-caps
             class="cat-btn"
             color="white"
@@ -165,7 +164,7 @@ import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 
-const DEFAULT_IMAGE = 'https://via.placeholder.com/800x450?text=Evento'
+const DEFAULT_IMAGE = 'https://i.postimg.cc/C59stMzr/Captura-de-tela-2025-10-01-130250.png'
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -173,7 +172,7 @@ const featured = ref([])
 
 // seções adicionais
 const reveillonEvents = ref([])
-const carnavalEvents = ref(createPlaceholderCards('Carnaval'))
+const carnavalEvents = ref([])
 const saoJoaoEvents = ref(createPlaceholderCards('São João'))
 
 // categorias fixas usadas nos botoes tiles
@@ -190,6 +189,7 @@ const categories = ref([
 onMounted(() => {
   loadFeatured()
   loadReveillon()
+  loadCarnaval()
 })
 
 async function loadFeatured() {
@@ -248,6 +248,27 @@ async function loadReveillon() {
   } catch (err) {
     console.error('Falha ao carregar reveillon', err)
     reveillonEvents.value = []
+  }
+}
+
+// Carnaval ---------------------------------------------------------------
+async function loadCarnaval() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'filters[$and][0][tag][tagname][$eqi]': 'CARNAVAIS',
+        'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
+        publicationState: 'live',
+        'sort[0]': 'Data:asc',
+        populate: '*',
+      },
+    })
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+    carnavalEvents.value = festas.map(toFeaturedCard)
+  } catch (err) {
+    console.error('Falha ao carregar carnaval', err)
+    carnavalEvents.value = []
   }
 }
 
@@ -328,9 +349,10 @@ function formatLocation(city, state) {
   if (!city) return state
   if (!state) return city
   return city + ' - ' + state
+
 }
 
-// busca a melhor imagem disponivel entre os campos do Strapi
+// busca a melhor festa entre as enviadas pelo strapi, 
 function resolveImage(festa) {
   const gallery = Array.isArray(festa?.FOTOSEVENTO) ? festa.FOTOSEVENTO : []
   const sources = [
@@ -443,10 +465,12 @@ function createPlaceholderCards(prefix) {
   align-items: center;
 }
 .featured-wrap {
-  width: calc(100vw - 160px);
+  width: 100%;
   max-width: 1760px;
   height: 440px;
   margin: 0 auto;
+  padding: 0 80px;
+  box-sizing: border-box;
 }
 .featured-grid {
   display: grid;
@@ -457,7 +481,15 @@ function createPlaceholderCards(prefix) {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-.featured-img,
+.featured-img {
+  overflow: hidden;
+}
+.featured-img .q-img__content img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
 .featured-img .full {
   width: 100%;
   height: 100%;
@@ -479,7 +511,7 @@ function createPlaceholderCards(prefix) {
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 28px;
+  padding: 20px;
   width: 100%;
   min-height: 100%;
 }
@@ -517,6 +549,7 @@ function createPlaceholderCards(prefix) {
   justify-content: center;
 }
 .cat-btn {
+  border-radius: 8.75px !important;
   height: 46.79px;
   min-width: 168.76px;
   font-weight: 600;

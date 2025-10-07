@@ -15,7 +15,7 @@
             <q-input
               class="search-pill q-my-xs"
               filled
-              rounded
+              square-rounded
               bg-color="white"
               placeholder="Pesquisar eventos"
               v-model="search"
@@ -60,7 +60,7 @@ const drawer = ref(false)
 
 /* HEADER: altura total = 26(top) + 48(input) + 26(bottom) = 100px */
 .custom-toolbar {
-  min-height: 100px;
+  min-height: 48px;
   padding: 0;
 }
 
@@ -85,7 +85,7 @@ const drawer = ref(false)
   height: 48px;
 }
 .search-pill .q-field__control {
-  border-radius: 9999px !important;
+  border-radius: 8px !important;
   min-height: 48px;
 }
 .search-pill .q-field__native {

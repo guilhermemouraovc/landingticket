@@ -1,0 +1,367 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { api } from 'boot/axios'
+import EventSectionCarousel from 'components/EventSectionCarousel.vue'
+
+const DEFAULT_IMAGE = 'https://via.placeholder.com/800x450?text=Evento'
+
+// refs que alimentam o carrossel hero
+const activeSlide = ref(null)
+const featured = ref([])
+
+// seções adicionais
+const reveillonEvents = ref([])
+const carnavalEvents = ref([])
+const saoJoaoEvents = ref(createPlaceholderCards('São João'))
+
+// categorias fixas usadas nos botoes tiles
+const categories = ref([
+  { label: 'Carnaval', icon: 'celebration' },
+  { label: 'São João', icon: 'park' },
+  { label: 'Semana Santa', icon: 'holiday_village' },
+  { label: 'Ano Novo', icon: 'auto_awesome' },
+  { label: 'Boate', icon: 'nightlife' },
+  { label: 'Calourada', icon: 'school' },
+])
+
+// boot das seções
+onMounted(() => {
+  loadFeatured()
+  loadReveillon()
+  loadCarnaval()
+})
+
+async function loadFeatured() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'pagination[pageSize]': 25,
+        populate: '*',
+      },
+    })
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+
+    if (!festas.length) {
+      featured.value = []
+      activeSlide.value = null
+      return
+    }
+
+    featured.value = festas.map(toFeaturedCard)
+    activeSlide.value = featured.value[0]?.id ?? null
+  } catch (err) {
+    console.error('Falha ao carregar festas', err)
+  }
+}
+
+async function loadReveillon() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'pagination[pageSize]': 25,
+        populate: '*',
+      },
+    })
+
+async function loadCarnaval() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'pagination[pageSize]': 50,
+        populate: '*',
+      },
+    })
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+
+    carnavalEvents.value = festas
+      .filter((festa) => hasTagCarnavais(festa?.attributes ?? festa ?? {}))
+      .map(toFeaturedCard)
+  } catch (err) {
+    console.error('Falha ao carregar carnaval', err)
+    carnavalEvents.value = []
+  }
+}
+
+function hasTagCarnavais(record) {
+  const tags = collectTags(record)
+  if (!tags.size) {
+    const name = normalizeForSearch(
+      firstNonEmptyString(
+        record.Nome,
+        record.nome,
+        record.Titulo,
+        record.titulo,
+        record.Title,
+        record.title,
+      ),
+    )
+    return name.includes('carnaval')
+  }
+  return tags.has('carnavais') || tags.has('carnaval')
+}
+
+function collectTags(record) {
+  const out = new Set()
+  const candidates = [
+    record.tags,
+    record.Tags,
+    record.tag,
+    record.categorias,
+    record.Categorias,
+    record.categories,
+    record.category,
+    record.etiquetas,
+  ]
+  for (const field of candidates) {
+    if (!field) continue
+    if (typeof field === 'string') {
+      field
+        .split(/[,;|]/)
+        .map((s) => normalizeForSearch(String(s || '')))
+        .filter(Boolean)
+        .forEach((s) => out.add(s))
+      continue
+    }
+    if (Array.isArray(field)) {
+      for (const item of field) {
+        if (typeof item === 'string') {
+          const v = normalizeForSearch(item)
+          if (v) out.add(v)
+        } else if (item && typeof item === 'object') {
+          const v = normalizeForSearch(
+            firstNonEmptyString(
+              item.name,
+              item.nome,
+              item.titulo,
+              item.label,
+              item.Title,
+              item.slug,
+            ),
+          )
+          if (v) out.add(v)
+        }
+      }
+      continue
+    }
+    const rel = field?.data
+    if (Array.isArray(rel)) {
+      for (const e of rel) {
+        const v = normalizeForSearch(
+          firstNonEmptyString(
+            e?.attributes?.name,
+            e?.attributes?.Nome,
+            e?.attributes?.titulo,
+            e?.attributes?.label,
+          ),
+        )
+        if (v) out.add(v)
+      }
+    } else if (rel && typeof rel === 'object') {
+      const v = normalizeForSearch(
+        firstNonEmptyString(
+          rel?.attributes?.name,
+          rel?.attributes?.Nome,
+          rel?.attributes?.titulo,
+          rel?.attributes?.label,
+        ),
+      )
+      if (v) out.add(v)
+    }
+  }
+  return out
+}
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+
+    reveillonEvents.value = festas
+      .filter((festa) => {
+        // Normaliza diferentes campos do CMS antes de verificar o nome do evento
+        const record = festa?.attributes ?? festa ?? {}
+        const rawName = firstNonEmptyString(
+          record.Nome,
+          record.nome,
+          record.Titulo,
+          record.titulo,
+          record.Title,
+          record.title,
+          festa?.Nome,
+          festa?.nome,
+        )
+        const normalized = normalizeForSearch(rawName)
+        return normalized.includes('reveillon')
+      })
+      .map(toFeaturedCard)
+  } catch (err) {
+    console.error('Falha ao carregar reveillon', err)
+    reveillonEvents.value = []
+  }
+}
+
+// transforma o payload do Strapi no objeto usado pelos cards
+function toFeaturedCard(festa) {
+  const record = festa?.attributes ?? festa ?? {}
+  const baseId = festa?.id ?? record.id ?? record.UID ?? record.slug ?? record.documentId
+  const cardId = String(baseId ?? Math.random().toString(36).slice(2))
+  const documentId = record.documentId ?? String(baseId ?? cardId)
+
+  // Busca o primeiro título preenchido, independente do formato vindo do CMS
+  const title =
+    firstNonEmptyString(
+      record.Nome,
+      record.nome,
+      record.Titulo,
+      record.titulo,
+      record.Title,
+      record.title,
+    ) || 'Evento sem nome'
+
+  const description = firstNonEmptyString(
+    record.Descricao,
+    record.descricao,
+    record.description,
+    record.Resumo,
+    record.resumo,
+  )
+
+  const dateValue = firstNonEmptyString(
+    record.Data,
+    record.data,
+    record.DataInicio,
+    record.dataInicio,
+    record.data_inicio,
+    record.Inicio,
+    record.inicio,
+    record.startDate,
+  )
+
+  const city = firstNonEmptyString(
+    record.Cidade,
+    record.cidade,
+    record.Localidade,
+    record.local,
+    record.city,
+  )
+
+  const state = firstNonEmptyString(
+    record.Estado,
+    record.estado,
+    record.UF,
+    record.uf,
+    record.state,
+  )
+
+  return {
+    id: cardId,
+    title,
+    description,
+    date: formatDate(dateValue),
+    location: formatLocation(city, state),
+    image: resolveImage(record),
+    link: { name: 'event-detail', params: { id: documentId } },
+  }
+}
+
+// helpers de formato
+function formatDate(value) {
+  if (!value) return 'Data a definir'
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return 'Data a definir'
+  return parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+function formatLocation(city, state) {
+  if (!city && !state) return 'Local a definir'
+  if (!city) return state
+  if (!state) return city
+  return city + ' - ' + state
+}
+
+// busca a melhor imagem disponivel entre os campos do Strapi
+function resolveImage(festa) {
+  const gallery = Array.isArray(festa?.FOTOSEVENTO) ? festa.FOTOSEVENTO : []
+  const sources = [
+    festa?.banner,
+    festa?.capa,
+    festa?.imagem,
+    festa?.Imagem,
+    festa?.imagemUrl,
+    festa?.cover,
+    festa?.capaPrincipal,
+    ...gallery,
+  ]
+
+  for (const source of sources) {
+    const url = extractMediaUrl(source)
+    if (url) return prependHost(url)
+  }
+
+  return DEFAULT_IMAGE
+}
+
+function extractMediaUrl(media) {
+  if (!media) return null
+  if (typeof media === 'string') return media
+  if (Array.isArray(media)) {
+    for (const item of media) {
+      const nested = extractMediaUrl(item)
+      if (nested) return nested
+    }
+    return null
+  }
+
+  return (
+    media?.url ??
+    media?.attributes?.url ??
+    media?.data?.attributes?.url ??
+    media?.data?.url ??
+    media?.formats?.medium?.url ??
+    media?.formats?.large?.url ??
+    media?.formats?.small?.url ??
+    null
+  )
+}
+
+function prependHost(url) {
+  if (!url || typeof url !== 'string') return DEFAULT_IMAGE
+  if (url.startsWith('http')) return url
+  return 'http://localhost:1337' + url
+}
+
+// Retorna a primeira string não vazia encontrada nas opções pendentes
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value !== 'string') continue
+    const trimmed = value.trim()
+    if (trimmed.length > 0) return trimmed
+  }
+  return ''
+}
+
+// Remove acentos e deixa minúsculo para comparações consistentes
+function normalizeForSearch(value) {
+  if (typeof value !== 'string') return ''
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+}
+
+// Gera cards fictícios para preencher seções que ainda não possuem dados reais
+function createPlaceholderCards(prefix) {
+  const baseSlug =
+    normalizeForSearch(prefix)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || 'evento'
+
+  return Array.from({ length: 3 }).map((_, index) => ({
+    id: `${baseSlug}-${index}`,
+    title: `${prefix} Amoré 2025`,
+    date: '14 FEV > 17 FEV',
+    location: 'Parque Memorial Arcoverde, Olinda - PE',
+    image: DEFAULT_IMAGE,
+    link: '#',
+  }))
+}
+</script>

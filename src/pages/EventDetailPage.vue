@@ -22,23 +22,29 @@
 
       <div v-else>
         <div class="event-hero-wrap">
-          <q-img :src="event.image" class="event-hero" ratio="16/9" spinner-color="white" />
+          <q-img
+            :src="event.image"
+            class="event-hero"
+            height="440px"
+            fit="cover"
+            spinner-color="white"
+            loading="eager"
+          />
         </div>
 
         <q-card class="event-card">
           <div class="event-body">
             <div class="event-heading row items-start justify-between q-mb-lg">
               <div>
-                <div class="text-h4 text-weight-bold text-white">{{ event.title }}</div>
+                <div class="text-h4 text-weight-bold text-white event-title">{{ event.title }}</div>
                 <div v-if="event.highlight" class="event-highlight text-body2">
                   {{ event.highlight }}
                 </div>
               </div>
 
               <q-btn
-                round
-                dense
                 unelevated
+                rounded
                 color="primary"
                 icon="share"
                 class="event-share"
@@ -76,9 +82,8 @@
               color="warning"
               text-color="black"
               label="Comprar"
-              unelevated
-              rounded
-              size="lg"
+              unselevated
+              no-caps
               @click="openWhatsapp"
             />
 
@@ -143,6 +148,7 @@ async function loadEvent(idParam) {
     }
 
     event.value = mapEvent(record)
+    console.log('image:', event.value.image)
   } catch (err) {
     console.error('Falha ao carregar evento', err)
     error.value = 'Nao foi possivel carregar os detalhes do evento.'
@@ -378,9 +384,25 @@ function goHome() {
 }
 
 .event-container {
-  width: calc(100vw - 160px);
-  max-width: 1100px;
+  width: min(1280px, calc(100vw - 160px));
+  max-width: 1280px;
   margin: 0 auto;
+}
+
+/* Hero grande com cantos arredondados e recorte */
+.event-hero-wrap {
+  /* Unifica visualmente com o quadro de conteúdo */
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  box-shadow: none;
+}
+
+.event-hero :where(.q-img__content, .q-img__image, img) {
+  border-radius: inherit;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 
 .event-toolbar {
@@ -400,14 +422,37 @@ function goHome() {
 }
 
 .event-card {
-  background: #1f2937;
-  border-radius: 32px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  background: #2a3447;
+  border-radius: 0 0 24px 24px;
+  box-shadow: none;
 }
 
 .event-body {
-  padding: 32px 36px 40px;
+  padding: 20px 36px 36px;
   color: #f9fafb;
+}
+
+/* Título mais destacado, estilo cartão grande */
+.event-heading .text-h4 {
+  font-size: 64px;
+  line-height: 1.15;
+}
+
+/* Título do evento: Poppins Semibold 64, branco */
+.event-title {
+  color: #fff !important;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    'Noto Sans',
+    'Liberation Sans',
+    sans-serif;
+  font-weight: 600 !important; /* semibold */
 }
 
 .event-heading {
@@ -433,39 +478,54 @@ function goHome() {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: transparent !important;
   padding: 16px 20px;
-  border-radius: 20px;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .meta-badge {
-  width: 72px;
-  background: linear-gradient(135deg, #38bdf8, #6366f1);
-  border-radius: 18px;
-  padding: 10px 0;
-  color: white;
-  text-transform: uppercase;
-  font-weight: 700;
+  /* Tile 80x80 com topo magenta e sombra */
+  width: 80px;
+  height: 80px;
+  background: #303b4f; /* leve contraste sobre #2A3447 */
+  border-radius: 16px;
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  display: grid;
+  grid-template-rows: 28px 1fr;
+  overflow: hidden;
 }
 
 .badge-month {
-  font-size: 0.85rem;
+  background: #d946ef; /* magenta */
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 28px;
+  text-align: center;
+  text-transform: capitalize;
 }
 
 .badge-day {
   font-size: 1.8rem;
-  line-height: 1.2;
-}
-
-.meta-icon {
-  width: 72px;
-  height: 72px;
+  line-height: 1;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #fb7185, #f97316);
-  border-radius: 18px;
-  color: white;
+}
+
+.meta-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #303b4f;
+  border-radius: 16px;
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
+  color: #d946ef; /* magenta no ícone */
 }
 
 .meta-title {
@@ -479,9 +539,16 @@ function goHome() {
 }
 
 .buy-btn {
-  width: 100%;
-  font-weight: 700;
-  height: 56px;
+  /* Centraliza e mantém 434px das extremidades em viewports >= 1440px */
+  width: min(572px, calc(100vw - 868px));
+  height: 57px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600; /* semibold */
+  line-height: 1;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .event-section {
@@ -507,8 +574,16 @@ function goHome() {
     width: calc(100vw - 40px);
   }
 
+  .event-hero {
+    height: 320px;
+  }
+
   .event-body {
     padding: 24px;
+  }
+
+  .event-heading .text-h4 {
+    font-size: 44px;
   }
 }
 
@@ -518,13 +593,21 @@ function goHome() {
   }
 
   .event-card {
-    background: #1f2937;
-    border-radius: 32px;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    background: #2a3447;
+    border-radius: 0 0 20px 20px;
+    box-shadow: none;
   }
 
   .event-body {
     padding: 20px;
+  }
+
+  .event-hero {
+    height: 220px;
+  }
+
+  .event-heading .text-h4 {
+    font-size: 32px;
   }
 
   .meta-item {
@@ -534,7 +617,8 @@ function goHome() {
 
   .meta-badge,
   .meta-icon {
-    width: 100%;
+    width: 80px;
+    height: 80px;
     border-radius: 16px;
   }
 }

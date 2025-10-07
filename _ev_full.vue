@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="event-section">
     <!-- Cabecalho da secao com titulo, CTA e navegacao -->
     <div class="section-header">
@@ -93,7 +93,7 @@
   </section>
 </template>
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 function openCard(card) {
@@ -110,7 +110,7 @@ const props = defineProps({
 })
 
 const viewport = ref(null)
-const scrollStep = 344
+// dynamic scroll step based on measured card width\nconst CARD_GAP = 24\nconst measuredWidth = ref(360)\nconst scrollStep = computed(() => Math.round(measuredWidth.value + CARD_GAP))
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 const showRightFade = ref(true)
@@ -119,7 +119,7 @@ const FADE_HIDE_AT = 40
 
 const hasCards = computed(() => props.items.length > 0)
 const hasScrolled = ref(false)
-function updateScrollState() {
+function measureCard()\n    updateScrollState() {
   const el = viewport.value
   if (!el) return
   const maxScrollLeft = el.scrollWidth - el.clientWidth - 1
@@ -133,6 +133,11 @@ function updateScrollState() {
   }
 }
 
+function measureCard() {
+  const el = viewport.value
+  const card = el?.querySelector('.event-card')
+  if (card) measuredWidth.value = card.getBoundingClientRect().width
+}
 function scroll(offset) {
   const el = viewport.value
   if (!el) return
@@ -143,13 +148,13 @@ watch(
   () => props.items,
   async () => {
     await nextTick()
-    updateScrollState()
+    measureCard()\n    updateScrollState()
   },
 )
 
 onMounted(() => {
   if (!hasCards.value) return
-  nextTick().then(updateScrollState)
+  nextTick().then(() => {\n    measureCard()\n    measureCard()\n    updateScrollState()\n  })
 })
 </script>
 
@@ -199,6 +204,7 @@ onMounted(() => {
 .nav-buttons {
   display: flex;
   gap: 8px;
+  
 }
 
 .nav-btn {
@@ -291,3 +297,6 @@ onMounted(() => {
   padding: 0 22px 22px;
 }
 </style>
+
+
+

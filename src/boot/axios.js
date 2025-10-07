@@ -1,7 +1,12 @@
 ﻿import { defineBoot } from '#q-app/wrappers'
 import axios from 'axios'
 
-const api = axios.create({ baseURL: 'http://localhost:1337/api' })
+const api = axios.create({
+  baseURL: 'https://worthy-nurture-3ed4b9b27b.strapiapp.com/api',
+  headers: {
+    Authorization: `Bearer ${process.env.VITE_STRAPI_TOKEN}`,
+  },
+})
 
 export default defineBoot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
