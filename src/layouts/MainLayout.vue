@@ -11,7 +11,15 @@
 
           <!-- MENU DESKTOP -->
           <div class="row items-center gt-sm">
-            <q-btn flat label="BLOG" class="text-white text-weight-bold" />
+            <q-btn flat no-caps label="Filtros" class="text-white text-weight-bold">
+              <template #prepend>
+                <q-icon
+                  name="img:/public/sliders-horizontal 2.svg"
+                  size="20px"
+                  class="text-white"
+                />
+              </template>
+            </q-btn>
             <q-input
               class="search-pill q-my-xs"
               filled
@@ -99,6 +107,16 @@ const drawer = ref(false)
 }
 .search-pill .q-field__append .q-icon {
   color: #64748b;
+}
+
+/* Estilo personalizado para o botão Filtros */
+.q-btn[aria-label='Filtros'] .q-btn__content {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+.q-btn[aria-label='Filtros'] .q-btn__prepend {
+  margin-right: 8px;
 }
 
 /* fundo das áreas */

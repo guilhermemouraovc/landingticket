@@ -210,8 +210,8 @@ onMounted(() => {
   overflow-y: visible;
   position: relative;
   scrollbar-width: none;
-  --fade: 20px; /* largura do fade */
-  scroll-padding-right: 140px;
+  --fade: 28px; /* largura do fade */
+  scroll-padding-right: 200px;
   padding-top: 9px;
   padding-bottom: 13px;
 }
@@ -227,10 +227,23 @@ onMounted(() => {
 
 .cards-row {
   --card-width: 320px;
+  --peek: calc(var(--card-width) * 2.62); /* ~30-40% do próximo card visível */
   display: flex;
   gap: 24px;
   align-items: stretch;
-  padding-right: calc(var(--card-width) * 0.45);
+  padding-right: var(--peek);
+}
+
+/* Responsividade: ajustar peek em telas menores */
+@media (max-width: 768px) {
+  .cards-viewport {
+    --fade: 24px;
+    scroll-padding-right: 160px;
+  }
+
+  .cards-row {
+    --peek: calc(var(--card-width) * 0.5);
+  }
 }
 
 .event-card {

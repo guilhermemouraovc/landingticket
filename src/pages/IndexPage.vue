@@ -33,20 +33,20 @@
               <!-- Painel -->
               <div class="featured-panel">
                 <div class="panel-inner">
-                  <div class="text-h5 text-weight-bold q-mb-sm">{{ ev.title }}</div>
+                  <div class="event-title q-mb-sm">{{ ev.title }}</div>
 
                   <div v-if="ev.description" class="featured-description text-body1 q-mt-xs">
                     {{ ev.description }}
                   </div>
 
                   <div class="q-mt-md q-gutter-sm">
-                    <div class="row items-center text-grey-8">
-                      <q-icon name="event" class="q-mr-sm" />
-                      <span class="text-body2">{{ ev.date }}</span>
+                    <div class="row items-center event-meta">
+                      <q-icon name="event" class="q-mr-sm event-meta__icon" />
+                      <span>{{ ev.date }}</span>
                     </div>
-                    <div class="row items-center text-grey-8">
-                      <q-icon name="place" class="q-mr-sm" />
-                      <span class="text-body2">{{ ev.location }}</span>
+                    <div class="row items-center event-meta">
+                      <q-icon name="place" class="q-mr-sm event-meta__icon" />
+                      <span>{{ ev.location }}</span>
                     </div>
                   </div>
 
@@ -105,6 +105,13 @@
       <EventSectionCarousel
         title="São João"
         :items="saoJoaoEvents"
+        see-all-label="Ver Tudo"
+        :default-image="DEFAULT_IMAGE"
+      />
+
+      <EventSectionCarousel
+        title="Programação completa"
+        :items="allEvents"
         see-all-label="Ver Tudo"
         :default-image="DEFAULT_IMAGE"
       />
@@ -173,7 +180,8 @@ const featured = ref([])
 // seções adicionais
 const reveillonEvents = ref([])
 const carnavalEvents = ref([])
-const saoJoaoEvents = ref(createPlaceholderCards('São João'))
+const saoJoaoEvents = ref([])
+const allEvents = ref([])
 
 // categorias fixas usadas nos botoes tiles
 const categories = ref([
@@ -190,6 +198,8 @@ onMounted(() => {
   loadFeatured()
   loadReveillon()
   loadCarnaval()
+  loadSaoJoao()
+  loadAllEvents()
 })
 
 async function loadFeatured() {
@@ -220,31 +230,16 @@ async function loadReveillon() {
   try {
     const response = await api.get('/festas', {
       params: {
+        'filters[$and][0][tag][tagname][$eqi]': 'REVEILLON',
+        publicationState: 'live',
+        'sort[0]': 'Data:asc',
         'pagination[pageSize]': 25,
         populate: '*',
       },
     })
 
     const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-
-    reveillonEvents.value = festas
-      .filter((festa) => {
-        // Normaliza diferentes campos do CMS antes de verificar o nome do evento
-        const record = festa?.attributes ?? festa ?? {}
-        const rawName = firstNonEmptyString(
-          record.Nome,
-          record.nome,
-          record.Titulo,
-          record.titulo,
-          record.Title,
-          record.title,
-          festa?.Nome,
-          festa?.nome,
-        )
-        const normalized = normalizeForSearch(rawName)
-        return normalized.includes('reveillon')
-      })
-      .map(toFeaturedCard)
+    reveillonEvents.value = festas.map(toFeaturedCard)
   } catch (err) {
     console.error('Falha ao carregar reveillon', err)
     reveillonEvents.value = []
@@ -269,6 +264,47 @@ async function loadCarnaval() {
   } catch (err) {
     console.error('Falha ao carregar carnaval', err)
     carnavalEvents.value = []
+  }
+}
+
+// São João ---------------------------------------------------------------
+async function loadSaoJoao() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'filters[$and][0][tag][tagname][$eqi]': 'SaoJoao',
+        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
+        publicationState: 'live',
+        'sort[0]': 'Data:asc',
+        populate: '*',
+      },
+    })
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+    saoJoaoEvents.value = festas.map(toFeaturedCard)
+  } catch (err) {
+    console.error('Falha ao carregar São João', err)
+    saoJoaoEvents.value = []
+  }
+}
+
+// Programação completa ---------------------------------------------------------------
+async function loadAllEvents() {
+  try {
+    const response = await api.get('/festas', {
+      params: {
+        'pagination[pageSize]': 60,
+        publicationState: 'live',
+        'sort[0]': 'Data:asc',
+        populate: '*',
+      },
+    })
+
+    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
+    allEvents.value = festas.map(toFeaturedCard)
+  } catch (err) {
+    console.error('Falha ao carregar programação completa', err)
+    allEvents.value = []
   }
 }
 
@@ -349,10 +385,9 @@ function formatLocation(city, state) {
   if (!city) return state
   if (!state) return city
   return city + ' - ' + state
-
 }
 
-// busca a melhor festa entre as enviadas pelo strapi, 
+// busca a melhor festa entre as enviadas pelo strapi,
 function resolveImage(festa) {
   const gallery = Array.isArray(festa?.FOTOSEVENTO) ? festa.FOTOSEVENTO : []
   const sources = [
@@ -414,30 +449,8 @@ function firstNonEmptyString(...values) {
 }
 
 // Remove acentos e deixa minúsculo para comparações consistentes
-function normalizeForSearch(value) {
-  if (typeof value !== 'string') return ''
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-}
 
 // Gera cards fictícios para preencher seções que ainda não possuem dados reais
-function createPlaceholderCards(prefix) {
-  const baseSlug =
-    normalizeForSearch(prefix)
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '') || 'evento'
-
-  return Array.from({ length: 3 }).map((_, index) => ({
-    id: `${baseSlug}-${index}`,
-    title: `${prefix} Amoré 2025`,
-    date: '14 FEV > 17 FEV',
-    location: 'Parque Memorial Arcoverde, Olinda - PE',
-    image: DEFAULT_IMAGE,
-    link: '#',
-  }))
-}
 </script>
 
 <style scoped>
@@ -524,8 +537,15 @@ function createPlaceholderCards(prefix) {
   line-clamp: 3;
   -webkit-box-orient: vertical;
 }
+.featured-carousel {
+  position: relative;
+}
 .featured-carousel .q-carousel__navigation {
-  bottom: 8px;
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 }
 .featured-carousel .q-carousel__navigation .q-btn {
   opacity: 0.85;
@@ -534,36 +554,92 @@ function createPlaceholderCards(prefix) {
 /* ================= CATEGORIAS ================= */
 .categories {
   background-color: #2a3447;
-  margin-top: 100px;
-  padding-bottom: 40px;
+  margin-top: 60px;
+  padding: 60px 0;
 }
 .categories-wrap {
   width: calc(100vw - 160px);
   max-width: 1760px;
   margin: 0 auto;
+  padding: 0 80px;
 }
 .cat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, auto));
-  gap: 20.23px;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+  .categories-wrap {
+    padding: 0 40px;
+  }
+
+  .cat-grid {
+    gap: 12px;
+    justify-content: space-around;
+  }
+
+  .cat-btn {
+    min-width: 140px;
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .cat-btn .q-icon {
+    font-size: 18px;
+    margin-right: 6px;
+  }
 }
 .cat-btn {
-  border-radius: 8.75px !important;
-  height: 46.79px;
-  min-width: 168.76px;
+  border-radius: 12px !important;
+  height: 52px;
+  min-width: 180px;
   font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
 }
 .cat-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #ffffff !important;
+  background: #35c7ee !important;
+  border-color: #35c7ee !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(53, 199, 238, 0.3);
 }
 .cat-btn .q-btn__content {
   font-weight: 700;
   letter-spacing: 0.3px;
+  color: white !important;
+}
+.cat-btn:hover .q-btn__content {
+  color: white !important;
 }
 .cat-btn .q-icon {
   margin-right: 8px;
+  font-size: 20px;
+}
+
+/* ================= HERO - TIPOGRAFIA E CORES ================= */
+.event-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* semibold */
+  font-size: 36px;
+  line-height: 1.2;
+  color: #1f2937;
+}
+
+.event-meta {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* regular */
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.event-meta__icon {
+  color: #8b5cf6; /* roxo */
 }
 
 /* ================= FOOTER ================= */
