@@ -9,6 +9,11 @@
         name: 'event-detail',
         component: () => import('pages/EventDetailPage.vue'),
       },
+      {
+        path: 'programacao',
+        name: 'programacao-completa',
+        component: () => import('pages/ProgramacaoCompletaPage.vue'),
+      },
     ],
   },
 

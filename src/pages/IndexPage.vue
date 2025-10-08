@@ -113,6 +113,7 @@
         title="Programação completa"
         :items="allEvents"
         see-all-label="Ver Tudo"
+        :see-all-link="{ name: 'programacao-completa' }"
         :default-image="DEFAULT_IMAGE"
       />
     </section>
