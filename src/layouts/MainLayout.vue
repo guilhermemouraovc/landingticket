@@ -11,7 +11,13 @@
 
           <!-- MENU DESKTOP -->
           <div class="row items-center gt-sm">
-            <q-btn flat no-caps label="Filtros" class="text-white text-weight-bold">
+            <q-btn
+              flat
+              no-caps
+              label="Filtros"
+              class="text-white text-weight-bold"
+              @click="filterDrawer = true"
+            >
               <template #prepend>
                 <q-icon
                   name="img:/public/sliders-horizontal 2.svg"
@@ -49,6 +55,70 @@
       </q-list>
     </q-drawer>
 
+    <!-- DRAWER DE FILTROS -->
+    <q-drawer v-model="filterDrawer" side="right" overlay :width="400" class="filter-drawer">
+      <div class="filter-drawer-content">
+        <!-- Cabeçalho -->
+        <div class="filter-drawer-header">
+          <div class="filter-drawer-title">
+            <q-icon name="tune" size="28px" color="primary" />
+            <span>Filtros</span>
+          </div>
+          <q-btn flat round dense icon="close" @click="filterDrawer = false" />
+        </div>
+
+        <q-separator />
+
+        <!-- Conteúdo dos filtros -->
+        <div class="filter-drawer-body">
+          <!-- Filtro de Categorias -->
+          <CategoryFilter v-model="filters.categories" />
+
+          <q-separator class="q-my-md" />
+
+          <!-- Filtro de Data (Futuro) -->
+          <div class="filter-section">
+            <div class="filter-header">
+              <q-icon name="event" size="20px" class="filter-header__icon" />
+              <span class="filter-header__title">Data</span>
+            </div>
+            <div class="coming-soon">Em breve</div>
+          </div>
+
+          <q-separator class="q-my-md" />
+
+          <!-- Filtro de Localização (Futuro) -->
+          <div class="filter-section">
+            <div class="filter-header">
+              <q-icon name="place" size="20px" class="filter-header__icon" />
+              <span class="filter-header__title">Localização</span>
+            </div>
+            <div class="coming-soon">Em breve</div>
+          </div>
+        </div>
+
+        <!-- Footer com ações -->
+        <div class="filter-drawer-footer">
+          <q-btn
+            flat
+            no-caps
+            label="Limpar tudo"
+            color="grey-7"
+            class="full-width q-mb-sm"
+            @click="clearAllFilters"
+          />
+          <q-btn
+            unelevated
+            no-caps
+            label="Aplicar filtros"
+            color="primary"
+            class="full-width"
+            @click="applyFilters"
+          />
+        </div>
+      </div>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -57,11 +127,22 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import CategoryFilter from 'src/components/CategoryFilter.vue'
 
 const router = useRouter()
+const route = useRoute()
 const search = ref('')
 const drawer = ref(false)
+const filterDrawer = ref(false)
+
+// Estado dos filtros
+const filters = ref({
+  categories: [],
+  // Futuros filtros:
+  // dateRange: null,
+  // location: '',
+})
 
 // Debounce timer
 let debounceTimer = null
@@ -83,10 +164,40 @@ watch(search, (newValue) => {
     // Redireciona para a página de programação com query param
     router.push({
       path: '/programacao',
-      query: { q: newValue.trim() },
+      query: {
+        ...route.query,
+        q: newValue.trim(),
+      },
     })
   }, 300)
 })
+
+// Funções de filtro
+function clearAllFilters() {
+  filters.value.categories = []
+  // Limpar outros filtros no futuro
+}
+
+function applyFilters() {
+  // Monta query params baseado nos filtros ativos
+  const query = { ...route.query }
+
+  // Adiciona categorias selecionadas
+  if (filters.value.categories.length > 0) {
+    query.categories = filters.value.categories.join(',')
+  } else {
+    delete query.categories
+  }
+
+  // Navega para programação com filtros
+  router.push({
+    path: '/programacao',
+    query,
+  })
+
+  // Fecha o drawer
+  filterDrawer.value = false
+}
 </script>
 
 <style>
@@ -115,7 +226,7 @@ watch(search, (newValue) => {
   column-gap: 26px;
 }
 
-/* input “pill” = 440px largura x 48px altura */
+/* input "pill" = 440px largura x 48px altura */
 .search-pill {
   width: 440px;
   height: 48px;
@@ -153,5 +264,76 @@ watch(search, (newValue) => {
 }
 .q-drawer {
   background-color: #2a3447;
+}
+
+/* ==================== DRAWER DE FILTROS ==================== */
+.filter-drawer {
+  background-color: #ffffff !important;
+}
+
+.filter-drawer-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.filter-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.filter-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.filter-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.filter-drawer-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.filter-section {
+  padding: 16px 0;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.filter-header__icon {
+  color: #35c7ee;
+}
+
+.filter-header__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.coming-soon {
+  padding: 32px 20px;
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px dashed #d1d5db;
 }
 </style>

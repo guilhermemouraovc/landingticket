@@ -27,17 +27,53 @@
         />
       </div>
 
+      <!-- Filtros ativos -->
+      <div v-if="activeFilters.length > 0" class="active-filters">
+        <div class="active-filters__header">
+          <q-icon name="filter_list" size="18px" class="q-mr-sm" />
+          <span>Filtros ativos:</span>
+        </div>
+        <div class="active-filters__chips">
+          <q-chip
+            v-for="filter in activeFilters"
+            :key="filter.id"
+            removable
+            :color="filter.color"
+            text-color="white"
+            :icon="filter.icon"
+            @remove="removeFilter(filter.id)"
+          >
+            {{ filter.name }}
+          </q-chip>
+          <q-btn
+            flat
+            dense
+            no-caps
+            size="sm"
+            label="Limpar tudo"
+            color="grey-7"
+            @click="clearAllFilters"
+          />
+        </div>
+      </div>
+
       <!-- Mensagem de nenhum resultado -->
-      <div v-if="searchQuery && filteredItems.length === 0" class="no-results">
+      <div v-if="filteredItems.length === 0" class="no-results">
         <q-icon name="search_off" size="64px" color="grey-6" />
         <div class="no-results-title">Nenhum evento encontrado</div>
-        <div class="no-results-text">Não encontramos eventos para "{{ searchQuery }}"</div>
+        <div class="no-results-text">
+          {{
+            searchQuery
+              ? `Não encontramos eventos para "${searchQuery}"`
+              : 'Não encontramos eventos com os filtros selecionados'
+          }}
+        </div>
         <q-btn
           color="primary"
           label="Ver todos os eventos"
           no-caps
           unelevated
-          @click="clearSearch"
+          @click="clearAllFilters"
           class="q-mt-md"
         />
       </div>
@@ -76,43 +112,79 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
 import { normalizeString } from 'src/utils/eventMapper'
+import { CATEGORIES } from 'src/constants/config'
 
 const router = useRouter()
 const route = useRoute()
 const items = ref([])
 
-// Query param de busca
+// Query params
 const searchQuery = computed(() => route.query.q || '')
+const categoryFilters = computed(() => {
+  const cats = route.query.categories || ''
+  return cats ? cats.split(',').filter(Boolean) : []
+})
 
 // Composable para gerenciar eventos
 const { fetchAllEvents } = useEvents()
 
-// Eventos filtrados baseado na busca
-const filteredItems = computed(() => {
-  const query = searchQuery.value.trim()
+// Filtros ativos exibidos como chips
+const activeFilters = computed(() => {
+  return categoryFilters.value
+    .map((catId) => {
+      const category = CATEGORIES.find((c) => c.id === catId)
+      return category
+        ? {
+            id: catId,
+            name: category.name,
+            icon: category.icon,
+            color: category.color,
+          }
+        : null
+    })
+    .filter(Boolean)
+})
 
-  // Se não há busca, retorna todos
-  if (!query) {
-    return items.value
+// Eventos filtrados
+const filteredItems = computed(() => {
+  let result = items.value
+
+  // Filtro por busca (título ou localização)
+  const query = searchQuery.value.trim()
+  if (query) {
+    const normalizedQuery = normalizeString(query)
+    result = result.filter((event) => {
+      const title = normalizeString(event.title || '')
+      const location = normalizeString(event.location || '')
+      return title.includes(normalizedQuery) || location.includes(normalizedQuery)
+    })
   }
 
-  // Normaliza o termo de busca (remove acentos, lowercase)
-  const normalizedQuery = normalizeString(query)
+  // Filtro por categorias
+  if (categoryFilters.value.length > 0) {
+    result = result.filter((event) => {
+      // Normaliza as tags do evento
+      const eventTags = normalizeString(event.tags || '').toLowerCase()
 
-  // Filtra por título OU localização
-  return items.value.filter((event) => {
-    const title = normalizeString(event.title || '')
-    const location = normalizeString(event.location || '')
+      // Verifica se alguma categoria selecionada corresponde
+      return categoryFilters.value.some((catId) => {
+        const category = CATEGORIES.find((c) => c.id === catId)
+        if (!category) return false
 
-    return title.includes(normalizedQuery) || location.includes(normalizedQuery)
-  })
+        // Verifica se alguma tag da categoria está nas tags do evento
+        return category.tags.some((tag) => eventTags.includes(normalizeString(tag).toLowerCase()))
+      })
+    })
+  }
+
+  return result
 })
 
 onMounted(loadAll)
 
 // Recarrega eventos se a query mudar
 watch(
-  () => route.query.q,
+  () => route.query,
   () => {
     // Se não há eventos carregados, carrega
     if (items.value.length === 0) {
@@ -140,7 +212,25 @@ async function loadAll() {
 }
 
 function clearSearch() {
-  // Remove o query param e volta para programação completa
+  const query = { ...route.query }
+  delete query.q
+  router.push({ path: '/programacao', query })
+}
+
+function removeFilter(categoryId) {
+  const current = categoryFilters.value.filter((id) => id !== categoryId)
+  const query = { ...route.query }
+
+  if (current.length > 0) {
+    query.categories = current.join(',')
+  } else {
+    delete query.categories
+  }
+
+  router.push({ path: '/programacao', query })
+}
+
+function clearAllFilters() {
   router.push({ path: '/programacao' })
 }
 </script>
@@ -207,6 +297,31 @@ function clearSearch() {
 
 .clear-search-btn:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== FILTROS ATIVOS ==================== */
+.active-filters {
+  background: rgba(53, 199, 238, 0.1);
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(53, 199, 238, 0.3);
+}
+
+.active-filters__header {
+  display: flex;
+  align-items: center;
+  color: #35c7ee;
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.active-filters__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 /* Mensagem de nenhum resultado */
