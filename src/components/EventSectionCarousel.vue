@@ -52,42 +52,15 @@
       :class="{ 'fade-right': showRightFade }"
     >
       <div class="cards-row">
-        <q-card
+        <EventCard
           v-for="card in items"
           :key="card.id"
-          class="event-card"
-          flat
-          bordered
-          clickable
-          v-ripple
+          :event="card"
+          variant="carousel"
+          image-height="220px"
+          :default-image="defaultImage"
           @click="openCard(card)"
-          role="button"
-          tabindex="0"
-          :to="card.link"
-        >
-          <q-img
-            :src="card.image || defaultImage"
-            class="event-card__image"
-            height="220px"
-            ratio="16/9"
-            spinner-color="white"
-          />
-
-          <q-card-section class="event-card__body">
-            <div class="card-title text-weight-bold">{{ card.title }}</div>
-
-            <div class="card-meta q-mt-md">
-              <div class="meta-item">
-                <q-icon name="event" size="18px" />
-                <span class="meta-highlight">{{ card.date }}</span>
-              </div>
-              <div class="meta-item">
-                <q-icon name="place" size="18px" />
-                <span>{{ card.location }}</span>
-              </div>
-            </div>
-          </q-card-section>
-        </q-card>
+        />
       </div>
     </div>
   </section>
@@ -95,6 +68,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import EventCard from './EventCard.vue'
 const router = useRouter()
 function openCard(card) {
   const to = card?.link
@@ -226,8 +200,7 @@ onMounted(() => {
 }
 
 .cards-row {
-  --card-width: 320px;
-  --peek: calc(var(--card-width) * 2.62); /* ~30-40% do próximo card visível */
+  --peek: calc(var(--card-width) * 2.62);
   display: flex;
   gap: 24px;
   align-items: stretch;
@@ -244,63 +217,5 @@ onMounted(() => {
   .cards-row {
     --peek: calc(var(--card-width) * 0.5);
   }
-}
-
-.event-card {
-  cursor: pointer;
-  flex: 0 0 var(--card-width);
-  width: var(--card-width);
-  display: flex;
-  flex-direction: column;
-  border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  overflow: hidden;
-}
-
-.event-card:hover,
-.event-card:focus-within {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
-}
-
-.event-card__body {
-  flex: 1;
-  padding: 20px 22px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  color: #1f2937;
-}
-
-.card-title {
-  font-size: 1.05rem;
-  line-height: 1.35;
-}
-
-.card-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #6b7280;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-}
-
-.meta-highlight {
-  color: #ec4899;
-  font-weight: 600;
-}
-
-.card-actions {
-  padding: 0 22px 22px;
 }
 </style>
