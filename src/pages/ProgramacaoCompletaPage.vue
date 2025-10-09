@@ -57,8 +57,13 @@
         </div>
       </div>
 
+      <!-- Loading skeleton -->
+      <div v-if="loading" class="cards-grid">
+        <SkeletonLoader variant="list" :count="12" />
+      </div>
+
       <!-- Mensagem de nenhum resultado -->
-      <div v-if="filteredItems.length === 0" class="no-results">
+      <div v-else-if="filteredItems.length === 0" class="no-results">
         <q-icon name="search_off" size="64px" color="grey-6" />
         <div class="no-results-title">Nenhum evento encontrado</div>
         <div class="no-results-text">
@@ -78,6 +83,7 @@
         />
       </div>
 
+      <!-- Grid de eventos -->
       <div v-else class="cards-grid">
         <q-card
           v-for="card in filteredItems"
@@ -89,7 +95,7 @@
           @click="goToEvent(card)"
           class="event-card"
         >
-          <q-img :src="card.image" ratio="16/9" height="180px" />
+          <q-img :src="card.image" ratio="16/9" height="180px" loading="lazy" />
           <q-card-section>
             <div class="event-title q-mb-xs">{{ card.title }}</div>
             <div class="row items-center event-meta q-mt-xs">
@@ -113,10 +119,12 @@ import { useRouter, useRoute } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
 import { normalizeString } from 'src/utils/eventMapper'
 import { CATEGORIES } from 'src/constants/config'
+import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 
 const router = useRouter()
 const route = useRoute()
 const items = ref([])
+const loading = ref(true)
 
 // Query params
 const searchQuery = computed(() => route.query.q || '')
@@ -200,6 +208,7 @@ function goToEvent(card) {
 }
 
 async function loadAll() {
+  loading.value = true
   try {
     // Busca eventos com formato de data numérico
     items.value = await fetchAllEvents(120, {
@@ -208,6 +217,8 @@ async function loadAll() {
   } catch (e) {
     console.error('Falha ao carregar programação completa', e)
     items.value = []
+  } finally {
+    loading.value = false
   }
 }
 

@@ -117,7 +117,7 @@ const props = defineProps({
   // Lazy loading de imagens
   lazyLoad: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 
   // Ícone customizado para data
@@ -221,6 +221,7 @@ function handleClick() {
   color: #1f2937;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -231,6 +232,7 @@ function handleClick() {
   color: #6b7280;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

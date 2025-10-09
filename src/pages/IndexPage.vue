@@ -2,7 +2,14 @@
   <q-page class="bg-landing">
     <!-- EVENTOS EM DESTAQUE -->
     <section class="destaque">
+      <!-- Skeleton para featured -->
+      <div v-if="loadingFeatured" class="featured-wrap">
+        <SkeletonLoader variant="hero" />
+      </div>
+
+      <!-- Carousel real -->
       <q-carousel
+        v-else
         v-model="activeSlide"
         animated
         infinite
@@ -27,6 +34,7 @@
                   class="full"
                   :ratio="16 / 9"
                   spinner-color="white"
+                  loading="lazy"
                 />
               </div>
 
@@ -88,41 +96,52 @@
     </section>
 
     <section class="event-groups">
-      <EventSectionCarousel
-        title="Réveillon"
-        :items="reveillonEvents"
-        see-all-label="Ver Tudo"
-        :default-image="DEFAULT_IMAGE"
-      />
+      <!-- Skeletons para carrosséis -->
+      <template v-if="loadingCarousels">
+        <SkeletonLoader variant="carousel" :carousel-count="4" />
+        <SkeletonLoader variant="carousel" :carousel-count="4" />
+        <SkeletonLoader variant="carousel" :carousel-count="4" />
+        <SkeletonLoader variant="carousel" :carousel-count="4" />
+      </template>
 
-      <EventSectionCarousel
-        title="Carnaval"
-        :items="carnavalEvents"
-        see-all-label="Ver Tudo"
-        :default-image="DEFAULT_IMAGE"
-      />
+      <!-- Carrosséis reais -->
+      <template v-else>
+        <EventSectionCarousel
+          title="Réveillon"
+          :items="reveillonEvents"
+          see-all-label="Ver Tudo"
+          :default-image="DEFAULT_IMAGE"
+        />
 
-      <EventSectionCarousel
-        title="São João"
-        :items="saoJoaoEvents"
-        see-all-label="Ver Tudo"
-        :default-image="DEFAULT_IMAGE"
-      />
+        <EventSectionCarousel
+          title="Carnaval"
+          :items="carnavalEvents"
+          see-all-label="Ver Tudo"
+          :default-image="DEFAULT_IMAGE"
+        />
 
-      <EventSectionCarousel
-        title="Programação completa"
-        :items="allEvents"
-        see-all-label="Ver Tudo"
-        :see-all-link="{ name: 'programacao-completa' }"
-        :default-image="DEFAULT_IMAGE"
-      />
+        <EventSectionCarousel
+          title="São João"
+          :items="saoJoaoEvents"
+          see-all-label="Ver Tudo"
+          :default-image="DEFAULT_IMAGE"
+        />
+
+        <EventSectionCarousel
+          title="Programação completa"
+          :items="allEvents"
+          see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'programacao-completa' }"
+          :default-image="DEFAULT_IMAGE"
+        />
+      </template>
     </section>
 
     <!-- FOOTER -->
     <footer class="footer">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <img src="/logo.svg" alt="Logo" class="footer-logo" />
+          <img src="/logo.svg" alt="Logo" class="footer-logo" loading="lazy" />
 
           <div class="row q-gutter-md">
             <q-btn flat no-caps label="Compre Conosco" class="text-white" />
@@ -170,6 +189,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
+import SkeletonLoader from 'components/SkeletonLoader.vue'
 import { useEvents } from 'src/composables/useEvents'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
@@ -188,6 +208,10 @@ const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
 const allEvents = ref([])
 
+// Estados de loading
+const loadingFeatured = ref(true)
+const loadingCarousels = ref(true)
+
 // categorias fixas usadas nos botoes tiles
 const categories = ref([
   { label: 'Carnaval', icon: 'celebration' },
@@ -200,14 +224,13 @@ const categories = ref([
 
 // boot das seções
 onMounted(async () => {
-  // Carrega todas as seções em paralelo para melhor performance
-  await Promise.all([
-    loadFeatured(),
-    loadReveillon(),
-    loadCarnaval(),
-    loadSaoJoao(),
-    loadAllEvents(),
-  ])
+  // Carrega featured separadamente para mostrar primeiro
+  await loadFeatured()
+  loadingFeatured.value = false
+
+  // Carrega carrosséis em paralelo
+  await Promise.all([loadReveillon(), loadCarnaval(), loadSaoJoao(), loadAllEvents()])
+  loadingCarousels.value = false
 })
 
 async function loadFeatured() {
@@ -363,7 +386,7 @@ async function loadAllEvents() {
 /* ================= CATEGORIAS ================= */
 .categories {
   background-color: #2a3447;
-  margin-top: 60px;
+  margin-top: 30px;
   padding: 60px 0;
 }
 .categories-wrap {
