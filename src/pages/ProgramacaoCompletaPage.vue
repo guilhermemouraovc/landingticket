@@ -38,11 +38,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { api } from 'boot/axios'
+import { useEvents } from 'src/composables/useEvents'
 
 const router = useRouter()
 const items = ref([])
-const DEFAULT_IMAGE = 'https://i.postimg.cc/C59stMzr/Captura-de-tela-2025-10-01-130250.png'
+
+// Composable para gerenciar eventos
+const { fetchAllEvents } = useEvents()
 
 onMounted(loadAll)
 
@@ -54,78 +56,14 @@ function goToEvent(card) {
 
 async function loadAll() {
   try {
-    const { data } = await api.get('/festas', {
-      params: {
-        'pagination[pageSize]': 120,
-        publicationState: 'live',
-        'sort[0]': 'Data:asc',
-        populate: '*',
-      },
+    // Busca eventos com formato de data numérico
+    items.value = await fetchAllEvents(120, {
+      transformOptions: { dateFormat: 'numeric' },
     })
-    const festas = Array.isArray(data?.data) ? data.data : []
-    items.value = festas.map(toCard)
   } catch (e) {
     console.error('Falha ao carregar programação completa', e)
     items.value = []
   }
-}
-
-function toCard(festa) {
-  const r = festa?.attributes ?? festa ?? {}
-  const id = String(festa?.id ?? r.id ?? r.documentId ?? Math.random().toString(36).slice(2))
-
-  // Formatar data
-  const dateValue = r.Data || r.data || r.Inicio || r.inicio || r.startDate
-  const formattedDate = formatDate(dateValue)
-
-  return {
-    id,
-    title: r.Nome || r.nome || r.Titulo || r.titulo || r.Title || r.title || 'Evento sem nome',
-    date: formattedDate,
-    location: [r.Cidade || r.cidade, r.Estado || r.estado || r.UF || r.uf]
-      .filter(Boolean)
-      .join(' - '),
-    image: resolveImage(r) || DEFAULT_IMAGE,
-    link: { name: 'event-detail', params: { id: r.documentId ?? id } },
-  }
-}
-
-function formatDate(value) {
-  if (!value) return 'Data a definir'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return 'Data a definir'
-  return parsed.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
-
-function resolveImage(r) {
-  const gallery = Array.isArray(r?.FOTOSEVENTO) ? r.FOTOSEVENTO : []
-  const sources = [
-    r?.banner,
-    r?.capa,
-    r?.imagem,
-    r?.Imagem,
-    r?.imagemUrl,
-    r?.cover,
-    r?.capaPrincipal,
-    ...gallery,
-  ]
-  for (const s of sources) {
-    const u =
-      typeof s === 'string'
-        ? s
-        : s?.url ||
-          s?.attributes?.url ||
-          s?.data?.attributes?.url ||
-          s?.formats?.medium?.url ||
-          s?.formats?.large?.url ||
-          s?.formats?.small?.url
-    if (u) return u.startsWith('http') ? u : 'http://localhost:1337' + u
-  }
-  return ''
 }
 </script>
 

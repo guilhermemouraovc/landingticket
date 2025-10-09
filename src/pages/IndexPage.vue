@@ -51,12 +51,12 @@
                   </div>
 
                   <q-btn
-                    class="q-mt-lg"
+                    class="q-mt-lg featured-cta"
                     color="warning"
                     text-color="black"
                     unelevated
-                    rounded
-                    label="Ver Detalhes"
+                    no-caps
+                    label="Ver detalhes"
                     :to="ev.link || '#'"
                   />
                 </div>
@@ -169,10 +169,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { api } from 'boot/axios'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
+import { useEvents } from 'src/composables/useEvents'
+import { DEFAULT_IMAGES } from 'src/constants/config'
 
-const DEFAULT_IMAGE = 'https://i.postimg.cc/C59stMzr/Captura-de-tela-2025-10-01-130250.png'
+const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
+
+// Composable para gerenciar eventos
+const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -195,263 +199,67 @@ const categories = ref([
 ])
 
 // boot das seções
-onMounted(() => {
-  loadFeatured()
-  loadReveillon()
-  loadCarnaval()
-  loadSaoJoao()
-  loadAllEvents()
+onMounted(async () => {
+  // Carrega todas as seções em paralelo para melhor performance
+  await Promise.all([
+    loadFeatured(),
+    loadReveillon(),
+    loadCarnaval(),
+    loadSaoJoao(),
+    loadAllEvents(),
+  ])
 })
 
 async function loadFeatured() {
   try {
-    const response = await api.get('/festas', {
-      params: {
-        'pagination[pageSize]': 25,
-        populate: '*',
-      },
-    })
-
-    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-
-    if (!festas.length) {
-      featured.value = []
-      activeSlide.value = null
-      return
-    }
-
-    featured.value = festas.map(toFeaturedCard)
-    activeSlide.value = featured.value[0]?.id ?? null
+    const events = await fetchEvents({ 'pagination[pageSize]': 25 })
+    featured.value = events
+    activeSlide.value = events[0]?.id ?? null
   } catch (err) {
     console.error('Falha ao carregar festas', err)
+    featured.value = []
   }
 }
 
 async function loadReveillon() {
   try {
-    const response = await api.get('/festas', {
-      params: {
-        'filters[$and][0][tag][tagname][$eqi]': 'REVEILLON',
-        publicationState: 'live',
-        'sort[0]': 'Data:asc',
-        'pagination[pageSize]': 25,
-        populate: '*',
-      },
-    })
-
-    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-    reveillonEvents.value = festas.map(toFeaturedCard)
+    reveillonEvents.value = await fetchEventsByTag('REVEILLON')
   } catch (err) {
     console.error('Falha ao carregar reveillon', err)
     reveillonEvents.value = []
   }
 }
 
-// Carnaval ---------------------------------------------------------------
 async function loadCarnaval() {
   try {
-    const response = await api.get('/festas', {
-      params: {
-        'filters[$and][0][tag][tagname][$eqi]': 'CARNAVAIS',
-        'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-        publicationState: 'live',
-        'sort[0]': 'Data:asc',
-        populate: '*',
-      },
+    carnavalEvents.value = await fetchEventsByTag('CARNAVAIS', {
+      'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
     })
-
-    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-    carnavalEvents.value = festas.map(toFeaturedCard)
   } catch (err) {
     console.error('Falha ao carregar carnaval', err)
     carnavalEvents.value = []
   }
 }
 
-// São João ---------------------------------------------------------------
 async function loadSaoJoao() {
   try {
-    const response = await api.get('/festas', {
-      params: {
-        'filters[$and][0][tag][tagname][$eqi]': 'SaoJoao',
-        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-        publicationState: 'live',
-        'sort[0]': 'Data:asc',
-        populate: '*',
-      },
+    saoJoaoEvents.value = await fetchEventsByTag('SaoJoao', {
+      'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
     })
-
-    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-    saoJoaoEvents.value = festas.map(toFeaturedCard)
   } catch (err) {
     console.error('Falha ao carregar São João', err)
     saoJoaoEvents.value = []
   }
 }
 
-// Programação completa ---------------------------------------------------------------
 async function loadAllEvents() {
   try {
-    const response = await api.get('/festas', {
-      params: {
-        'pagination[pageSize]': 60,
-        publicationState: 'live',
-        'sort[0]': 'Data:asc',
-        populate: '*',
-      },
-    })
-
-    const festas = Array.isArray(response?.data?.data) ? response.data.data : []
-    allEvents.value = festas.map(toFeaturedCard)
+    allEvents.value = await fetchAllEvents(60)
   } catch (err) {
     console.error('Falha ao carregar programação completa', err)
     allEvents.value = []
   }
 }
-
-// transforma o payload do Strapi no objeto usado pelos cards
-function toFeaturedCard(festa) {
-  const record = festa?.attributes ?? festa ?? {}
-  const baseId = festa?.id ?? record.id ?? record.UID ?? record.slug ?? record.documentId
-  const cardId = String(baseId ?? Math.random().toString(36).slice(2))
-  const documentId = record.documentId ?? String(baseId ?? cardId)
-
-  // Busca o primeiro título preenchido, independente do formato vindo do CMS
-  const title =
-    firstNonEmptyString(
-      record.Nome,
-      record.nome,
-      record.Titulo,
-      record.titulo,
-      record.Title,
-      record.title,
-    ) || 'Evento sem nome'
-
-  const description = firstNonEmptyString(
-    record.Descricao,
-    record.descricao,
-    record.description,
-    record.Resumo,
-    record.resumo,
-  )
-
-  const dateValue = firstNonEmptyString(
-    record.Data,
-    record.data,
-    record.DataInicio,
-    record.dataInicio,
-    record.data_inicio,
-    record.Inicio,
-    record.inicio,
-    record.startDate,
-  )
-
-  const city = firstNonEmptyString(
-    record.Cidade,
-    record.cidade,
-    record.Localidade,
-    record.local,
-    record.city,
-  )
-
-  const state = firstNonEmptyString(
-    record.Estado,
-    record.estado,
-    record.UF,
-    record.uf,
-    record.state,
-  )
-
-  return {
-    id: cardId,
-    title,
-    description,
-    date: formatDate(dateValue),
-    location: formatLocation(city, state),
-    image: resolveImage(record),
-    link: { name: 'event-detail', params: { id: documentId } },
-  }
-}
-
-// helpers de formato
-function formatDate(value) {
-  if (!value) return 'Data a definir'
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return 'Data a definir'
-  return parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
-function formatLocation(city, state) {
-  if (!city && !state) return 'Local a definir'
-  if (!city) return state
-  if (!state) return city
-  return city + ' - ' + state
-}
-
-// busca a melhor festa entre as enviadas pelo strapi,
-function resolveImage(festa) {
-  const gallery = Array.isArray(festa?.FOTOSEVENTO) ? festa.FOTOSEVENTO : []
-  const sources = [
-    festa?.banner,
-    festa?.capa,
-    festa?.imagem,
-    festa?.Imagem,
-    festa?.imagemUrl,
-    festa?.cover,
-    festa?.capaPrincipal,
-    ...gallery,
-  ]
-
-  for (const source of sources) {
-    const url = extractMediaUrl(source)
-    if (url) return prependHost(url)
-  }
-
-  return DEFAULT_IMAGE
-}
-
-function extractMediaUrl(media) {
-  if (!media) return null
-  if (typeof media === 'string') return media
-  if (Array.isArray(media)) {
-    for (const item of media) {
-      const nested = extractMediaUrl(item)
-      if (nested) return nested
-    }
-    return null
-  }
-
-  return (
-    media?.url ??
-    media?.attributes?.url ??
-    media?.data?.attributes?.url ??
-    media?.data?.url ??
-    media?.formats?.medium?.url ??
-    media?.formats?.large?.url ??
-    media?.formats?.small?.url ??
-    null
-  )
-}
-
-function prependHost(url) {
-  if (!url || typeof url !== 'string') return DEFAULT_IMAGE
-  if (url.startsWith('http')) return url
-  return 'http://localhost:1337' + url
-}
-
-// Retorna a primeira string não vazia encontrada nas opções pendentes
-function firstNonEmptyString(...values) {
-  for (const value of values) {
-    if (typeof value !== 'string') continue
-    const trimmed = value.trim()
-    if (trimmed.length > 0) return trimmed
-  }
-  return ''
-}
-
-// Remove acentos e deixa minúsculo para comparações consistentes
-
-// Gera cards fictícios para preencher seções que ainda não possuem dados reais
 </script>
 
 <style scoped>
@@ -624,6 +432,18 @@ function firstNonEmptyString(...values) {
 }
 
 /* ================= HERO - TIPOGRAFIA E CORES ================= */
+.featured-cta {
+  width: 142px;
+  height: 44px;
+  border-radius: 8px;
+  min-width: 142px;
+}
+.featured-cta .q-btn__content {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* semibold */
+  font-size: 14px;
+}
+
 .event-title {
   font-family: 'Poppins', sans-serif;
   font-weight: 600; /* semibold */

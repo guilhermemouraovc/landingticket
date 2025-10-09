@@ -2,9 +2,9 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'https://worthy-nurture-3ed4b9b27b.strapiapp.com/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
-    Authorization: `Bearer ${process.env.VITE_STRAPI_TOKEN}`,
+    Authorization: `Bearer ${import.meta.env.VITE_STRAPI_TOKEN}`,
   },
 })
 

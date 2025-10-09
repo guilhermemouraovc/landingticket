@@ -20,7 +20,7 @@
         <q-btn color="warning" text-color="black" label="Voltar para inicio" @click="goHome" />
       </div>
 
-      <div v-else>
+      <div v-else-if="event">
         <div class="event-hero-wrap">
           <q-img
             :src="event.image"
@@ -82,7 +82,7 @@
               color="warning"
               text-color="black"
               label="Comprar"
-              unselevated
+              unelevated
               no-caps
               @click="openWhatsapp"
             />
@@ -106,20 +106,21 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { api } from 'boot/axios'
+import { useEvents } from 'src/composables/useEvents'
 
-const DEFAULT_IMAGE = 'https://via.placeholder.com/1200x600?text=Evento'
-const DEFAULT_WHATSAPP_MESSAGE = 'Ola! Tenho interesse no evento.'
+const DEFAULT_WHATSAPP_MESSAGE = 'Olá! Tenho interesse no evento.'
 
 const route = useRoute()
 const router = useRouter()
 
-// estado base da tela
-const loading = ref(true)
+// Composable para gerenciar eventos
+const { fetchEventById, loading, error: apiError } = useEvents()
+
+// Estado base da tela
 const error = ref('')
 const event = ref(null)
 
-// carrega evento inicial e reage a mudancas de rota
+// Carrega evento inicial e reage a mudanças de rota
 onMounted(() => {
   loadEvent(route.params.id)
 })
@@ -133,206 +134,28 @@ watch(
   },
 )
 
-// fluxo principal de obtencao de dados
+// Fluxo principal de obtenção de dados
 async function loadEvent(idParam) {
-  loading.value = true
   error.value = ''
   event.value = null
 
   try {
-    const record = await fetchEventRecord(idParam)
+    const eventData = await fetchEventById(idParam)
 
-    if (!record) {
-      error.value = 'Evento nao encontrado.'
+    if (!eventData) {
+      error.value = 'Evento não encontrado.'
       return
     }
 
-    event.value = mapEvent(record)
+    event.value = eventData
     console.log('image:', event.value.image)
   } catch (err) {
     console.error('Falha ao carregar evento', err)
-    error.value = 'Nao foi possivel carregar os detalhes do evento.'
-  } finally {
-    loading.value = false
+    error.value = apiError.value || 'Não foi possível carregar os detalhes do evento.'
   }
 }
 
-// tenta acessar direto e, se falhar, recorre ao filtro por documentId
-async function fetchEventRecord(idParam) {
-  if (!idParam) return null
-
-  const direct = await tryFetchSingle(idParam)
-  if (direct) return direct
-
-  if (/^\d+$/.test(String(idParam))) {
-    const numeric = await tryFetchSingle(Number(idParam))
-    if (numeric) return numeric
-  }
-
-  const response = await api.get('/festas', {
-    params: {
-      populate: '*',
-      'filters[documentId][$eq]': idParam,
-      'pagination[pageSize]': 1,
-    },
-  })
-
-  const items = Array.isArray(response?.data?.data) ? response.data.data : []
-  return items[0] ?? null
-}
-
-// requisicao defensiva para /festas/:id (string ou numero)
-async function tryFetchSingle(idValue) {
-  try {
-    const response = await api.get(`/festas/${encodeURIComponent(idValue)}`, {
-      params: { populate: '*' },
-    })
-    return response?.data?.data ?? null
-  } catch (err) {
-    if (err?.response?.status === 404) {
-      return null
-    }
-    throw err
-  }
-}
-
-// normaliza o payload do Strapi para o template
-function mapEvent(payload) {
-  const record = payload?.attributes ?? payload ?? {}
-  const parsedDate = parseDate(record.Data)
-  const dateBadge = buildDateBadge(parsedDate)
-  const whatsapp = extractWhatsapp(record)
-
-  return {
-    id: String(payload?.id ?? record.documentId ?? dateBadge.code),
-    title: record.Nome ?? record.title ?? 'Evento sem nome',
-    highlight: record.gatilho ?? record.subtitulo ?? '',
-    description:
-      record.Descricao ??
-      record.descricao ??
-      record.description ??
-      'Sem descricao disponivel no momento.',
-    additionalInfo: record.observacoes ?? record.observacao ?? record.Observacao ?? '',
-    image: resolveImage(record),
-    dateBadge,
-    dateLabel: formatDateLabel(parsedDate),
-    timeLabel: formatTimeLabel(parsedDate),
-    location:
-      record.Local ?? record.local ?? record.Localizacao ?? record.Cidade ?? 'Local a definir',
-    cityState: formatCityState(record.Cidade, record.Estado),
-    whatsapp,
-    whatsappMessage: record.mensagemWhatsapp ?? record.mensagem ?? DEFAULT_WHATSAPP_MESSAGE,
-    shareUrl: record.link ?? record.url ?? record.site ?? '',
-  }
-}
-
-// helpers de formato --------------------------------------------------------
-function parseDate(value) {
-  const date = value ? new Date(value) : null
-  return date && !Number.isNaN(date.getTime()) ? date : null
-}
-
-function buildDateBadge(date) {
-  if (!date) {
-    return { month: '--', day: '--', code: Math.random().toString(36).slice(2) }
-  }
-
-  const month = date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
-  const day = date.toLocaleDateString('pt-BR', { day: '2-digit' })
-
-  return { month, day, code: (month + '-' + day).toLowerCase() }
-}
-
-function formatDateLabel(date) {
-  if (!date) return 'Data a definir'
-  return date.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  })
-}
-
-function formatTimeLabel(date) {
-  if (!date) return ''
-  const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-  return `${time} BRT`
-}
-
-function formatCityState(city, state) {
-  if (!city && !state) return 'Local a definir'
-  if (!state) return city
-  if (!city) return state
-  return city + ' - ' + state
-}
-
-// imagem e midias -----------------------------------------------------------
-function resolveImage(record) {
-  const gallery = Array.isArray(record?.FOTOSEVENTO) ? record.FOTOSEVENTO : []
-  const sources = [
-    record?.banner,
-    record?.capa,
-    record?.imagem,
-    record?.Imagem,
-    record?.imagemUrl,
-    record?.cover,
-    record?.capaPrincipal,
-    ...gallery,
-  ]
-
-  for (const source of sources) {
-    const url = extractMediaUrl(source)
-    if (url) return prependHost(url)
-  }
-
-  return DEFAULT_IMAGE
-}
-
-function extractMediaUrl(media) {
-  if (!media) return null
-  if (typeof media === 'string') return media
-  if (Array.isArray(media)) {
-    for (const item of media) {
-      const nested = extractMediaUrl(item)
-      if (nested) return nested
-    }
-    return null
-  }
-
-  return (
-    media?.url ??
-    media?.attributes?.url ??
-    media?.data?.attributes?.url ??
-    media?.data?.url ??
-    media?.formats?.large?.url ??
-    media?.formats?.medium?.url ??
-    media?.formats?.small?.url ??
-    null
-  )
-}
-
-function prependHost(url) {
-  if (!url || typeof url !== 'string') return DEFAULT_IMAGE
-  if (url.startsWith('http')) return url
-  return 'http://localhost:1337' + url
-}
-
-// utilitarios ---------------------------------------------------------------
-function extractWhatsapp(record) {
-  const candidate =
-    record.whatsapp ??
-    record.Whatsapp ??
-    record.whatsApp ??
-    record.contatoWhatsapp ??
-    record.whatsappNumber ??
-    record.linkWhatsapp ??
-    null
-
-  if (!candidate || typeof candidate !== 'string') return null
-  const digits = candidate.replace(/\D/g, '')
-  return digits.length >= 10 ? digits : null
-}
-
+// Utilitários de ação
 function openWhatsapp() {
   if (!event.value) return
 
