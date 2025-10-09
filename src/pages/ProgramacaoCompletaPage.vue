@@ -6,9 +6,45 @@
         <div class="list-title">Programação completa</div>
       </div>
 
-      <div class="cards-grid">
+      <!-- Mensagem de busca -->
+      <div v-if="searchQuery" class="search-info">
+        <div class="search-result-text">
+          <q-icon name="search" size="20px" class="q-mr-sm" />
+          <span class="result-count"
+            >{{ filteredItems.length }} resultado{{ filteredItems.length !== 1 ? 's' : '' }}</span
+          >
+          <span class="search-term">para "{{ searchQuery }}"</span>
+        </div>
+        <q-btn
+          flat
+          dense
+          no-caps
+          label="Limpar busca"
+          icon="close"
+          color="white"
+          class="clear-search-btn"
+          @click="clearSearch"
+        />
+      </div>
+
+      <!-- Mensagem de nenhum resultado -->
+      <div v-if="searchQuery && filteredItems.length === 0" class="no-results">
+        <q-icon name="search_off" size="64px" color="grey-6" />
+        <div class="no-results-title">Nenhum evento encontrado</div>
+        <div class="no-results-text">Não encontramos eventos para "{{ searchQuery }}"</div>
+        <q-btn
+          color="primary"
+          label="Ver todos os eventos"
+          no-caps
+          unelevated
+          @click="clearSearch"
+          class="q-mt-md"
+        />
+      </div>
+
+      <div v-else class="cards-grid">
         <q-card
-          v-for="card in items"
+          v-for="card in filteredItems"
           :key="card.id"
           flat
           bordered
@@ -36,17 +72,54 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
+import { normalizeString } from 'src/utils/eventMapper'
 
 const router = useRouter()
+const route = useRoute()
 const items = ref([])
+
+// Query param de busca
+const searchQuery = computed(() => route.query.q || '')
 
 // Composable para gerenciar eventos
 const { fetchAllEvents } = useEvents()
 
+// Eventos filtrados baseado na busca
+const filteredItems = computed(() => {
+  const query = searchQuery.value.trim()
+
+  // Se não há busca, retorna todos
+  if (!query) {
+    return items.value
+  }
+
+  // Normaliza o termo de busca (remove acentos, lowercase)
+  const normalizedQuery = normalizeString(query)
+
+  // Filtra por título OU localização
+  return items.value.filter((event) => {
+    const title = normalizeString(event.title || '')
+    const location = normalizeString(event.location || '')
+
+    return title.includes(normalizedQuery) || location.includes(normalizedQuery)
+  })
+})
+
 onMounted(loadAll)
+
+// Recarrega eventos se a query mudar
+watch(
+  () => route.query.q,
+  () => {
+    // Se não há eventos carregados, carrega
+    if (items.value.length === 0) {
+      loadAll()
+    }
+  },
+)
 
 function goToEvent(card) {
   if (card?.link) {
@@ -64,6 +137,11 @@ async function loadAll() {
     console.error('Falha ao carregar programação completa', e)
     items.value = []
   }
+}
+
+function clearSearch() {
+  // Remove o query param e volta para programação completa
+  router.push({ path: '/programacao' })
 }
 </script>
 
@@ -91,6 +169,69 @@ async function loadAll() {
   font-weight: 700;
   font-size: 20px;
   color: #fff;
+}
+
+/* ==================== BUSCA ==================== */
+.search-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-result-text {
+  display: flex;
+  align-items: center;
+  color: #e5e7eb;
+  font-size: 1rem;
+}
+
+.result-count {
+  font-weight: 700;
+  color: #35c7ee;
+  margin-right: 6px;
+}
+
+.search-term {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.clear-search-btn {
+  font-weight: 600;
+}
+
+.clear-search-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mensagem de nenhum resultado */
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.no-results-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.no-results-text {
+  font-size: 1rem;
+  color: #9ca3af;
+  max-width: 400px;
+  line-height: 1.6;
 }
 
 .cards-grid {

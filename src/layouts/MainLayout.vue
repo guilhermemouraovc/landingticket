@@ -56,9 +56,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const search = ref('')
 const drawer = ref(false)
+
+// Debounce timer
+let debounceTimer = null
+
+// Watch no campo de busca com debounce de 300ms
+watch(search, (newValue) => {
+  // Limpa o timer anterior
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+
+  // Se o campo estiver vazio, não faz nada
+  if (!newValue || newValue.trim() === '') {
+    return
+  }
+
+  // Cria novo timer de 300ms
+  debounceTimer = setTimeout(() => {
+    // Redireciona para a página de programação com query param
+    router.push({
+      path: '/programacao',
+      query: { q: newValue.trim() },
+    })
+  }, 300)
+})
 </script>
 
 <style>
