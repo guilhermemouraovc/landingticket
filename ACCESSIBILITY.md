@@ -274,4 +274,3 @@ Todos os textos atendem ao contraste mínimo de 4.5:1 (WCAG AA):
 **Data da Implementação**: Outubro 2025  
 **Versão**: 1.0  
 **Status**: ✅ Fase 6.2 Completa
-
