@@ -5,3 +5,7 @@
 <script setup>
 //
 </script>
+
+<style>
+@import './css/accessibility.css';
+</style>

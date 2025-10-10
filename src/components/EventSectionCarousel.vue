@@ -16,10 +16,11 @@
           class="see-all"
           text-color="grey-4"
           :label="seeAllLabel"
+          :aria-label="`Ver todos os eventos de ${title}`"
           :to="seeAllLink"
         />
 
-        <div class="nav-buttons">
+        <div class="nav-buttons" role="group" aria-label="Controles de navegação do carrossel">
           <q-btn
             dense
             round
@@ -27,6 +28,7 @@
             text-color="primary"
             icon="chevron_left"
             class="nav-btn"
+            aria-label="Navegar para eventos anteriores"
             :disable="!canScrollLeft"
             @click="scroll(-scrollStep)"
           />
@@ -37,6 +39,7 @@
             text-color="primary"
             icon="chevron_right"
             class="nav-btn"
+            aria-label="Navegar para próximos eventos"
             :disable="!canScrollRight"
             @click="scroll(scrollStep)"
           />
@@ -217,5 +220,16 @@ onMounted(() => {
   .cards-row {
     --peek: calc(var(--card-width) * 0.5);
   }
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.nav-btn:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.see-all:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 </style>

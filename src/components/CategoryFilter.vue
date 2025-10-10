@@ -5,7 +5,7 @@
       <span class="filter-header__title">Categorias</span>
     </div>
 
-    <div class="category-chips">
+    <div class="category-chips" role="group" aria-label="Seleção de categorias">
       <q-chip
         v-for="category in categories"
         :key="category.id"
@@ -15,7 +15,13 @@
         :text-color="selectedCategories.includes(category.id) ? 'white' : 'grey-8'"
         :icon="category.icon"
         class="category-chip"
+        :aria-label="`${category.name}. ${selectedCategories.includes(category.id) ? 'Selecionado' : 'Não selecionado'}`"
+        :aria-pressed="selectedCategories.includes(category.id)"
+        role="button"
+        tabindex="0"
         @click="toggleCategory(category.id)"
+        @keydown.enter="toggleCategory(category.id)"
+        @keydown.space.prevent="toggleCategory(category.id)"
       >
         {{ category.name }}
       </q-chip>
@@ -31,6 +37,7 @@
         icon="close"
         color="grey-7"
         size="sm"
+        aria-label="Limpar todas as categorias selecionadas"
         @click="clearCategories"
       />
     </div>
@@ -122,5 +129,16 @@ function clearCategories() {
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.category-chip:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.q-btn:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 </style>

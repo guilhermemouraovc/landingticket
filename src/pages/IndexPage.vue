@@ -30,6 +30,7 @@
               <div class="featured-img">
                 <q-img
                   :src="ev.image"
+                  :alt="`Imagem do evento ${ev.title}`"
                   fit="cover"
                   class="full"
                   :ratio="16 / 9"
@@ -49,11 +50,11 @@
 
                   <div class="q-mt-md q-gutter-sm">
                     <div class="row items-center event-meta">
-                      <q-icon name="event" class="q-mr-sm event-meta__icon" />
+                      <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
                       <span>{{ ev.date }}</span>
                     </div>
                     <div class="row items-center event-meta">
-                      <q-icon name="place" class="q-mr-sm event-meta__icon" />
+                      <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
                       <span>{{ ev.location }}</span>
                     </div>
                   </div>
@@ -65,6 +66,7 @@
                     unelevated
                     no-caps
                     label="Ver detalhes"
+                    :aria-label="`Ver detalhes do evento ${ev.title}`"
                     :to="ev.link || '#'"
                   />
                 </div>
@@ -76,7 +78,7 @@
     </section>
 
     <!-- CATEGORIAS -->
-    <section class="categories">
+    <section class="categories" aria-label="Categorias de eventos">
       <div class="categories-wrap">
         <div class="cat-grid">
           <q-btn
@@ -90,10 +92,17 @@
             text-color="white"
             :icon="c.icon"
             :label="c.label"
+            :aria-label="`Filtrar eventos de ${c.label}`"
           />
         </div>
       </div>
     </section>
+
+    <!-- BANNER CARD -->
+    <BannerCard
+      image="https://i.postimg.cc/BvKKyNgG/carva-sem-taxa-200px-3.png"
+      cta-link="/programacao?q=Carvalheira na Ladeira"
+    />
 
     <section class="event-groups">
       <!-- Skeletons para carrosséis -->
@@ -138,13 +147,24 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <img src="/logo.svg" alt="Logo" class="footer-logo" loading="lazy" />
+          <img
+            src="/logo.svg"
+            alt="TicketPE - Eventos em Pernambuco"
+            class="footer-logo"
+            loading="lazy"
+          />
 
           <div class="row q-gutter-md">
-            <q-btn flat no-caps label="Compre Conosco" class="text-white" />
+            <q-btn
+              flat
+              no-caps
+              label="Compre Conosco"
+              class="text-white"
+              aria-label="Comprar ingressos conosco"
+            />
           </div>
         </div>
 
@@ -163,10 +183,34 @@
           <div>
             <div class="text-subtitle2 text-bold q-mb-sm">Contato</div>
             <div>ajuda@ticketpe.com.br</div>
-            <div class="row q-gutter-md q-mt-sm">
-              <q-icon name="mdi-facebook" size="28px" />
-              <q-icon name="mdi-instagram" size="28px" />
-              <q-icon name="mdi-tiktok" size="28px" />
+            <div class="row q-gutter-md q-mt-sm" role="list" aria-label="Redes sociais">
+              <q-btn
+                flat
+                round
+                dense
+                icon="mdi-facebook"
+                size="md"
+                class="social-icon"
+                aria-label="Seguir no Facebook"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="mdi-instagram"
+                size="md"
+                class="social-icon"
+                aria-label="Seguir no Instagram"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="mdi-tiktok"
+                size="md"
+                class="social-icon"
+                aria-label="Seguir no TikTok"
+              />
             </div>
           </div>
 
@@ -190,6 +234,7 @@
 import { ref, onMounted } from 'vue'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
+import BannerCard from 'components/BannerCard.vue'
 import { useEvents } from 'src/composables/useEvents'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
@@ -500,5 +545,23 @@ async function loadAllEvents() {
 }
 .footer-links div {
   margin-bottom: 2px;
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.q-btn:focus-visible,
+.q-carousel__control button:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.social-icon:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.cat-btn:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
 }
 </style>

@@ -9,10 +9,12 @@
     @click="handleClick"
     role="button"
     :tabindex="clickable ? 0 : -1"
+    :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
   >
     <!-- Imagem do evento -->
     <q-img
       :src="event.image || defaultImage"
+      :alt="`Imagem do evento ${event.title || 'Sem nome'}`"
       class="event-card__image"
       :height="imageHeight"
       ratio="16/9"
@@ -39,13 +41,13 @@
       <div class="event-card__meta q-mt-md" :class="metaLayoutClass">
         <!-- Data -->
         <div class="meta-item">
-          <q-icon :name="dateIcon" :size="iconSize" />
+          <q-icon :name="dateIcon" :size="iconSize" aria-hidden="true" />
           <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
         </div>
 
         <!-- Localização -->
         <div class="meta-item">
-          <q-icon :name="locationIcon" :size="iconSize" />
+          <q-icon :name="locationIcon" :size="iconSize" aria-hidden="true" />
           <span>{{ event.location || 'Local a definir' }}</span>
         </div>
       </div>
@@ -184,6 +186,12 @@ function handleClick() {
 .event-card--clickable:focus-within {
   transform: translateY(-4px);
   box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.event-card:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
 }
 
 /* ==================== VARIANTES ==================== */

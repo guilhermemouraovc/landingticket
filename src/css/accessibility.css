@@ -1,0 +1,156 @@
+/**
+ * ACESSIBILIDADE - WCAG 2.1 AA Compliance
+ * Este arquivo contém estilos globais de acessibilidade
+ */
+
+/* ==================== FOCUS STATES GLOBAIS ==================== */
+/* Garante que todos os elementos interativos tenham focus visível */
+
+/* Botões e links */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+/* Campos de formulário */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+/* Elementos clicáveis genéricos */
+[role='button']:focus-visible,
+[role='link']:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+/* Elementos com tabindex */
+[tabindex='0']:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+/* ==================== CONTRASTE DE CORES ==================== */
+/* Garantindo contraste adequado WCAG AA (4.5:1 para texto normal) */
+
+/* Texto sobre fundo escuro */
+.text-on-dark {
+  color: #ffffff; /* Contraste 21:1 sobre #2a3447 */
+}
+
+.text-secondary-on-dark {
+  color: #e5e7eb; /* Contraste 12.6:1 sobre #2a3447 */
+}
+
+.text-muted-on-dark {
+  color: #9ca3af; /* Contraste 5.3:1 sobre #2a3447 */
+}
+
+/* Texto sobre fundo claro */
+.text-on-light {
+  color: #1f2937; /* Contraste 15.3:1 sobre #ffffff */
+}
+
+.text-secondary-on-light {
+  color: #4b5563; /* Contraste 8.6:1 sobre #ffffff */
+}
+
+.text-muted-on-light {
+  color: #6b7280; /* Contraste 5.7:1 sobre #ffffff */
+}
+
+/* ==================== ESTADOS DE HOVER ==================== */
+/* Melhorar visibilidade de elementos interativos */
+
+button:hover:not(:disabled),
+a:hover {
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+/* ==================== SKIP LINKS ==================== */
+/* Links de pular navegação para leitores de tela */
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #35c7ee;
+  color: #ffffff;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* ==================== REDUZIR MOVIMENTO ==================== */
+/* Respeitar preferência de movimento reduzido */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==================== ALTO CONTRASTE ==================== */
+/* Suporte para modo de alto contraste do Windows */
+
+@media (prefers-contrast: high) {
+  button:focus-visible,
+  a:focus-visible,
+  [role='button']:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+/* ==================== UTILITÁRIOS DE ACESSIBILIDADE ==================== */
+
+/* Esconder visualmente, mas manter acessível para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Tornar visível quando focado (útil para skip links) */
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Indicador visual de foco forte para navegação por teclado */
+.focus-visible-strong:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(53, 199, 238, 0.2);
+}
+

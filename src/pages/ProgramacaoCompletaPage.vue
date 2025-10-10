@@ -2,14 +2,21 @@
   <q-page class="bg-landing">
     <div class="list-wrap">
       <div class="list-header">
-        <q-btn flat round icon="arrow_back" to="/" class="q-mr-md" />
+        <q-btn
+          flat
+          round
+          icon="arrow_back"
+          to="/"
+          class="q-mr-md"
+          aria-label="Voltar para página inicial"
+        />
         <div class="list-title">Programação completa</div>
       </div>
 
       <!-- Mensagem de busca -->
-      <div v-if="searchQuery" class="search-info">
+      <div v-if="searchQuery" class="search-info" role="status" aria-live="polite">
         <div class="search-result-text">
-          <q-icon name="search" size="20px" class="q-mr-sm" />
+          <q-icon name="search" size="20px" class="q-mr-sm" aria-hidden="true" />
           <span class="result-count"
             >{{ filteredItems.length }} resultado{{ filteredItems.length !== 1 ? 's' : '' }}</span
           >
@@ -23,14 +30,20 @@
           icon="close"
           color="white"
           class="clear-search-btn"
+          aria-label="Limpar busca e mostrar todos os eventos"
           @click="clearSearch"
         />
       </div>
 
       <!-- Filtros ativos -->
-      <div v-if="activeFilters.length > 0" class="active-filters">
+      <div
+        v-if="activeFilters.length > 0"
+        class="active-filters"
+        role="region"
+        aria-label="Filtros ativos"
+      >
         <div class="active-filters__header">
-          <q-icon name="filter_list" size="18px" class="q-mr-sm" />
+          <q-icon name="filter_list" size="18px" class="q-mr-sm" aria-hidden="true" />
           <span>Filtros ativos:</span>
         </div>
         <div class="active-filters__chips">
@@ -41,6 +54,7 @@
             :color="filter.color"
             text-color="white"
             :icon="filter.icon"
+            :aria-label="`Remover filtro ${filter.name}`"
             @remove="removeFilter(filter.id)"
           >
             {{ filter.name }}
@@ -52,6 +66,7 @@
             size="sm"
             label="Limpar tudo"
             color="grey-7"
+            aria-label="Limpar todos os filtros"
             @click="clearAllFilters"
           />
         </div>
@@ -63,8 +78,8 @@
       </div>
 
       <!-- Mensagem de nenhum resultado -->
-      <div v-else-if="filteredItems.length === 0" class="no-results">
-        <q-icon name="search_off" size="64px" color="grey-6" />
+      <div v-else-if="filteredItems.length === 0" class="no-results" role="status">
+        <q-icon name="search_off" size="64px" color="grey-6" aria-hidden="true" />
         <div class="no-results-title">Nenhum evento encontrado</div>
         <div class="no-results-text">
           {{
@@ -78,13 +93,14 @@
           label="Ver todos os eventos"
           no-caps
           unelevated
+          aria-label="Limpar filtros e ver todos os eventos"
           @click="clearAllFilters"
           class="q-mt-md"
         />
       </div>
 
       <!-- Grid de eventos -->
-      <div v-else class="cards-grid">
+      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos">
         <q-card
           v-for="card in filteredItems"
           :key="card.id"
@@ -94,16 +110,27 @@
           v-ripple
           @click="goToEvent(card)"
           class="event-card"
+          role="listitem"
+          :aria-label="`Evento: ${card.title}. ${card.date}. ${card.location}`"
+          tabindex="0"
+          @keydown.enter="goToEvent(card)"
+          @keydown.space.prevent="goToEvent(card)"
         >
-          <q-img :src="card.image" ratio="16/9" height="180px" loading="lazy" />
+          <q-img
+            :src="card.image"
+            :alt="`Imagem do evento ${card.title}`"
+            ratio="16/9"
+            height="180px"
+            loading="lazy"
+          />
           <q-card-section>
             <div class="event-title q-mb-xs">{{ card.title }}</div>
             <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="event" class="q-mr-sm event-meta__icon" />
+              <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
               <span>{{ card.date }}</span>
             </div>
             <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="place" class="q-mr-sm event-meta__icon" />
+              <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
               <span>{{ card.location }}</span>
             </div>
           </q-card-section>
@@ -424,5 +451,21 @@ function clearAllFilters() {
   .cards-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.q-btn:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.event-card:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
+}
+
+.q-chip:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 </style>

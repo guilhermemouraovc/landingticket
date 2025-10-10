@@ -6,7 +6,12 @@
         <div class="header-inner">
           <!-- LOGO -->
           <div class="row items-center">
-            <img src="/logo.svg" alt="Logo" style="width: 220px" class="q-mr-sm" />
+            <img
+              src="/logo.svg"
+              alt="TicketPE - Eventos em Pernambuco"
+              style="width: 220px"
+              class="q-mr-sm"
+            />
           </div>
 
           <!-- MENU DESKTOP -->
@@ -16,6 +21,7 @@
               no-caps
               label="Filtros"
               class="text-white text-weight-bold"
+              aria-label="Abrir filtros de eventos"
               @click="filterDrawer = true"
             >
               <template #prepend>
@@ -23,6 +29,7 @@
                   name="img:/public/sliders-horizontal 2.svg"
                   size="20px"
                   class="text-white"
+                  aria-hidden="true"
                 />
               </template>
             </q-btn>
@@ -33,15 +40,25 @@
               bg-color="white"
               placeholder="Pesquisar eventos"
               v-model="search"
+              aria-label="Campo de busca de eventos"
+              role="searchbox"
             >
               <template #append>
-                <q-icon name="search" />
+                <q-icon name="search" aria-hidden="true" />
               </template>
             </q-input>
           </div>
 
           <!-- MENU MOBILE -->
-          <q-btn class="lt-md" flat round dense icon="menu" @click="drawer = true" />
+          <q-btn
+            class="lt-md"
+            flat
+            round
+            dense
+            icon="menu"
+            aria-label="Abrir menu de navegação"
+            @click="drawer = true"
+          />
         </div>
       </q-toolbar>
     </q-header>
@@ -61,10 +78,17 @@
         <!-- Cabeçalho -->
         <div class="filter-drawer-header">
           <div class="filter-drawer-title">
-            <q-icon name="tune" size="28px" color="primary" />
+            <q-icon name="tune" size="28px" color="primary" aria-hidden="true" />
             <span>Filtros</span>
           </div>
-          <q-btn flat round dense icon="close" @click="filterDrawer = false" />
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            aria-label="Fechar filtros"
+            @click="filterDrawer = false"
+          />
         </div>
 
         <q-separator />
@@ -105,6 +129,7 @@
             label="Limpar tudo"
             color="grey-7"
             class="full-width q-mb-sm"
+            aria-label="Limpar todos os filtros"
             @click="clearAllFilters"
           />
           <q-btn
@@ -113,6 +138,7 @@
             label="Aplicar filtros"
             color="primary"
             class="full-width"
+            aria-label="Aplicar filtros selecionados"
             @click="applyFilters"
           />
         </div>
@@ -335,5 +361,22 @@ function applyFilters() {
   background: #f9fafb;
   border-radius: 12px;
   border: 1px dashed #d1d5db;
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.q-btn:focus-visible,
+.q-btn:focus {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.q-input:focus-within .q-field__control {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.q-chip:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 </style>

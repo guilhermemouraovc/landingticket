@@ -9,21 +9,29 @@
           icon="arrow_back"
           label="Voltar"
           class="toolbar-back"
+          aria-label="Voltar para página anterior"
           @click="goBack"
         />
       </div>
 
       <q-linear-progress v-if="loading" indeterminate color="warning" class="q-mt-xl" />
 
-      <div v-else-if="error" class="event-error text-center">
+      <div v-else-if="error" class="event-error text-center" role="alert">
         <div class="text-h6 text-white q-mb-sm">{{ error }}</div>
-        <q-btn color="warning" text-color="black" label="Voltar para inicio" @click="goHome" />
+        <q-btn
+          color="warning"
+          text-color="black"
+          label="Voltar para inicio"
+          aria-label="Voltar para página inicial"
+          @click="goHome"
+        />
       </div>
 
       <div v-else-if="event">
         <div class="event-hero-wrap">
           <q-img
             :src="event.image"
+            :alt="`Imagem destacada do evento ${event.title}`"
             class="event-hero"
             height="440px"
             fit="cover"
@@ -48,13 +56,14 @@
                 color="primary"
                 icon="share"
                 class="event-share"
+                aria-label="Compartilhar evento"
                 @click="shareEvent"
               />
             </div>
 
             <div class="event-meta">
-              <div class="meta-item">
-                <div class="meta-badge text-center">
+              <div class="meta-item" role="group" aria-label="Data do evento">
+                <div class="meta-badge text-center" aria-hidden="true">
                   <div class="badge-month">{{ event.dateBadge.month }}</div>
                   <div class="badge-day">{{ event.dateBadge.day }}</div>
                 </div>
@@ -65,8 +74,8 @@
                 </div>
               </div>
 
-              <div class="meta-item">
-                <div class="meta-icon">
+              <div class="meta-item" role="group" aria-label="Local do evento">
+                <div class="meta-icon" aria-hidden="true">
                   <q-icon name="place" size="32px" />
                 </div>
 
@@ -84,6 +93,7 @@
               label="Comprar"
               unelevated
               no-caps
+              aria-label="Comprar ingresso via WhatsApp"
               @click="openWhatsapp"
             />
 
@@ -444,5 +454,27 @@ function goHome() {
     height: 80px;
     border-radius: 16px;
   }
+}
+
+/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.q-btn:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
+}
+
+.toolbar-back:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.event-share:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 3px;
+}
+
+.buy-btn:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
 }
 </style>
