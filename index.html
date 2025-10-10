@@ -1,10 +1,13 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <title><%= productName %></title>
+    <title><%= productName %> - Descubra os Melhores Eventos em Pernambuco</title>
 
     <meta charset="utf-8" />
-    <meta name="description" content="<%= productDescription %>" />
+    <meta
+      name="description"
+      content="Descubra e reserve ingressos para os melhores eventos em Pernambuco. Shows, festas, teatro, esportes e muito mais. Sua experiência começa aqui no TicketPE!"
+    />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
     <meta
@@ -12,8 +15,43 @@
       content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>"
     />
 
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ticketpe.com.br/" />
+
     <!-- Acessibilidade: Define a cor do tema para navegadores móveis -->
     <meta name="theme-color" content="#161f2f" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ticketpe.com.br/" />
+    <meta property="og:title" content="TicketPE - Descubra os Melhores Eventos em Pernambuco" />
+    <meta
+      property="og:description"
+      content="Descubra e reserve ingressos para os melhores eventos em Pernambuco. Shows, festas, teatro, esportes e muito mais. Sua experiência começa aqui no TicketPE!"
+    />
+    <meta property="og:image" content="https://ticketpe.com.br/logo.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="TicketPE" />
+    <meta property="og:locale" content="pt_BR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://ticketpe.com.br/" />
+    <meta name="twitter:title" content="TicketPE - Descubra os Melhores Eventos em Pernambuco" />
+    <meta
+      name="twitter:description"
+      content="Descubra e reserve ingressos para os melhores eventos em Pernambuco. Shows, festas, teatro, esportes e muito mais. Sua experiência começa aqui no TicketPE!"
+    />
+    <meta name="twitter:image" content="https://ticketpe.com.br/logo.svg" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta
+      name="keywords"
+      content="eventos, ingressos, Pernambuco, Recife, shows, festas, teatro, entretenimento, cultura"
+    />
+    <meta name="author" content="TicketPE" />
+    <meta name="robots" content="index, follow" />
 
     <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png" />
     <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
