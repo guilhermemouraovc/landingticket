@@ -155,12 +155,14 @@
 import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
+import { useQuasar } from 'quasar'
 
 const router = useRouter()
 const route = useRoute()
 const search = ref('')
 const drawer = ref(false)
 const filterDrawer = ref(false)
+const $q = useQuasar()
 
 // Estado dos filtros
 const filters = ref({
@@ -200,29 +202,56 @@ watch(search, (newValue) => {
 
 // Funções de filtro
 function clearAllFilters() {
+  const hadFilter = filters.value.categories.length > 0
+
   filters.value.categories = []
-  // Limpar outros filtros no futuro
+
+  if (hadFilter) {
+    $q.notify({
+      type: 'info',
+      message: 'Todos os filtros foram removidos',
+      position: 'top',
+      timeout: 2000,
+      icon: 'clear_all',
+    })
+  }
 }
 
 function applyFilters() {
-  // Monta query params baseado nos filtros ativos
   const query = { ...route.query }
+  let activeFiltersCount = 0
 
-  // Adiciona categorias selecionadas
+  // Conta filtros ativos
   if (filters.value.categories.length > 0) {
     query.categories = filters.value.categories.join(',')
+    activeFiltersCount += filters.value.categories.length
   } else {
     delete query.categories
   }
 
-  // Navega para programação com filtros
   router.push({
     path: '/programacao',
     query,
   })
 
-  // Fecha o drawer
   filterDrawer.value = false
+
+  if (activeFiltersCount > 0) {
+    $q.notify({
+      type: 'positive',
+      message: `${activeFiltersCount} ${activeFiltersCount === 1 ? 'filtro aplicado' : 'filtros aplicados'}`,
+      position: 'top',
+      timeout: 2000,
+      icon: 'filter_alt',
+    })
+  } else {
+    $q.notify({
+      type: 'info',
+      message: 'Mostrando todos os eventos',
+      position: 'top',
+      timeout: 2000,
+    })
+  }
 }
 </script>
 

@@ -41,13 +41,13 @@
       <div class="event-card__meta q-mt-md" :class="metaLayoutClass">
         <!-- Data -->
         <div class="meta-item">
-          <q-icon :name="dateIcon" :size="iconSize" aria-hidden="true" />
+          <q-icon :name="dateIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
           <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
         </div>
 
         <!-- Localização -->
         <div class="meta-item">
-          <q-icon :name="locationIcon" :size="iconSize" aria-hidden="true" />
+          <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
           <span>{{ event.location || 'Local a definir' }}</span>
         </div>
       </div>
@@ -267,6 +267,10 @@ function handleClick() {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.meta-icon {
+  color: #ec4899;
 }
 
 .meta-highlight {

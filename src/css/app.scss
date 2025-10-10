@@ -1,2 +1,79 @@
 // app global css in SCSS form
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+.q-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.q-btn:hover:not(.q-btn--disable):not(.q-btn--loading) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.q-btn:active:not(.q-btn--disable) {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Transição para cards de eventos */
+.event-card-item {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.event-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Fade suave para elementos que aparecem/desaparecem */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Slide para drawer lateral */
+.q-drawer {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Animação sutil para skeleton loaders */
+.q-skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Transição suave para chips de filtro */
+.q-chip {
+  transition: all 0.2s ease;
+}
+
+.q-chip:hover {
+  transform: scale(1.05);
+}
+
+/* Transição para imagens carregando */
+.q-img {
+  transition: opacity 0.3s ease;
+}
+
+/* Efeito de ripple mais suave */
+.q-ripple {
+  transition: opacity 0.4s ease;
+}

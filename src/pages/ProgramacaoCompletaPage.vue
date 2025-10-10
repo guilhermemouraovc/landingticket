@@ -13,6 +13,9 @@
         <div class="list-title">Programação completa</div>
       </div>
 
+      <!-- Breadcrumbs -->
+      <BreadcrumbNav :crumbs="breadcrumbItems" />
+
       <!-- Mensagem de busca -->
       <div v-if="searchQuery" class="search-info" role="status" aria-live="polite">
         <div class="search-result-text">
@@ -147,6 +150,7 @@ import { useEvents } from 'src/composables/useEvents'
 import { normalizeString } from 'src/utils/eventMapper'
 import { CATEGORIES } from 'src/constants/config'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
+import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -178,6 +182,30 @@ const activeFilters = computed(() => {
         : null
     })
     .filter(Boolean)
+})
+
+// Breadcrumbs dinâmicos
+const breadcrumbItems = computed(() => {
+  const crumbs = [{ label: 'Início', to: '/', icon: 'home' }]
+
+  if (searchQuery.value) {
+    crumbs.push({
+      label: `Busca: "${searchQuery.value}"`,
+      to: null,
+    })
+  } else if (activeFilters.value.length > 0) {
+    crumbs.push({
+      label: `${activeFilters.value.length} filtro${activeFilters.value.length !== 1 ? 's' : ''} ativo${activeFilters.value.length !== 1 ? 's' : ''}`,
+      to: null,
+    })
+  } else {
+    crumbs.push({
+      label: 'Todos os eventos',
+      to: null,
+    })
+  }
+
+  return crumbs
 })
 
 // Eventos filtrados

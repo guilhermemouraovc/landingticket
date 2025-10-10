@@ -14,6 +14,15 @@
         />
       </div>
 
+      <!-- Breadcrumbs -->
+      <BreadcrumbNav
+        v-if="event"
+        :crumbs="[
+          { label: 'Início', to: '/', icon: 'home' },
+          { label: event.title, to: null },
+        ]"
+      />
+
       <q-linear-progress v-if="loading" indeterminate color="warning" class="q-mt-xl" />
 
       <div v-else-if="error" class="event-error text-center" role="alert">
@@ -93,9 +102,14 @@
               label="Comprar"
               unelevated
               no-caps
+              :loading="openingWhatsapp"
               aria-label="Comprar ingresso via WhatsApp"
               @click="openWhatsapp"
-            />
+            >
+              <template #loading>
+                <q-spinner-dots size="20px" />
+              </template>
+            </q-btn>
 
             <div class="event-section q-mt-xl">
               <div class="section-title">Descricao do Evento</div>
@@ -117,6 +131,11 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
+import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import { useQuasar } from 'quasar'
+const openingWhatsapp = ref(false)
+
+const $q = useQuasar()
 
 const DEFAULT_WHATSAPP_MESSAGE = 'Olá! Tenho interesse no evento.'
 
@@ -169,6 +188,8 @@ async function loadEvent(idParam) {
 function openWhatsapp() {
   if (!event.value) return
 
+  openingWhatsapp.value = true
+
   const phone = event.value.whatsapp
   const message = encodeURIComponent(event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE)
   const base = phone ? 'https://wa.me/' + phone : 'https://wa.me/'
@@ -177,6 +198,11 @@ function openWhatsapp() {
   if (typeof window !== 'undefined') {
     window.open(url, '_blank')
   }
+
+  // Desativa loading após 500ms
+  setTimeout(() => {
+    openingWhatsapp.value = false
+  }, 500)
 }
 
 function shareEvent() {
@@ -190,9 +216,43 @@ function shareEvent() {
   }
 
   if (navigator?.share) {
-    navigator.share(shareData).catch(() => {})
+    navigator
+      .share(shareData)
+      .then(() => {
+        $q.notify({
+          type: 'positive',
+          message: 'Evento compartilhado com sucesso!',
+          position: 'top',
+          timeout: 2000,
+          icon: 'check_circle',
+        })
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          $q.notify({
+            type: 'warning',
+            message: 'Não foi possível compartilhar',
+            position: 'top',
+            timeout: 2000,
+          })
+        }
+      })
   } else if (navigator?.clipboard?.writeText) {
-    navigator.clipboard.writeText(shareUrl).catch(() => {})
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      $q.notify({
+        type: 'negative',
+        message: 'Erro ao copiar link',
+        position: 'top',
+        timeout: 2000,
+      })
+    })
+  } else {
+    $q.notify({
+      type: 'info',
+      message: 'Compartilhamento não disponível neste navegador',
+      position: 'top',
+      timeout: 3000,
+    })
   }
 }
 
