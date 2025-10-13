@@ -14,6 +14,16 @@
         name: 'programacao-completa',
         component: () => import('pages/ProgramacaoCompletaPage.vue'),
       },
+      {
+        path: 'reveillon',
+        name: 'reveillon',
+        component: () => import('pages/ReveillonPage.vue'),
+      },
+      {
+        path: 'carnaval',
+        name: 'carnaval',
+        component: () => import('pages/CarnavalPage.vue'),
+      },
     ],
   },
 

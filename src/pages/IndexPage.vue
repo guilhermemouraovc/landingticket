@@ -119,6 +119,7 @@
           title="Réveillon"
           :items="reveillonEvents"
           see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'reveillon' }"
           :default-image="DEFAULT_IMAGE"
         />
 
@@ -126,6 +127,7 @@
           title="Carnaval"
           :items="carnavalEvents"
           see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'carnaval' }"
           :default-image="DEFAULT_IMAGE"
         />
 
@@ -354,6 +356,7 @@ async function loadAllEvents() {
   display: flex;
   align-items: center;
 }
+
 .featured-wrap {
   width: 100%;
   max-width: 1760px;
