@@ -88,11 +88,13 @@
             square-rounded
             no-caps
             class="cat-btn"
+            :class="{ 'cat-btn--active': selectedCategory === c.label }"
             color="white"
             text-color="white"
             :icon="c.icon"
             :label="c.label"
             :aria-label="`Filtrar eventos de ${c.label}`"
+            @click="toggleCategory(c.label)"
           />
         </div>
       </div>
@@ -108,12 +110,18 @@
       <!-- Skeletons para carrosséis -->
       <template v-if="loadingCarousels">
         <SkeletonLoader variant="carousel" :carousel-count="4" />
-        <SkeletonLoader variant="carousel" :carousel-count="4" />
-        <SkeletonLoader variant="carousel" :carousel-count="4" />
-        <SkeletonLoader variant="carousel" :carousel-count="4" />
       </template>
 
-      <!-- Carrosséis reais -->
+      <!-- Eventos filtrados por categoria -->
+      <template v-else-if="selectedCategory">
+        <EventSectionCarousel
+          :title="`Eventos de ${selectedCategory}`"
+          :items="filteredEvents"
+          :default-image="DEFAULT_IMAGE"
+        />
+      </template>
+
+      <!-- Carrosséis normais -->
       <template v-else>
         <EventSectionCarousel
           title="Réveillon"
@@ -233,7 +241,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
@@ -259,6 +267,10 @@ const allEvents = ref([])
 const loadingFeatured = ref(true)
 const loadingCarousels = ref(true)
 
+// Filtro por categoria (agora vem do header)
+const selectedCategory = ref(null)
+const filteredEvents = ref([])
+
 // categorias fixas usadas nos botoes tiles
 const categories = ref([
   { label: 'Carnaval', icon: 'celebration' },
@@ -269,8 +281,24 @@ const categories = ref([
   { label: 'Calourada', icon: 'school' },
 ])
 
+// Escuta eventos do header
+function handleCategorySelected(event) {
+  const category = event.detail.category
+  selectedCategory.value = category
+
+  if (category) {
+    filterEventsByCategory(category)
+  } else {
+    // Se categoria foi desmarcada, volta aos carrosséis normais
+    filteredEvents.value = []
+  }
+}
+
 // boot das seções
 onMounted(async () => {
+  // Adiciona listener para eventos do header
+  window.addEventListener('categorySelected', handleCategorySelected)
+
   // Carrega featured separadamente para mostrar primeiro
   await loadFeatured()
   loadingFeatured.value = false
@@ -278,6 +306,11 @@ onMounted(async () => {
   // Carrega carrosséis em paralelo
   await Promise.all([loadReveillon(), loadCarnaval(), loadSaoJoao(), loadAllEvents()])
   loadingCarousels.value = false
+})
+
+onUnmounted(() => {
+  // Remove listener quando componente é desmontado
+  window.removeEventListener('categorySelected', handleCategorySelected)
 })
 
 async function loadFeatured() {
@@ -328,6 +361,46 @@ async function loadAllEvents() {
   } catch (err) {
     console.error('Falha ao carregar programação completa', err)
     allEvents.value = []
+  }
+}
+
+// Filtro por categoria
+function toggleCategory(categoryLabel) {
+  if (selectedCategory.value === categoryLabel) {
+    // Se já está selecionada, deseleciona
+    selectedCategory.value = null
+    filteredEvents.value = []
+  } else {
+    // Seleciona nova categoria e filtra eventos
+    selectedCategory.value = categoryLabel
+    filterEventsByCategory(categoryLabel)
+  }
+}
+
+async function filterEventsByCategory(categoryLabel) {
+  loadingCarousels.value = true
+  try {
+    // Mapeamento de categorias para tags da API
+    const categoryMap = {
+      Carnaval: 'CARNAVAIS',
+      'São João': 'SaoJoao',
+      'Ano Novo': 'REVEILLON',
+      'Semana Santa': 'SemanaSanta',
+      Boate: 'Boate',
+      Calourada: 'Calourada',
+    }
+
+    const tagName = categoryMap[categoryLabel]
+    if (tagName) {
+      filteredEvents.value = await fetchEventsByTag(tagName)
+    } else {
+      filteredEvents.value = []
+    }
+  } catch (err) {
+    console.error('Falha ao filtrar eventos', err)
+    filteredEvents.value = []
+  } finally {
+    loadingCarousels.value = false
   }
 }
 </script>
@@ -500,6 +573,17 @@ async function loadAllEvents() {
 .cat-btn .q-icon {
   margin-right: 8px;
   font-size: 20px;
+}
+
+/* Estado ativo da categoria */
+.cat-btn--active {
+  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+.cat-btn--active .q-btn__content {
+  color: white !important;
 }
 
 /* ================= HERO - TIPOGRAFIA E CORES ================= */

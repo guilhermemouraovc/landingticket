@@ -20,9 +20,10 @@
               flat
               no-caps
               label="Filtros"
-              class="text-white text-weight-bold"
+              class="text-white text-weight-bold filter-btn"
+              :class="{ 'filter-btn--active': showCategories }"
               aria-label="Abrir filtros de eventos"
-              @click="filterDrawer = true"
+              @click="toggleCategories"
             >
               <template #prepend>
                 <q-icon
@@ -61,6 +62,38 @@
           />
         </div>
       </q-toolbar>
+
+      <!-- CATEGORIAS EXPANSÍVEIS -->
+      <div class="categories-drawer" :class="{ 'categories-drawer--open': showCategories }">
+        <div class="categories-content">
+          <div class="categories-grid">
+            <q-btn
+              v-for="category in categories"
+              :key="category.label"
+              outline
+              square-rounded
+              no-caps
+              class="category-btn"
+              :class="{ 'category-btn--active': selectedCategory === category.label }"
+              color="white"
+              text-color="white"
+              :icon="category.icon"
+              :label="category.label"
+              :aria-label="`Filtrar eventos de ${category.label}`"
+              @click="selectCategory(category.label)"
+            />
+            <q-btn
+              flat
+              round
+              dense
+              icon="add"
+              class="add-category-btn"
+              color="white"
+              aria-label="Adicionar mais categorias"
+            />
+          </div>
+        </div>
+      </div>
     </q-header>
 
     <!-- DRAWER MOBILE -->
@@ -152,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, provide } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
 import { useQuasar } from 'quasar'
@@ -164,6 +197,20 @@ const drawer = ref(false)
 const filterDrawer = ref(false)
 const $q = useQuasar()
 
+// Estado das categorias expansíveis
+const showCategories = ref(false)
+const selectedCategory = ref(null)
+
+// Categorias disponíveis
+const categories = ref([
+  { label: 'Carnaval', icon: 'celebration' },
+  { label: 'São João', icon: 'park' },
+  { label: 'Semana Santa', icon: 'holiday_village' },
+  { label: 'Ano Novo', icon: 'auto_awesome' },
+  { label: 'Boate', icon: 'nightlife' },
+  { label: 'Calourada', icon: 'school' },
+])
+
 // Estado dos filtros
 const filters = ref({
   categories: [],
@@ -174,6 +221,33 @@ const filters = ref({
 
 // Debounce timer
 let debounceTimer = null
+
+// Função para alternar a exibição das categorias
+function toggleCategories() {
+  showCategories.value = !showCategories.value
+}
+
+// Função para selecionar uma categoria
+function selectCategory(categoryLabel) {
+  if (selectedCategory.value === categoryLabel) {
+    // Se já está selecionada, deseleciona
+    selectedCategory.value = null
+  } else {
+    // Seleciona nova categoria
+    selectedCategory.value = categoryLabel
+  }
+
+  // Emite evento para a página atual
+  window.dispatchEvent(
+    new CustomEvent('categorySelected', {
+      detail: { category: selectedCategory.value },
+    }),
+  )
+}
+
+// Provide para comunicação com páginas filhas
+provide('selectedCategory', selectedCategory)
+provide('selectCategory', selectCategory)
 
 // Watch no campo de busca com debounce de 300ms
 watch(search, (newValue) => {
@@ -304,13 +378,122 @@ function applyFilters() {
 }
 
 /* Estilo personalizado para o botão Filtros */
-.q-btn[aria-label='Filtros'] .q-btn__content {
+.filter-btn {
+  transition: all 0.3s ease;
+}
+
+.filter-btn--active {
+  background-color: transparent !important;
+  color: #35c7ee !important;
+}
+.filter-btn--active .q-btn__content {
+  color: #35c7ee !important;
+}
+
+.filter-btn .q-btn__content {
   font-family: 'Poppins', sans-serif !important;
   font-size: 16px !important;
   font-weight: 600 !important;
 }
-.q-btn[aria-label='Filtros'] .q-btn__prepend {
+.filter-btn .q-btn__prepend {
   margin-right: 8px;
+}
+
+.filter-btn--active .q-icon {
+  color: #35c7ee !important;
+}
+/* ==================== CATEGORIAS EXPANSÍVEIS ==================== */
+.categories-drawer {
+  background-color: #161f2f;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.categories-drawer--open {
+  max-height: 200px; /* Altura suficiente para as categorias */
+}
+
+.categories-content {
+  padding: 20px 0;
+}
+
+.categories-grid {
+  width: calc(100vw - 160px);
+  max-width: 1760px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.category-btn {
+  border-radius: 12px !important;
+  height: 52px;
+  min-width: 180px;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  background: #35c7ee !important;
+  border-color: #35c7ee !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(53, 199, 238, 0.3);
+}
+
+.category-btn--active {
+  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
+  border-color: transparent !important;
+  color: white !important;
+}
+
+.category-btn .q-btn__content {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: white !important;
+}
+
+.category-btn .q-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.add-category-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.add-category-btn:hover {
+  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
+
+  border-color: #35c7ee !important;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+  .categories-grid {
+    width: calc(100vw - 80px);
+    padding: 0 40px;
+    gap: 8px;
+  }
+
+  .category-btn {
+    min-width: 140px;
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .add-category-btn {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* fundo das áreas */
