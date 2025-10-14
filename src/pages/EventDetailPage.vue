@@ -2,16 +2,12 @@
   <q-page class="event-page">
     <div class="event-container">
       <div class="event-toolbar">
-        <q-btn
-          flat
-          dense
-          color="white"
-          icon="arrow_back"
-          label="Voltar"
-          class="toolbar-back"
-          aria-label="Voltar para página anterior"
-          @click="goBack"
-        />
+        <div class="back-button-container" @click="goBack">
+          <div class="back-icon">
+            <q-icon name="arrow_back" size="24px" class="back-arrow-icon" />
+          </div>
+          <span class="back-text">Voltar</span>
+        </div>
       </div>
 
       <!-- Breadcrumbs -->
@@ -304,6 +300,42 @@ function goHome() {
   margin-bottom: 24px;
 }
 
+.back-button-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button-container:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-icon {
+  width: 56px;
+  height: 56px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-text {
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
 .toolbar-back {
   border-radius: 999px;
 }
@@ -536,5 +568,29 @@ function goHome() {
 .buy-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
+}
+
+.back-button-container:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.back-arrow-icon {
+  color: #35c7ee !important;
+}
+
+.back-arrow-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+/* Garantir que a cor seja aplicada */
+.back-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon svg {
+  width: 24px;
+  height: 24px;
 }
 </style>
