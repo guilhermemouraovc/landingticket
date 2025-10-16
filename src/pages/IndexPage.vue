@@ -143,6 +143,7 @@
           title="São João"
           :items="saoJoaoEvents"
           see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'sao-joao' }"
           :default-image="DEFAULT_IMAGE"
         />
 

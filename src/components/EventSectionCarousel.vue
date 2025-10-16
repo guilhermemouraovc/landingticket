@@ -4,10 +4,7 @@
     <div class="section-header">
       <div class="section-info">
         <div class="section-title">{{ title }}</div>
-        <div v-if="items.length" class="section-divider">/ {{ items.length }} eventos</div>
-      </div>
-
-      <div class="header-actions">
+        <!-- Movido o botão Ver Tudo para cá, substituindo a contagem -->
         <q-btn
           v-if="seeAllLink"
           flat
@@ -19,6 +16,10 @@
           :aria-label="`Ver todos os eventos de ${title}`"
           :to="seeAllLink"
         />
+      </div>
+
+      <div class="header-actions">
+        <!-- Removido o botão Ver Tudo daqui -->
 
         <div class="nav-buttons" role="group" aria-label="Controles de navegação do carrossel">
           <q-btn

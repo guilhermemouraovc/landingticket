@@ -118,6 +118,13 @@
             </div>
           </div>
         </q-card>
+
+        <!-- Carrossel de eventos relacionados -->
+        <RelatedEventsCarousel
+          v-if="event"
+          :current-event-id="event.id"
+          :event-tags="getEventTags(event)"
+        />
       </div>
     </div>
   </q-page>
@@ -128,6 +135,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import { useQuasar } from 'quasar'
 const openingWhatsapp = ref(false)
 
@@ -262,6 +270,30 @@ function goBack() {
 
 function goHome() {
   router.push('/')
+}
+
+// Função para extrair tags do evento
+function getEventTags(eventData) {
+  // Tenta extrair tags de diferentes estruturas possíveis
+  if (eventData.tags && Array.isArray(eventData.tags)) {
+    return eventData.tags
+  }
+
+  // Se não há tags específicas, tenta inferir pela categoria baseada no título
+  const title = (eventData.title || '').toLowerCase()
+
+  if (title.includes('réveillon') || title.includes('reveillon') || title.includes('amoré')) {
+    return ['REVEILLON']
+  }
+  if (title.includes('carnaval') || title.includes('carvalheira')) {
+    return ['CARNAVAIS']
+  }
+  if (title.includes('são joão') || title.includes('sao joao') || title.includes('joão')) {
+    return ['SaoJoao']
+  }
+
+  // Padrão: Réveillon
+  return ['REVEILLON']
 }
 </script>
 

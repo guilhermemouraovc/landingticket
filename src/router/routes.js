@@ -24,6 +24,11 @@
         name: 'carnaval',
         component: () => import('pages/CarnavalPage.vue'),
       },
+      {
+        path: 'sao-joao',
+        name: 'sao-joao',
+        component: () => import('pages/SaoJoaoPage.vue'),
+      },
     ],
   },
 

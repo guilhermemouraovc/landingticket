@@ -3,7 +3,6 @@
     class="event-card"
     :class="[`event-card--${variant}`, { 'event-card--clickable': clickable }]"
     flat
-    bordered
     :clickable="clickable"
     v-ripple="clickable"
     @click="handleClick"
@@ -176,6 +175,8 @@ function handleClick() {
     transform 0.2s ease,
     box-shadow 0.2s ease;
   overflow: hidden;
+  border: none;
+  outline: none;
 }
 
 .event-card--clickable {
@@ -190,8 +191,8 @@ function handleClick() {
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
 .event-card:focus-visible {
-  outline: 3px solid #35c7ee;
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: 0 0 0 3px #35c7ee;
 }
 
 /* ==================== VARIANTES ==================== */

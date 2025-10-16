@@ -11,7 +11,7 @@
         </div>
 
         <!-- Título centralizado -->
-        <div class="page-title">Réveillon</div>
+        <div class="page-title">São João</div>
 
         <!-- Linha divisória -->
         <div class="title-divider"></div>
@@ -28,9 +28,9 @@
       <!-- Mensagem de nenhum resultado -->
       <div v-else-if="items.length === 0" class="no-results" role="status">
         <q-icon name="celebration" size="64px" color="grey-6" aria-hidden="true" />
-        <div class="no-results-title">Nenhum evento de Réveillon encontrado</div>
+        <div class="no-results-title">Nenhum evento de São João encontrado</div>
         <div class="no-results-text">
-          Não encontramos eventos de Réveillon no momento. Volte mais tarde!
+          Não encontramos eventos de São João no momento. Volte mais tarde!
         </div>
         <q-btn
           color="primary"
@@ -43,7 +43,7 @@
       </div>
 
       <!-- Grid de eventos -->
-      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Réveillon">
+      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de São João">
         <q-card
           v-for="card in items"
           :key="card.id"
@@ -99,10 +99,10 @@ const { fetchEventsByTag } = useEvents()
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
   { label: 'Início', to: '/', icon: 'home' },
-  { label: 'Réveillon', to: null },
+  { label: 'São João', to: null },
 ])
 
-onMounted(loadReveillonEvents)
+onMounted(loadSaoJoaoEvents)
 
 function goToEvent(card) {
   if (card?.link) {
@@ -110,19 +110,20 @@ function goToEvent(card) {
   }
 }
 
-async function loadReveillonEvents() {
+async function loadSaoJoaoEvents() {
   loading.value = true
   try {
-    items.value = await fetchEventsByTag('REVEILLON')
+    items.value = await fetchEventsByTag('SaoJoao', {
+      'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
+    })
   } catch (e) {
-    console.error('Falha ao carregar eventos de Réveillon', e)
+    console.error('Falha ao carregar eventos de São João', e)
     items.value = []
   } finally {
     loading.value = false
   }
 }
 
-// Adicionar esta função
 function goBack() {
   router.push('/')
 }
@@ -228,15 +229,6 @@ function goBack() {
   height: 24px;
 }
 
-/* Esconder elementos antigos */
-.list-header {
-  display: none;
-}
-
-.list-title {
-  display: none;
-}
-
 .no-results {
   display: flex;
   flex-direction: column;
@@ -337,65 +329,5 @@ function goBack() {
 .event-card:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px #35c7ee;
-}
-
-/* Adicionar estes estilos do botão customizado */
-.back-button-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.back-button-container:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.back-icon {
-  width: 56px;
-  height: 56px;
-  background-color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.back-text {
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  font-family:
-    'Poppins',
-    system-ui,
-    -apple-system,
-    sans-serif;
-}
-
-.back-button-container:focus-visible {
-  outline: 2px solid #35c7ee;
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-
-.back-arrow-icon {
-  color: #35c7ee !important;
-}
-
-.back-arrow-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon svg {
-  width: 24px;
-  height: 24px;
 }
 </style>
