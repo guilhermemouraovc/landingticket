@@ -217,12 +217,16 @@ import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
 import { useEvents } from 'src/composables/useEvents'
+import { supabase } from 'src/utils/supabase'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
-// Composable para gerenciar eventos
+// Composable para gerenciar eventos (Strapi - legado)
 const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
+
+// Composable para gerenciar eventos (Supabase - novo) - removido temporariamente
+// const { fetchEventsByTag: fetchEventsByTagSupabase } = useSupabaseEvents()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -297,9 +301,98 @@ async function loadFeatured() {
 
 async function loadReveillon() {
   try {
-    reveillonEvents.value = await fetchEventsByTag('REVEILLON')
+    console.log('🔍 Testando view_event_cards diretamente...')
+
+    // Teste simples: buscar todos os eventos da view
+    const { data: allEventsFromView, error: viewError } = await supabase
+      .from('view_event_cards')
+      .select('*')
+      .limit(5)
+
+    console.log('📊 Todos os eventos da view_event_cards:', allEventsFromView)
+    console.log('❌ Erro da view:', viewError)
+
+    if (viewError) {
+      console.error('❌ Erro na view_event_cards:', viewError)
+      // Fallback: usar método direto
+      await loadReveillonFallback()
+      return
+    }
+
+    // Se a view funcionou, filtrar por tag
+    const { data: eventTags, error: tagsError } = await supabase
+      .from('event_tags')
+      .select(
+        `
+        event_id,
+        tags!inner(slug)
+      `,
+      )
+      .eq('tags.slug', 'reveillon')
+
+    console.log('📊 Event tags para reveillon:', eventTags)
+
+    if (tagsError) {
+      console.error('❌ Erro nas tags:', tagsError)
+      await loadReveillonFallback()
+      return
+    }
+
+    const reveillonEventIds = eventTags?.map((et) => et.event_id) || []
+    console.log('🎯 IDs dos eventos de Reveillon:', reveillonEventIds)
+
+    const reveillonEventsFiltered =
+      allEventsFromView?.filter((event) => reveillonEventIds.includes(event.id)) || []
+
+    console.log('🎯 Eventos filtrados:', reveillonEventsFiltered)
+
+    // Mapear os eventos
+    const { toEventCardFromSb } = await import('src/utils/supabaseEventMapper')
+    reveillonEvents.value = reveillonEventsFiltered.map(toEventCardFromSb)
+
+    console.log('✅ Eventos mapeados:', reveillonEvents.value.length)
+    if (reveillonEvents.value[0]) {
+      console.log('🖼️ Primeiro evento - imagem:', reveillonEvents.value[0].image)
+    }
   } catch (err) {
-    console.error('Falha ao carregar reveillon', err)
+    console.error('❌ Falha ao carregar reveillon', err)
+    await loadReveillonFallback()
+  }
+}
+
+async function loadReveillonFallback() {
+  try {
+    console.log('🔄 Usando método fallback...')
+
+    // Método fallback: buscar diretamente das tabelas
+    const { data: events, error } = await supabase
+      .from('events')
+      .select(
+        `
+        *,
+        event_tags!inner(
+          tags!inner(
+            slug
+          )
+        )
+      `,
+      )
+      .eq('event_tags.tags.slug', 'reveillon')
+      .limit(20)
+
+    console.log('📊 Eventos do fallback:', events)
+
+    if (error) {
+      throw error
+    }
+
+    // Mapear os eventos
+    const { toEventCardFromSb } = await import('src/utils/supabaseEventMapper')
+    reveillonEvents.value = (events || []).map(toEventCardFromSb)
+
+    console.log('✅ Eventos mapeados (fallback):', reveillonEvents.value.length)
+  } catch (err) {
+    console.error('❌ Falha no fallback:', err)
     reveillonEvents.value = []
   }
 }

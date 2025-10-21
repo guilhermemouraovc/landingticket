@@ -51,6 +51,21 @@
         </div>
       </div>
 
+      <!-- Seção de Preços -->
+      <div v-if="event.hasPrice && showPrice" class="event-card__price-section q-mt-md">
+        <!-- Preço Parcelado (se existir) -->
+        <div v-if="event.installments && event.installmentValue" class="price-installment">
+          <span class="installment-label">{{ event.installments }}x de</span>
+          <div class="installment-value">{{ event.formattedInstallmentValue }}</div>
+          <span class="installment-info">sem juros</span>
+        </div>
+
+        <!-- Preço À Vista -->
+        <div v-if="event.fullPrice" class="price-full">
+          ou {{ event.formattedFullPrice }} à vista
+        </div>
+      </div>
+
       <!-- Slot para conteúdo adicional -->
       <slot name="footer"></slot>
     </q-card-section>
@@ -137,6 +152,12 @@ const props = defineProps({
   iconSize: {
     type: String,
     default: '18px',
+  },
+
+  // Mostrar preços
+  showPrice: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -281,6 +302,50 @@ function handleClick() {
 
 /* ==================== RESPONSIVIDADE ==================== */
 
+/* ==================== PREÇOS ==================== */
+
+.event-card__price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.price-installment {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.installment-label {
+  font-size: 0.85rem;
+  color: #00b5e2;
+  font-weight: 500;
+}
+
+.installment-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #00b5e2;
+  line-height: 1.2;
+}
+
+.installment-info {
+  font-size: 0.85rem;
+  color: #00b5e2;
+  font-weight: 400;
+}
+
+.price-full {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* ==================== RESPONSIVIDADE ==================== */
+
 @media (max-width: 768px) {
   .event-card--carousel {
     flex: 0 0 280px;
@@ -297,6 +362,10 @@ function handleClick() {
 
   .event-card__meta {
     font-size: 0.9rem;
+  }
+
+  .installment-value {
+    font-size: 1.5rem;
   }
 }
 </style>
