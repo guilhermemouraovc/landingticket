@@ -161,81 +161,51 @@
     <footer class="footer" role="contentinfo">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <img
-            src="/logo.svg"
-            alt="TicketPE - Eventos em Pernambuco"
-            class="footer-logo"
-            loading="lazy"
-          />
-
-          <div class="row q-gutter-md">
-            <q-btn
-              flat
-              no-caps
-              label="Compre Conosco"
-              class="text-white"
-              aria-label="Comprar ingressos conosco"
+          <div class="footer-logo-container">
+            <img
+              src="/ticketpe.svg"
+              alt="TicketPE - Eventos em Pernambuco"
+              class="footer-logo"
+              loading="lazy"
             />
+          </div>
+
+          <div class="social-icons row q-gutter-md">
+            <a href="#" class="social-link" aria-label="WhatsApp">
+              <img src="/whatsapp.svg" alt="WhatsApp" class="social-icon" />
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <img src="/insta.svg" alt="Instagram" class="social-icon" />
+            </a>
+            <a href="#" class="social-link" aria-label="TikTok">
+              <img src="/tiktok.svg" alt="TikTok" class="social-icon" />
+            </a>
           </div>
         </div>
 
         <q-separator dark />
 
         <div class="footer-links row justify-between q-mt-lg">
-          <div>
-            <div class="text-subtitle2 q-bold q-mb-sm">Links Úteis</div>
-            <div>Eventos em Destaque</div>
-            <div>Próximos Eventos</div>
-            <div>Blog</div>
-            <div>Programação Completa</div>
+          <div class="footer-column">
+            <div class="footer-title">Links Úteis</div>
+            <div class="footer-link">Programação Completa</div>
           </div>
 
-          <!-- Contato -->
-          <div>
-            <div class="text-subtitle2 text-bold q-mb-sm">Contato</div>
-            <div>ajuda@ticketpe.com.br</div>
-            <div class="row q-gutter-md q-mt-sm" role="list" aria-label="Redes sociais">
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-facebook"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no Facebook"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-instagram"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no Instagram"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-tiktok"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no TikTok"
-              />
-            </div>
+          <div class="footer-column">
+            <div class="footer-title">Contato</div>
+            <div class="footer-link">ajuda@ticketpe.com.br</div>
           </div>
 
-          <!-- Suporte -->
-          <div>
-            <div class="text-subtitle2 text-bold q-mb-sm">Suporte</div>
-            <div>Termos de Uso</div>
-            <div>Polí­tica de Privacidade</div>
+          <div class="footer-column">
+            <div class="footer-title">Suporte</div>
+            <div class="footer-link">Termos de Uso</div>
+            <div class="footer-link">Política de Privacidade</div>
           </div>
         </div>
 
         <q-separator dark class="q-mt-lg" />
 
-        <div class="text-center q-mt-md">© 2025 Ticketpe. Todos os direitos reservados.</div>
+        <div class="footer-copyright">© 2025 ticketpe. Todos os direitos reservados.</div>
       </div>
     </footer>
   </q-page>
@@ -411,6 +381,7 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   max-width: 1200px;
   margin: 0 auto;
+  margin-bottom: 100px; /* Adiciona gap de 250px entre o carrossel e o footer */
 }
 /* fundo */
 .bg-landing {
@@ -621,18 +592,146 @@ async function filterEventsByCategory(categoryLabel) {
 
 /* ================= FOOTER ================= */
 .footer {
-  background-color: #161f2f;
-  padding: 32px 40px;
+  background-color: #1a202c;
+  padding: 32px 0;
   color: white;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
+
+.footer-wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (min-width: 1600px) {
+  .footer-wrap {
+    max-width: 1600px;
+    padding: 0 60px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .footer-wrap {
+    max-width: 1800px;
+    padding: 0 80px;
+  }
+}
+
+.footer-logo-container {
+  display: flex;
+  align-items: center;
+}
+
 .footer-logo {
-  height: 60px;
-  width: auto;
+  height: 60.26px;
+  width: 240px;
   display: block;
   object-fit: contain;
 }
-.footer-links div {
-  margin-bottom: 2px;
+
+.social-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-2px);
+}
+
+.social-icon {
+  width: 55.8px;
+  height: 55.8px;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.footer-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #35c7ee;
+}
+
+.footer-copyright {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #d1d5db;
+  text-align: left;
+  margin-top: 16px;
+}
+
+/* Telas grandes */
+@media (min-width: 1200px) {
+  .footer-links {
+    gap: 60px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .footer-links {
+    gap: 80px;
+  }
+}
+
+/* Telas pequenas */
+@media (max-width: 768px) {
+  .footer-wrap {
+    padding: 0 20px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
 }
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */

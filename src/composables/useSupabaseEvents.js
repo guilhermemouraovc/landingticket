@@ -1,44 +1,22 @@
 import { ref } from 'vue'
 import { supabase } from 'src/utils/supabase'
+import { toEventCardFromSb, toEventDetailFromSb } from 'src/utils/supabaseEventMapper'
 
 export function useSupabaseEvents() {
   const loading = ref(false)
   const error = ref(null)
 
-  /**
-   * Busca eventos genérica
-   */
-  async function fetchEvents(filters = {}) {
+  async function fetchEvents({ limit = 60 } = {}) {
     loading.value = true
     error.value = null
-
     try {
-      let query = supabase
-        .from('events')
-        .select(
-          `
-          *,
-          event_images(*),
-          event_tags(tags(*))
-        `,
-        )
+      const { data, error: e } = await supabase
+        .from('view_event_cards')
+        .select('*')
         .order('start_date', { ascending: true })
-
-      // Aplicar filtros
-      if (filters.tag) {
-        query = query.eq('event_tags.tags.name', filters.tag)
-      }
-      if (filters.city) {
-        query = query.eq('city', filters.city)
-      }
-      if (filters.limit) {
-        query = query.limit(filters.limit)
-      }
-
-      const { data, error: fetchError } = await query
-
-      if (fetchError) throw fetchError
-      return data || []
+        .limit(limit)
+      if (e) throw e
+      return (data || []).map(toEventCardFromSb)
     } catch (err) {
       console.error('Erro ao buscar eventos:', err)
       error.value = 'Falha ao carregar eventos'
@@ -48,28 +26,46 @@ export function useSupabaseEvents() {
     }
   }
 
-  /**
-   * Busca evento por ID
-   */
+  async function fetchEventsByTag(tagName, { limit = 60 } = {}) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data: tagRows, error: e1 } = await supabase
+        .from('view_events_by_tag')
+        .select('event_id')
+        .eq('tag_name', tagName)
+      if (e1) throw e1
+      const ids = (tagRows || []).map((r) => r.event_id)
+      if (!ids.length) return []
+
+      const { data, error: e2 } = await supabase
+        .from('view_event_cards')
+        .select('*')
+        .in('id', ids)
+        .order('start_date', { ascending: true })
+        .limit(limit)
+      if (e2) throw e2
+      return (data || []).map(toEventCardFromSb)
+    } catch (err) {
+      console.error('Erro ao filtrar eventos:', err)
+      error.value = 'Falha ao filtrar eventos'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchEventById(id) {
     loading.value = true
     error.value = null
-
     try {
-      const { data, error: fetchError } = await supabase
-        .from('events')
-        .select(
-          `
-          *,
-          event_images(*),
-          event_tags(tags(*))
-        `,
-        )
+      const { data, error: e } = await supabase
+        .from('view_event_detail')
+        .select('*')
         .eq('id', id)
         .single()
-
-      if (fetchError) throw fetchError
-      return data
+      if (e) throw e
+      return toEventDetailFromSb(data)
     } catch (err) {
       console.error('Erro ao buscar evento:', err)
       error.value = 'Evento não encontrado'
@@ -79,26 +75,9 @@ export function useSupabaseEvents() {
     }
   }
 
-  /**
-   * Busca eventos por tag
-   */
-  async function fetchEventsByTag(tagName) {
-    return fetchEvents({ tag: tagName })
-  }
-
-  /**
-   * Busca todos os eventos
-   */
   async function fetchAllEvents(limit = 60) {
     return fetchEvents({ limit })
   }
 
-  return {
-    loading,
-    error,
-    fetchEvents,
-    fetchEventById,
-    fetchEventsByTag,
-    fetchAllEvents,
-  }
+  return { loading, error, fetchEvents, fetchEventsByTag, fetchEventById, fetchAllEvents }
 }

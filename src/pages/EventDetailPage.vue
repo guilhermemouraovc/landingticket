@@ -58,12 +58,13 @@
               <q-btn
                 unelevated
                 rounded
-                color="primary"
-                icon="share"
+                color="transparent"
                 class="event-share"
                 aria-label="Compartilhar evento"
                 @click="shareEvent"
-              />
+              >
+                <img src="/export.svg" alt="Compartilhar" class="share-icon" />
+              </q-btn>
             </div>
 
             <div class="event-meta">
@@ -422,7 +423,17 @@ function getEventTags(eventData) {
 }
 
 .event-share {
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent !important;
+  padding: 8px;
+  min-width: 48px;
+  min-height: 48px;
+  box-shadow: none !important;
+}
+
+.share-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
 
 .event-meta {

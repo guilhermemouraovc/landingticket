@@ -4,6 +4,7 @@
     <div class="section-header">
       <div class="section-info">
         <div class="section-title">{{ title }}</div>
+        <div class="section-divider">|</div>
         <!-- Movido o botão Ver Tudo para cá, substituindo a contagem -->
         <q-btn
           v-if="seeAllLink"
@@ -147,7 +148,7 @@ onMounted(() => {
 .section-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
 }
 
 .section-title {
@@ -156,8 +157,10 @@ onMounted(() => {
 }
 
 .section-divider {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0 2px;
 }
 
 .header-actions {

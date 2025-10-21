@@ -179,7 +179,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <div class="main-container">
+        <router-view />
+      </div>
     </q-page-container>
   </q-layout>
 </template>
@@ -340,14 +342,27 @@ function applyFilters() {
   padding: 0;
 }
 
-/* container central com margens laterais de 80px */
+/* container central com margens laterais responsivas */
 .header-inner {
-  width: calc(100vw - 160px); /* 80px cada lado */
-  max-width: 1760px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: 0 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+@media (min-width: 1600px) {
+  .header-inner {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .header-inner {
+    max-width: 1800px;
+  }
 }
 
 /* espaço entre Blog e o input */
@@ -573,6 +588,38 @@ function applyFilters() {
   background: #f9fafb;
   border-radius: 12px;
   border: 1px dashed #d1d5db;
+}
+
+/* ==================== PREVENÇÃO DE SCROLL HORIZONTAL ==================== */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+.q-layout {
+  overflow-x: hidden;
+}
+
+/* ==================== CONTAINER RESPONSIVO ==================== */
+.main-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (min-width: 1600px) {
+  .main-container {
+    max-width: 1600px;
+    padding: 0 40px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .main-container {
+    max-width: 1800px;
+    padding: 0 60px;
+  }
 }
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
