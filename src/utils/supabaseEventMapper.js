@@ -38,19 +38,6 @@ function formatDateRange(start, end) {
 }
 
 /**
- * Formata data completa (para detalhes)
- */
-function formatRange(start, end) {
-  if (!start && !end) return ''
-  const s = new Date(start)
-  const e = end ? new Date(end) : null
-  const f = { day: '2-digit', month: '2-digit', year: 'numeric' }
-  const sStr = s.toLocaleDateString('pt-BR', f)
-  const eStr = e ? e.toLocaleDateString('pt-BR', f) : null
-  return eStr && eStr !== sStr ? `${sStr} - ${eStr}` : sStr
-}
-
-/**
  * Formata preço em Real brasileiro
  */
 function formatPrice(value) {
@@ -115,19 +102,105 @@ export function toEventCardFromSb(row) {
   }
 }
 
+/**
+ * Parse de string de data para objeto Date
+ */
+function parseDate(value) {
+  const date = value ? new Date(value) : null
+  return date && !Number.isNaN(date.getTime()) ? date : null
+}
+
+/**
+ * Formata data completa (dia da semana, DD de mês de YYYY)
+ */
+function formatDateLabel(date) {
+  if (!date) return 'Data a definir'
+  return date.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+/**
+ * Formata horário (HH:mm BRT)
+ */
+function formatTimeLabel(date) {
+  if (!date) return ''
+  const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  return `${time} BRT`
+}
+
+/**
+ * Cria badge de data (mês abreviado + dia)
+ */
+function buildDateBadge(date) {
+  if (!date) {
+    return { month: '--', day: '--', code: Math.random().toString(36).slice(2) }
+  }
+
+  const month = date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
+  const day = date.toLocaleDateString('pt-BR', { day: '2-digit' })
+
+  return { month, day, code: (month + '-' + day).toLowerCase() }
+}
+
+/**
+ * Formata cidade e estado
+ */
+function formatCityState(city, state) {
+  if (!city && !state) return 'Local a definir'
+  if (!state) return city
+  if (!city) return state
+  return city + ' - ' + state
+}
+
+/**
+ * Resolve a melhor imagem disponível para o evento
+ */
+function resolveImage(row) {
+  if (!row.images || !Array.isArray(row.images) || row.images.length === 0) {
+    return '/logo.svg'
+  }
+
+  // Busca a imagem primária primeiro
+  const primaryImage = row.images.find((img) => img.is_primary === true)
+  if (primaryImage && primaryImage.url) {
+    return primaryImage.url
+  }
+
+  // Se não há primária, pega a primeira disponível
+  const firstImage = row.images.find((img) => img.url)
+  if (firstImage && firstImage.url) {
+    return firstImage.url
+  }
+
+  return '/logo.svg'
+}
+
 export function toEventDetailFromSb(row) {
+  const parsedDate = parseDate(row.start_date)
+  const dateBadge = buildDateBadge(parsedDate)
+  const image = resolveImage(row)
+
   return {
     id: row.id,
     title: row.title,
-    description: row.description,
     highlight: row.highlight,
-    additional_info: row.additional_info,
-    date: formatRange(row.start_date, row.end_date),
-    location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
-    images: Array.isArray(row.images) ? row.images : [],
-    tags: Array.isArray(row.tags) ? row.tags.map((t) => t.name) : [],
+    description: row.description || 'Sem descrição disponível no momento.',
+    additionalInfo: row.additional_info || '',
+    image: image,
+    dateBadge,
+    dateLabel: formatDateLabel(parsedDate),
+    timeLabel: formatTimeLabel(parsedDate),
+    location: row.location || 'Local a definir',
+    cityState: formatCityState(row.city, row.state),
     whatsapp: row.whatsapp || null,
-    whatsapp_message: row.whatsapp_message || null,
-    share_url: row.share_url || null,
+    whatsappMessage: row.whatsapp_message || 'Olá! Tenho interesse no evento.',
+    shareUrl: row.share_url || null,
+    // Campos adicionais para compatibilidade
+    tags: Array.isArray(row.tags) ? row.tags.map((t) => t.name) : [],
+    images: Array.isArray(row.images) ? row.images : [],
   }
 }

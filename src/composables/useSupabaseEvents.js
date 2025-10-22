@@ -75,9 +75,38 @@ export function useSupabaseEvents() {
     }
   }
 
+  async function fetchFeaturedEvents({ limit = 25 } = {}) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: e } = await supabase
+        .from('view_event_cards')
+        .select('*')
+        .or('highlight.eq.sim,highlight.eq.SIM,highlight.eq.true,highlight.eq.1')
+        .order('start_date', { ascending: true })
+        .limit(limit)
+      if (e) throw e
+      return (data || []).map(toEventCardFromSb)
+    } catch (err) {
+      console.error('Erro ao buscar eventos em destaque:', err)
+      error.value = 'Falha ao carregar eventos em destaque'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchAllEvents(limit = 60) {
     return fetchEvents({ limit })
   }
 
-  return { loading, error, fetchEvents, fetchEventsByTag, fetchEventById, fetchAllEvents }
+  return {
+    loading,
+    error,
+    fetchEvents,
+    fetchEventsByTag,
+    fetchEventById,
+    fetchFeaturedEvents,
+    fetchAllEvents,
+  }
 }

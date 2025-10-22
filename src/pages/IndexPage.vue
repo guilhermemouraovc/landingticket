@@ -217,6 +217,7 @@ import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
 import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { supabase } from 'src/utils/supabase'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
@@ -225,8 +226,8 @@ const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 // Composable para gerenciar eventos (Strapi - legado)
 const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
 
-// Composable para gerenciar eventos (Supabase - novo) - removido temporariamente
-// const { fetchEventsByTag: fetchEventsByTagSupabase } = useSupabaseEvents()
+// Composable para gerenciar eventos (Supabase - novo)
+const { fetchFeaturedEvents, fetchEvents: fetchEventsSupabase } = useSupabaseEvents()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -290,11 +291,25 @@ onUnmounted(() => {
 
 async function loadFeatured() {
   try {
-    const events = await fetchEvents({ 'pagination[pageSize]': 25 })
+    // Primeiro tenta buscar eventos em destaque do Supabase
+    let events = await fetchFeaturedEvents({ limit: 25 })
+
+    // Se não há eventos em destaque, busca eventos recentes do Supabase
+    if (!events.length) {
+      console.log('🔄 Nenhum evento em destaque encontrado, buscando eventos recentes...')
+      events = await fetchEventsSupabase({ limit: 25 })
+    }
+
+    // Se ainda não há eventos do Supabase, usa fallback do Strapi
+    if (!events.length) {
+      console.log('🔄 Fallback para Strapi...')
+      events = await fetchEvents({ 'pagination[pageSize]': 25 })
+    }
+
     featured.value = events
     activeSlide.value = events[0]?.id ?? null
   } catch (err) {
-    console.error('Falha ao carregar festas', err)
+    console.error('Falha ao carregar eventos em destaque', err)
     featured.value = []
   }
 }

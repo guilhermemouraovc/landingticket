@@ -134,7 +134,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import { useQuasar } from 'quasar'
@@ -147,8 +147,8 @@ const DEFAULT_WHATSAPP_MESSAGE = 'Olá! Tenho interesse no evento.'
 const route = useRoute()
 const router = useRouter()
 
-// Composable para gerenciar eventos
-const { fetchEventById, loading, error: apiError } = useEvents()
+// Composable para gerenciar eventos do Supabase
+const { fetchEventById, loading, error: apiError } = useSupabaseEvents()
 
 // Estado base da tela
 const error = ref('')
