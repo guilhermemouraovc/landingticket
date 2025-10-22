@@ -30,12 +30,20 @@ export function useSupabaseEvents() {
     loading.value = true
     error.value = null
     try {
+      console.log('🔍 Buscando eventos com tag:', tagName)
+
       const { data: tagRows, error: e1 } = await supabase
         .from('view_events_by_tag')
         .select('event_id')
         .eq('tag_name', tagName)
+
+      console.log('📊 Resultado view_events_by_tag:', { tagRows, error: e1 })
+
       if (e1) throw e1
       const ids = (tagRows || []).map((r) => r.event_id)
+
+      console.log('🎯 IDs encontrados:', ids)
+
       if (!ids.length) return []
 
       const { data, error: e2 } = await supabase
@@ -44,10 +52,13 @@ export function useSupabaseEvents() {
         .in('id', ids)
         .order('start_date', { ascending: true })
         .limit(limit)
+
+      console.log('📊 Eventos encontrados:', data?.length)
+
       if (e2) throw e2
       return (data || []).map(toEventCardFromSb)
     } catch (err) {
-      console.error('Erro ao filtrar eventos:', err)
+      console.error('❌ Erro ao filtrar eventos:', err)
       error.value = 'Falha ao filtrar eventos'
       throw err
     } finally {

@@ -227,7 +227,11 @@ const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
 
 // Composable para gerenciar eventos (Supabase - novo)
-const { fetchFeaturedEvents, fetchEvents: fetchEventsSupabase } = useSupabaseEvents()
+const {
+  fetchFeaturedEvents,
+  fetchEvents: fetchEventsSupabase,
+  fetchEventsByTag: fetchEventsByTagSupabase,
+} = useSupabaseEvents()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -414,9 +418,24 @@ async function loadReveillonFallback() {
 
 async function loadCarnaval() {
   try {
-    carnavalEvents.value = await fetchEventsByTag('CARNAVAIS', {
-      'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-    })
+    // Primeiro tenta buscar do Supabase usando a tag 'CARNAVAL' ou 'carnavais'
+    let events = await fetchEventsByTagSupabase('CARNAVAL', { limit: 60 })
+
+    // Se não encontrou eventos com 'CARNAVAL', tenta 'carnavais' (slug)
+    if (!events.length) {
+      console.log('🔄 Tentando com slug "carnavais"...')
+      events = await fetchEventsByTagSupabase('carnavais', { limit: 60 })
+    }
+
+    // Fallback para Strapi se não encontrou no Supabase
+    if (!events.length) {
+      console.log('🔄 Fallback para Strapi (Carnaval)...')
+      events = await fetchEventsByTag('CARNAVAIS', {
+        'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
+      })
+    }
+
+    carnavalEvents.value = events
   } catch (err) {
     console.error('Falha ao carregar carnaval', err)
     carnavalEvents.value = []

@@ -44,39 +44,15 @@
 
       <!-- Grid de eventos -->
       <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Carnaval">
-        <q-card
+        <EventCard
           v-for="card in items"
           :key="card.id"
-          flat
-          clickable
-          v-ripple
+          :event="card"
+          variant="grid"
+          image-height="215px"
+          :show-price="true"
           @click="goToEvent(card)"
-          class="event-card"
-          role="listitem"
-          :aria-label="`Evento: ${card.title}. ${card.date}. ${card.location}`"
-          tabindex="0"
-          @keydown.enter="goToEvent(card)"
-          @keydown.space.prevent="goToEvent(card)"
-        >
-          <q-img
-            :src="card.image"
-            :alt="`Imagem do evento ${card.title}`"
-            ratio="16/9"
-            height="215px"
-            loading="lazy"
-          />
-          <q-card-section>
-            <div class="event-title q-mb-xs">{{ card.title }}</div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.date }}</span>
-            </div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.location }}</span>
-            </div>
-          </q-card-section>
-        </q-card>
+        />
       </div>
     </div>
   </q-page>
@@ -85,16 +61,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import EventCard from 'src/components/EventCard.vue'
 
 const router = useRouter()
 const items = ref([])
 const loading = ref(true)
 
-// Composable para gerenciar eventos
-const { fetchEventsByTag } = useEvents()
+// Composable para gerenciar eventos do Supabase
+const { fetchEventsByTag } = useSupabaseEvents()
 
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
@@ -113,9 +90,21 @@ function goToEvent(card) {
 async function loadCarnavalEvents() {
   loading.value = true
   try {
-    items.value = await fetchEventsByTag('CARNAVAIS', {
-      'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-    })
+    // Tenta diferentes variações da tag
+    let events = await fetchEventsByTag('CARNAVAL', { limit: 50 })
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "carnavais" (slug)...')
+      events = await fetchEventsByTag('carnavais', { limit: 50 })
+    }
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "CARNAVAIS" (plural)...')
+      events = await fetchEventsByTag('CARNAVAIS', { limit: 50 })
+    }
+
+    items.value = events
+    console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (e) {
     console.error('Falha ao carregar eventos de Carnaval', e)
     items.value = []
@@ -265,7 +254,7 @@ function goBack() {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 400px);
+  grid-template-columns: repeat(auto-fill, 320px);
   gap: 40px;
   justify-content: center;
 }

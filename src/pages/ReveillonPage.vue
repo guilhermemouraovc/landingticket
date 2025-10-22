@@ -90,8 +90,21 @@ function goToEvent(card) {
 async function loadReveillonEvents() {
   loading.value = true
   try {
-    // Busca eventos com a tag "reveillon" (case-insensitive no Supabase)
-    items.value = await fetchEventsByTag('reveillon', { limit: 50 })
+    // Tenta diferentes variações da tag
+    let events = await fetchEventsByTag('REVEILLONS', { limit: 50 })
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "reveillon" (minúsculo)...')
+      events = await fetchEventsByTag('reveillon', { limit: 50 })
+    }
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "REVEILLON" (singular)...')
+      events = await fetchEventsByTag('REVEILLON', { limit: 50 })
+    }
+
+    items.value = events
+    console.log('✅ Eventos de Réveillon carregados:', events.length)
   } catch (e) {
     console.error('Falha ao carregar eventos de Réveillon', e)
     items.value = []
