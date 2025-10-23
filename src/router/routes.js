@@ -25,9 +25,9 @@
         component: () => import('pages/CarnavalPage.vue'),
       },
       {
-        path: 'sao-joao',
-        name: 'sao-joao',
-        component: () => import('pages/SaoJoaoPage.vue'),
+        path: 'festivais',
+        name: 'festivais',
+        component: () => import('pages/FestivaisPage.vue'),
       },
     ],
   },

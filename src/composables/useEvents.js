@@ -88,7 +88,7 @@ export function useEvents() {
   }
 
   /**
-   * Busca múltiplas tags em paralelo (ex: Réveillon, Carnaval, São João)
+   * Busca múltiplas tags em paralelo (ex: Réveillon, Carnaval, Festivais)
    * @param {Array<string>} tags - Lista de tags
    * @returns {Promise<Object>} Objeto com eventos por tag
    */

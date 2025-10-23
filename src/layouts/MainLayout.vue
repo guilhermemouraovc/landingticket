@@ -206,7 +206,7 @@ const selectedCategory = ref(null)
 // Categorias disponíveis
 const categories = ref([
   { label: 'Carnaval', icon: 'celebration' },
-  { label: 'São João', icon: 'park' },
+  { label: 'Festivais', icon: 'park' },
   { label: 'Semana Santa', icon: 'holiday_village' },
   { label: 'Ano Novo', icon: 'auto_awesome' },
   { label: 'Boate', icon: 'nightlife' },

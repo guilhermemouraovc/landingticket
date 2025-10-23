@@ -290,7 +290,7 @@ function getEventTags(eventData) {
     return ['CARNAVAIS']
   }
   if (title.includes('são joão') || title.includes('sao joao') || title.includes('joão')) {
-    return ['SaoJoao']
+    return ['FESTIVAISS']
   }
 
   // Padrão: Réveillon

@@ -307,9 +307,9 @@ function handleClick() {
 .event-card__price-section {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  gap: 2px;
+  /*padding-top: 6px;
+  /* border-top: 1px solid #e5e7eb; */ /* Remover a linha também */
 }
 
 .price-installment {

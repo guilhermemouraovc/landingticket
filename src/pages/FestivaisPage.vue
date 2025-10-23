@@ -11,7 +11,7 @@
         </div>
 
         <!-- Título centralizado -->
-        <div class="page-title">São João</div>
+        <div class="page-title">Festivais</div>
 
         <!-- Linha divisória -->
         <div class="title-divider"></div>
@@ -28,9 +28,9 @@
       <!-- Mensagem de nenhum resultado -->
       <div v-else-if="items.length === 0" class="no-results" role="status">
         <q-icon name="celebration" size="64px" color="grey-6" aria-hidden="true" />
-        <div class="no-results-title">Nenhum evento de São João encontrado</div>
+        <div class="no-results-title">Nenhum evento de Festivais encontrado</div>
         <div class="no-results-text">
-          Não encontramos eventos de São João no momento. Volte mais tarde!
+          Não encontramos eventos de Festivais no momento. Volte mais tarde!
         </div>
         <q-btn
           color="primary"
@@ -43,7 +43,7 @@
       </div>
 
       <!-- Grid de eventos -->
-      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de São João">
+      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Festivais">
         <q-card
           v-for="card in items"
           :key="card.id"
@@ -86,6 +86,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 
@@ -95,14 +96,15 @@ const loading = ref(true)
 
 // Composable para gerenciar eventos
 const { fetchEventsByTag } = useEvents()
+const { fetchEventsByTag: fetchEventsByTagSupabase } = useSupabaseEvents()
 
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
   { label: 'Início', to: '/', icon: 'home' },
-  { label: 'São João', to: null },
+  { label: 'Festivais', to: null },
 ])
 
-onMounted(loadSaoJoaoEvents)
+onMounted(loadFestivaisEvents)
 
 function goToEvent(card) {
   if (card?.link) {
@@ -110,14 +112,28 @@ function goToEvent(card) {
   }
 }
 
-async function loadSaoJoaoEvents() {
+async function loadFestivaisEvents() {
   loading.value = true
   try {
-    items.value = await fetchEventsByTag('SaoJoao', {
-      'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-    })
+    console.log('🔍 Carregando eventos de Festivais...')
+
+    // Primeiro tenta buscar do Supabase usando a tag correta 'FESTIVAISS'
+    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 60 })
+    console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
+
+    // Fallback para Strapi se não encontrou no Supabase
+    if (!events.length) {
+      console.log('🔄 Fallback para Strapi (Festivais)...')
+      events = await fetchEventsByTag('FESTIVAISS', {
+        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
+      })
+      console.log('📊 Eventos encontrados no Strapi:', events.length)
+    }
+
+    items.value = events
+    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (e) {
-    console.error('Falha ao carregar eventos de São João', e)
+    console.error('❌ Falha ao carregar eventos de Festivais', e)
     items.value = []
   } finally {
     loading.value = false

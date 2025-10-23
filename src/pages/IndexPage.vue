@@ -140,10 +140,10 @@
         />
 
         <EventSectionCarousel
-          title="São João"
+          title="Festivais"
           :items="saoJoaoEvents"
           see-all-label="Ver Tudo"
-          :see-all-link="{ name: 'sao-joao' }"
+          :see-all-link="{ name: 'festivais' }"
           :default-image="DEFAULT_IMAGE"
         />
 
@@ -255,7 +255,7 @@ const filteredEvents = ref([])
 // categorias fixas usadas nos botoes tiles
 const categories = ref([
   { label: 'Carnaval', icon: 'celebration' },
-  { label: 'São João', icon: 'park' },
+  { label: 'Festivais', icon: 'park' },
   { label: 'Semana Santa', icon: 'holiday_village' },
   { label: 'Ano Novo', icon: 'auto_awesome' },
   { label: 'Boate', icon: 'nightlife' },
@@ -285,7 +285,7 @@ onMounted(async () => {
   loadingFeatured.value = false
 
   // Carrega carrosséis em paralelo
-  await Promise.all([loadReveillon(), loadCarnaval(), loadSaoJoao(), loadAllEvents()])
+  await Promise.all([loadReveillon(), loadCarnaval(), loadFestivais(), loadAllEvents()])
   loadingCarousels.value = false
 })
 
@@ -443,13 +443,27 @@ async function loadCarnaval() {
   }
 }
 
-async function loadSaoJoao() {
+async function loadFestivais() {
   try {
-    saoJoaoEvents.value = await fetchEventsByTag('SaoJoao', {
-      'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-    })
+    console.log('🔍 Carregando eventos de Festivais...')
+
+    // Primeiro tenta buscar do Supabase usando a tag correta 'FESTIVAISS'
+    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 60 })
+    console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
+
+    // Fallback para Strapi se não encontrou no Supabase
+    if (!events.length) {
+      console.log('🔄 Fallback para Strapi (Festivais)...')
+      events = await fetchEventsByTag('FESTIVAISS', {
+        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
+      })
+      console.log('📊 Eventos encontrados no Strapi:', events.length)
+    }
+
+    saoJoaoEvents.value = events
+    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (err) {
-    console.error('Falha ao carregar São João', err)
+    console.error('❌ Falha ao carregar Festivais', err)
     saoJoaoEvents.value = []
   }
 }
@@ -482,7 +496,7 @@ async function filterEventsByCategory(categoryLabel) {
     // Mapeamento de categorias para tags da API
     const categoryMap = {
       Carnaval: 'CARNAVAIS',
-      'São João': 'SaoJoao',
+      Festivais: 'FESTIVAISS',
       'Ano Novo': 'REVEILLON',
       'Semana Santa': 'SemanaSanta',
       Boate: 'Boate',
