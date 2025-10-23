@@ -224,13 +224,14 @@ import { DEFAULT_IMAGES } from 'src/constants/config'
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
 // Composable para gerenciar eventos (Strapi - legado)
-const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
+const { fetchEvents, fetchEventsByTag } = useEvents()
 
 // Composable para gerenciar eventos (Supabase - novo)
 const {
   fetchFeaturedEvents,
   fetchEvents: fetchEventsSupabase,
   fetchEventsByTag: fetchEventsByTagSupabase,
+  fetchAllEvents: fetchAllEventsSupabase,
 } = useSupabaseEvents()
 
 // refs que alimentam o carrossel hero
@@ -455,7 +456,7 @@ async function loadSaoJoao() {
 
 async function loadAllEvents() {
   try {
-    allEvents.value = await fetchAllEvents(60)
+    allEvents.value = await fetchAllEventsSupabase(60)
   } catch (err) {
     console.error('Falha ao carregar programação completa', err)
     allEvents.value = []

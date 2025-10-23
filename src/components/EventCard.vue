@@ -238,16 +238,16 @@ function handleClick() {
 
 .event-card__body {
   flex: 1;
-  padding: 20px 22px 18px;
+  padding: 15px 15px 13px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   color: #1f2937;
 }
 
 .event-card__title {
   font-size: 1.05rem;
-  line-height: 1.35;
+  line-height: 1.05;
   color: #1f2937;
   display: -webkit-box;
   -webkit-line-clamp: 2;

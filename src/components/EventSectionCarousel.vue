@@ -62,7 +62,7 @@
           :key="card.id"
           :event="card"
           variant="carousel"
-          image-height="220px"
+          image-height="200px"
           :default-image="defaultImage"
           @click="openCard(card)"
         />

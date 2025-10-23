@@ -149,7 +149,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { normalizeString } from 'src/utils/eventMapper'
 import { CATEGORIES } from 'src/constants/config'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
@@ -167,8 +167,8 @@ const categoryFilters = computed(() => {
   return cats ? cats.split(',').filter(Boolean) : []
 })
 
-// Composable para gerenciar eventos
-const { fetchAllEvents } = useEvents()
+// Composable para gerenciar eventos do Supabase
+const { fetchAllEvents } = useSupabaseEvents()
 
 // Filtros ativos exibidos como chips
 const activeFilters = computed(() => {
@@ -268,10 +268,8 @@ function goToEvent(card) {
 async function loadAll() {
   loading.value = true
   try {
-    // Busca eventos com formato de data numérico
-    items.value = await fetchAllEvents(120, {
-      transformOptions: { dateFormat: 'numeric' },
-    })
+    // Busca eventos do Supabase
+    items.value = await fetchAllEvents(120)
   } catch (e) {
     console.error('Falha ao carregar programação completa', e)
     items.value = []
