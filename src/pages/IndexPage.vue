@@ -17,7 +17,6 @@
         autoplay
         height="440px"
         control-color="white"
-        navigation
         navigation-position="bottom"
         transition-prev="slide-right"
         transition-next="slide-left"
@@ -75,6 +74,17 @@
           </div>
         </q-carousel-slide>
       </q-carousel>
+
+      <!-- Paginação separada -->
+      <div class="pagination-dots">
+        <button
+          v-for="(event, index) in featured"
+          :key="event.id"
+          :class="['pagination-dot', { 'pagination-dot--active': activeSlide === event.id }]"
+          :aria-label="`Ir para slide ${index + 1}`"
+          @click="activeSlide = event.id"
+        />
+      </div>
     </section>
 
     <!-- CATEGORIAS -->
@@ -607,15 +617,40 @@ async function filterEventsByCategory(categoryLabel) {
 .featured-carousel {
   position: relative;
 }
-.featured-carousel .q-carousel__navigation {
-  position: absolute;
-  bottom: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+/* ==================== PAGINAÇÃO SEPARADA ==================== */
+.pagination-dots {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 0 20px;
 }
-.featured-carousel .q-carousel__navigation .q-btn {
-  opacity: 0.85;
+
+.pagination-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.pagination-dot:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.pagination-dot--active {
+  background-color: white;
+  border-color: white;
+  transform: scale(1.2);
+}
+
+.pagination-dot:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 
 /* ================= CATEGORIAS ================= */

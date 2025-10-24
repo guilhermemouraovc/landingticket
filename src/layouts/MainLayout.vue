@@ -16,24 +16,33 @@
 
           <!-- MENU DESKTOP -->
           <div class="row items-center gt-sm">
-            <q-btn
-              flat
-              no-caps
-              label="Filtros"
-              class="text-white text-weight-bold filter-btn"
-              :class="{ 'filter-btn--active': showCategories }"
-              aria-label="Abrir filtros de eventos"
+            <!-- Container de filtros unificado -->
+            <div
+              class="filter-container"
+              :class="{ 'filter-container--active': showCategories }"
               @click="toggleCategories"
+              aria-label="Abrir filtros de eventos"
+              role="button"
+              tabindex="0"
+              @keydown.enter="toggleCategories"
+              @keydown.space="toggleCategories"
             >
-              <template #prepend>
-                <q-icon
-                  name="img:/public/sliders-horizontal 2.svg"
-                  size="20px"
-                  class="text-white"
-                  aria-hidden="true"
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 33"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="filter-icon"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 11.0078H9.125C9.3453 11.8683 9.8457 12.6309 10.5473 13.1755C11.2489 13.7201 12.1118 14.0157 13 14.0157C13.8882 14.0157 14.7511 13.7201 15.4527 13.1755C16.1543 12.6309 16.6547 11.8683 16.875 11.0078H27C27.2652 11.0078 27.5196 10.9025 27.7071 10.715C27.8946 10.5274 28 10.2731 28 10.0078C28 9.74263 27.8946 9.48827 27.7071 9.30074C27.5196 9.1132 27.2652 9.00784 27 9.00784H16.875C16.6547 8.14743 16.1543 7.38481 15.4527 6.8402C14.7511 6.2956 13.8882 6 13 6C12.1118 6 11.2489 6.2956 10.5473 6.8402C9.8457 7.38481 9.3453 8.14743 9.125 9.00784H5C4.73478 9.00784 4.48043 9.1132 4.29289 9.30074C4.10536 9.48827 4 9.74263 4 10.0078C4 10.2731 4.10536 10.5274 4.29289 10.715C4.48043 10.9025 4.73478 11.0078 5 11.0078ZM13 8.00784C13.3956 8.00784 13.7822 8.12514 14.1111 8.3449C14.44 8.56467 14.6964 8.87702 14.8478 9.24248C14.9991 9.60793 15.0387 10.0101 14.9616 10.398C14.8844 10.786 14.6939 11.1424 14.4142 11.4221C14.1345 11.7018 13.7781 11.8922 13.3902 11.9694C13.0022 12.0466 12.6001 12.007 12.2346 11.8556C11.8692 11.7042 11.5568 11.4479 11.3371 11.119C11.1173 10.7901 11 10.4034 11 10.0078C11 9.47741 11.2107 8.9687 11.5858 8.59363C11.9609 8.21856 12.4696 8.00784 13 8.00784ZM27 21.0078H24.875C24.6547 20.1474 24.1543 19.3848 23.4527 18.8402C22.7511 18.2956 21.8882 18 21 18C20.1118 18 19.2489 18.2956 18.5473 18.8402C17.8457 19.3848 17.3453 20.1474 17.125 21.0078H5C4.73478 21.0078 4.48043 21.1132 4.29289 21.3007C4.10536 21.4883 4 21.7426 4 22.0078C4 22.2731 4.10536 22.5274 4.29289 22.715C4.48043 22.9025 4.73478 23.0078 5 23.0078H17.125C17.3453 23.8683 17.8457 24.6309 18.5473 25.1755C19.2489 25.7201 20.1118 26.0157 21 26.0157C21.8882 26.0157 22.7511 25.7201 23.4527 25.1755C24.1543 24.6309 24.6547 23.8683 24.875 23.0078H27C27.2652 23.0078 27.5196 22.9025 27.7071 22.715C27.8946 22.5274 28 22.2731 28 22.0078C28 21.7426 27.8946 21.4883 27.7071 21.3007C27.5196 21.1132 27.2652 21.0078 27 21.0078ZM21 24.0078C20.6044 24.0078 20.2178 23.8905 19.8889 23.6708C19.56 23.451 19.3036 23.1387 19.1522 22.7732C19.0009 22.4078 18.9613 22.0056 19.0384 21.6177C19.1156 21.2297 19.3061 20.8733 19.5858 20.5936C19.8655 20.3139 20.2219 20.1234 20.6098 20.0463C20.9978 19.9691 21.3999 20.0087 21.7654 20.1601C22.1308 20.3115 22.4432 20.5678 22.6629 20.8967C22.8827 21.2256 23 21.6123 23 22.0078C23 22.5383 22.7893 23.047 22.4142 23.4221C22.0391 23.7971 21.5304 24.0078 21 24.0078Z"
+                  fill="white"
                 />
-              </template>
-            </q-btn>
+              </svg>
+              <span class="filter-text">Filtros</span>
+            </div>
             <q-input
               class="search-pill q-my-xs"
               filled
@@ -365,9 +374,53 @@ function applyFilters() {
   }
 }
 
-/* espaço entre Blog e o input */
+/* espaço entre elementos da header */
 .header-inner .gt-sm {
   column-gap: 26px;
+}
+
+/* ==================== CONTAINER DE FILTROS UNIFICADO ==================== */
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.filter-container--active {
+  background-color: transparent;
+}
+
+.filter-container--active .filter-icon path,
+.filter-container--active .filter-text {
+  color: #35c7ee !important;
+  fill: #35c7ee !important;
+}
+
+.filter-container:hover .filter-icon path,
+.filter-container:hover .filter-text {
+  color: #35c7ee !important;
+  fill: #35c7ee !important;
+}
+
+.filter-text {
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.filter-icon {
+  transition: fill 0.3s ease;
+}
+
+.filter-icon path {
+  transition: fill 0.3s ease;
 }
 
 /* input "pill" = 440px largura x 48px altura */
