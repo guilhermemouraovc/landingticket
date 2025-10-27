@@ -1,7 +1,27 @@
 <template>
   <div class="related-events-section">
     <div class="related-events-container">
-      <h2 class="related-events-title">Veja também</h2>
+      <div class="header-container">
+        <h2 class="related-events-title">Veja também</h2>
+        <div v-if="!loading && events.length > 0" class="navigation-arrows">
+          <button
+            class="nav-button"
+            @click="scrollLeft"
+            :disabled="isAtStart"
+            aria-label="Evento anterior"
+          >
+            <img src="/LEFT.svg" alt="Anterior" />
+          </button>
+          <button
+            class="nav-button"
+            @click="scrollRight"
+            :disabled="isAtEnd"
+            aria-label="Próximo evento"
+          >
+            <img src="/RIGHT.svg" alt="Próximo" />
+          </button>
+        </div>
+      </div>
 
       <div v-if="loading" class="carousel-loading">
         <q-skeleton type="rect" height="395px" width="100%" />
@@ -12,7 +32,7 @@
       </div>
 
       <div v-else class="carousel-container">
-        <div class="carousel-wrapper" ref="carouselRef">
+        <div class="carousel-wrapper" ref="carouselRef" @scroll="updateScrollState">
           <div class="carousel-track">
             <div
               v-for="event in events"
@@ -71,6 +91,8 @@ const router = useRouter()
 const events = ref([])
 const loading = ref(true)
 const carouselRef = ref(null)
+const isAtStart = ref(true)
+const isAtEnd = ref(false)
 
 /**
  * Mapeia variações de categoria para tag padrão
@@ -176,6 +198,35 @@ function goToEvent(event) {
   }
 }
 
+// Funções de navegação do carrossel
+function scrollLeft() {
+  if (carouselRef.value) {
+    const scrollAmount = 440 // largura do card (400px) + gap (40px)
+    carouselRef.value.scrollBy({
+      left: -scrollAmount,
+      behavior: 'smooth',
+    })
+  }
+}
+
+function scrollRight() {
+  if (carouselRef.value) {
+    const scrollAmount = 440 // largura do card (400px) + gap (40px)
+    carouselRef.value.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth',
+    })
+  }
+}
+
+function updateScrollState() {
+  if (carouselRef.value) {
+    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.value
+    isAtStart.value = scrollLeft <= 0
+    isAtEnd.value = scrollLeft + clientWidth >= scrollWidth - 1
+  }
+}
+
 // Reage a mudanças nas props
 watch(
   () => [props.currentEventId, props.eventTags],
@@ -194,13 +245,20 @@ onMounted(() => {
 .related-events-section {
   background-color: #2a3447;
   padding: 80px 0;
-  margin-top: 40px;
+  margin-top: 50px;
 }
 
 .related-events-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 36px;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
 }
 
 .related-events-title {
@@ -208,8 +266,44 @@ onMounted(() => {
   font-weight: 600; /* semibold */
   font-size: 24px;
   color: #ffffff;
-  margin-bottom: 24px;
-  margin-left: 0;
+  margin: 0;
+}
+
+.navigation-arrows {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-button {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.nav-button:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+.nav-button:active:not(:disabled) {
+  /* Sem efeito visual */
+}
+
+.nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-button img {
+  width: 44px;
+  height: 44px;
+  display: block;
 }
 
 .carousel-container {
@@ -218,29 +312,16 @@ onMounted(() => {
 }
 
 .carousel-wrapper {
-  width: 100%;
-  height: 395px;
   overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  overflow-y: visible; /* Permite hover expandir verticalmente */
+  position: relative;
+  scrollbar-width: none; /* Esconde scrollbar no Firefox */
+  padding-top: 10px;
+  padding-bottom: 20px; /* Espaço para hover não cortar */
 }
 
 .carousel-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-
-.carousel-wrapper::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.carousel-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-.carousel-wrapper::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  display: none; /* Esconde scrollbar no Chrome/Safari */
 }
 
 .carousel-track {
@@ -267,11 +348,14 @@ onMounted(() => {
   overflow: hidden;
   border: none;
   outline: none;
+  position: relative; /* Permite que o hover saia dos limites */
+  z-index: 1; /* Ficar sobre outros elementos */
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px); /* Subir mais */
   box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
+  z-index: 10; /* Ficar por cima */
 }
 
 .event-card__body {
@@ -340,9 +424,27 @@ onMounted(() => {
     padding: 40px 0;
   }
 
+  .header-container {
+    margin-bottom: 20px;
+  }
+
   .related-events-title {
     font-size: 20px;
-    margin-bottom: 20px;
+  }
+
+  .navigation-arrows {
+    gap: 8px;
+  }
+
+  .nav-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .nav-button img {
+    width: 20px;
+    height: 20px;
   }
 
   .carousel-wrapper {
