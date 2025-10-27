@@ -8,7 +8,7 @@
       </div>
 
       <div v-else-if="events.length === 0" class="no-events">
-        <p class="no-events-text">Nenhum evento relacionado encontrado</p>
+        <p class="no-events-text">Sem eventos relacionados para esta categoria.</p>
       </div>
 
       <div v-else class="carousel-container">
@@ -51,9 +51,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { supabase } from 'src/utils/supabase'
+import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
 
 const props = defineProps({
   currentEventId: {
@@ -67,26 +68,98 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const { fetchEventsByTag } = useSupabaseEvents()
-
 const events = ref([])
 const loading = ref(true)
 const carouselRef = ref(null)
 
+/**
+ * Mapeia variações de categoria para tag padrão
+ */
+function getCategoryTag(tags) {
+  if (!tags || tags.length === 0) return 'REVEILLONS'
+
+  const tag = tags[0].toUpperCase()
+
+  // Mapeamento de categorias
+  const categoryMap = {
+    REVEILLON: 'REVEILLONS',
+    REVEILLONS: 'REVEILLONS',
+    'ANO NOVO': 'REVEILLONS',
+    'OPEN BAR': 'REVEILLONS', // Tags adicionais que podem estar relacionadas
+    CARNAVAL: 'CARNAVAL',
+    CARNAVAIS: 'CARNAVAL',
+    FESTIVAIS: 'FESTIVAISS',
+    FESTIVAISS: 'FESTIVAISS',
+    FESTIVAL: 'FESTIVAISS',
+  }
+
+  const mappedTag = categoryMap[tag] || 'REVEILLONS' // Default para REVEILLONS ao invés de retornar a tag desconhecida
+  console.log(`🗺️ Mapeando "${tag}" → "${mappedTag}"`)
+  return mappedTag
+}
+
 // Carrega eventos relacionados
 async function loadRelatedEvents() {
   loading.value = true
+
   try {
     console.log('🔍 Carregando eventos relacionados...')
+    console.log('📋 Tags recebidas:', props.eventTags)
+    console.log('🆔 Evento atual:', props.currentEventId)
 
-    // Se não há tags, busca eventos de Réveillon por padrão (usando tag correta)
-    const tagToSearch = props.eventTags.length > 0 ? props.eventTags[0] : 'REVEILLONS'
+    if (!props.currentEventId) {
+      console.warn('⚠️ ID do evento atual não fornecido')
+      events.value = []
+      return
+    }
 
-    // Busca eventos com as mesmas tags do Supabase, excluindo o evento atual
-    const relatedEvents = await fetchEventsByTag(tagToSearch, { limit: 20 })
+    // Determina a categoria/tag para buscar
+    const categoryTag = getCategoryTag(props.eventTags)
+    console.log('🏷️ Tag normalizada:', categoryTag)
 
-    // Filtra o evento atual e limita a 6 eventos
-    events.value = relatedEvents.filter((event) => event.id !== props.currentEventId).slice(0, 6)
+    // Busca eventos pela tag usando view_events_by_tag
+    const { data: tagRows, error: tagError } = await supabase
+      .from('view_events_by_tag')
+      .select('event_id')
+      .eq('tag_name', categoryTag)
+      .limit(50)
+
+    if (tagError) {
+      console.error('❌ Erro ao buscar tags:', tagError)
+      console.error('Detalhes do erro:', tagError)
+      throw tagError
+    }
+
+    console.log('📦 Dados brutos retornados:', tagRows)
+
+    const eventIds = (tagRows || [])
+      .map((row) => row.event_id)
+      .filter((id) => id !== props.currentEventId) // Exclui evento atual
+
+    console.log('🎯 IDs de eventos encontrados:', eventIds.length)
+    console.log('🔢 IDs:', eventIds)
+
+    if (eventIds.length === 0) {
+      console.log('ℹ️ Nenhum evento relacionado encontrado')
+      events.value = []
+      return
+    }
+
+    // Busca os dados completos dos eventos
+    const { data: eventsData, error: eventsError } = await supabase
+      .from('view_event_cards')
+      .select('*')
+      .in('id', eventIds)
+      .order('start_date', { ascending: true })
+      .limit(12)
+
+    if (eventsError) {
+      console.error('❌ Erro ao buscar eventos:', eventsError)
+      throw eventsError
+    }
+
+    // Mapeia os eventos para o formato da UI
+    events.value = (eventsData || []).map(toEventCardFromSb).slice(0, 6) // Limita a 6 eventos no carrossel
 
     console.log('✅ Eventos relacionados carregados:', events.value.length)
   } catch (error) {
@@ -102,6 +175,15 @@ function goToEvent(event) {
     router.push(event.link)
   }
 }
+
+// Reage a mudanças nas props
+watch(
+  () => [props.currentEventId, props.eventTags],
+  () => {
+    loadRelatedEvents()
+  },
+  { deep: true },
+)
 
 onMounted(() => {
   loadRelatedEvents()

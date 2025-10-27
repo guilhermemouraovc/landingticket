@@ -111,7 +111,7 @@
 
             <!-- Botão de Comprar -->
             <q-btn
-              class="buy-btn q-mt-lg"
+              class="buy-btn"
               color="warning"
               text-color="black"
               label="Comprar"
@@ -293,26 +293,39 @@ function goHome() {
 
 // Função para extrair tags do evento
 function getEventTags(eventData) {
+  console.log('🏷️ Extraindo tags do evento:', eventData)
+
   // Tenta extrair tags de diferentes estruturas possíveis
-  if (eventData.tags && Array.isArray(eventData.tags)) {
+  if (eventData.tags && Array.isArray(eventData.tags) && eventData.tags.length > 0) {
+    console.log('✅ Tags encontradas no evento:', eventData.tags)
     return eventData.tags
   }
 
   // Se não há tags específicas, tenta inferir pela categoria baseada no título
   const title = (eventData.title || '').toLowerCase()
+  console.log('📝 Inferindo tag pelo título:', title)
 
   if (title.includes('réveillon') || title.includes('reveillon') || title.includes('amoré')) {
-    return ['REVEILLON']
+    console.log('🎆 Tag inferida: REVEILLONS')
+    return ['REVEILLONS'] // Tag correta do Supabase
   }
   if (title.includes('carnaval') || title.includes('carvalheira')) {
-    return ['CARNAVAIS']
+    console.log('🎭 Tag inferida: CARNAVAL')
+    return ['CARNAVAL'] // Tag correta do Supabase
   }
-  if (title.includes('são joão') || title.includes('sao joao') || title.includes('joão')) {
-    return ['FESTIVAISS']
+  if (
+    title.includes('são joão') ||
+    title.includes('sao joao') ||
+    title.includes('joão') ||
+    title.includes('festival')
+  ) {
+    console.log('🎪 Tag inferida: FESTIVAISS')
+    return ['FESTIVAISS'] // Tag correta do Supabase
   }
 
   // Padrão: Réveillon
-  return ['REVEILLON']
+  console.log('⚠️ Nenhuma tag específica encontrada, usando padrão: REVEILLONS')
+  return ['REVEILLONS']
 }
 </script>
 
@@ -433,6 +446,7 @@ function getEventTags(eventData) {
 
 .event-heading {
   gap: 16px;
+  margin-bottom: 0; /* Pode ajustar se necessário */
 }
 
 .event-highlight {
@@ -460,12 +474,14 @@ function getEventTags(eventData) {
   margin-top: 20px;
 }
 
+/* Remover a indentação dos meta-items */
 .meta-item {
   display: flex;
   align-items: center;
   gap: 16px;
   background: transparent !important;
-  padding: 16px 20px;
+  padding: 16px 0;
+  margin-left: 0; /* Garantir sem margem */
   border-radius: 0 !important;
   box-shadow: none !important;
 }
@@ -573,37 +589,39 @@ function getEventTags(eventData) {
   font-weight: 500;
   color: #d1d5db;
   line-height: 1.2;
-  margin-top: 4px;
+  margin-top: 24.66px; /* Distância exata conforme protótipo */
 }
 
 .buy-btn {
-  /* Botão centralizado abaixo dos preços */
   width: 572px;
   height: 57px;
   border-radius: 10px !important;
   font-size: 16px;
-  font-weight: 600; /* semibold */
+  font-weight: 600;
   line-height: 1;
   margin-left: auto;
   margin-right: auto;
   display: block;
+  margin-top: -200px; /* Bem próximo */
+  margin-bottom: 150px;
 }
 
 .event-section {
-  background: rgba(255, 255, 255, 0.04);
-  padding: 24px;
-  border-radius: 20px;
+  background: transparent; /* Sem fundo */
+  padding: 24px 0; /* Remove padding horizontal para alinhar com o título */
+  border-radius: 0; /* Remove border-radius */
 }
 
 .section-title {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 24px;
   margin-bottom: 12px;
 }
 
 .section-text {
   margin: 0;
   color: #e5e7eb;
+  font-size: 20px;
   line-height: 1.7;
 }
 
@@ -683,10 +701,18 @@ function getEventTags(eventData) {
 
   .installment-suffix {
     font-size: 14px;
+    font-weight: 400;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 20px;
   }
 
   .cash-price {
     font-size: 14px;
+    font-weight: 400;
+    color: #d1d5db;
+    line-height: 1.2;
+    margin-bottom: 20px;
   }
 
   .buy-btn {
