@@ -118,7 +118,7 @@ async function loadFestivaisEvents() {
     console.log('🔍 Carregando eventos de Festivais...')
 
     // Primeiro tenta buscar do Supabase usando a tag correta 'FESTIVAISS'
-    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 60 })
+    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
     console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
 
     // Fallback para Strapi se não encontrou no Supabase

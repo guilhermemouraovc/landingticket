@@ -422,11 +422,13 @@ function toggleCategory(categoryLabel) {
 async function filterEventsByCategory(categoryLabel) {
   loadingCarousels.value = true
   try {
-    // Mapeamento de categorias para tags da API
+    console.log('🔍 Filtrando eventos por categoria:', categoryLabel)
+
+    // Mapeamento de categorias para tags do Supabase
     const categoryMap = {
-      Carnaval: 'CARNAVAIS',
+      Carnaval: 'CARNAVAL',
       Festivais: 'FESTIVAISS',
-      'Ano Novo': 'REVEILLON',
+      'Ano Novo': 'REVEILLONS',
       'Semana Santa': 'SemanaSanta',
       Boate: 'Boate',
       Calourada: 'Calourada',
@@ -434,12 +436,15 @@ async function filterEventsByCategory(categoryLabel) {
 
     const tagName = categoryMap[categoryLabel]
     if (tagName) {
-      filteredEvents.value = await fetchEventsByTag(tagName)
+      // Usar Supabase ao invés do Strapi
+      filteredEvents.value = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+      console.log('✅ Eventos filtrados:', filteredEvents.value.length)
     } else {
+      console.warn('⚠️ Categoria não mapeada:', categoryLabel)
       filteredEvents.value = []
     }
   } catch (err) {
-    console.error('Falha ao filtrar eventos', err)
+    console.error('❌ Falha ao filtrar eventos por categoria:', err)
     filteredEvents.value = []
   } finally {
     loadingCarousels.value = false

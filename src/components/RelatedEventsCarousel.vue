@@ -53,7 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 
 const props = defineProps({
   currentEventId: {
@@ -67,7 +67,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const { fetchEventsByTag } = useEvents()
+const { fetchEventsByTag } = useSupabaseEvents()
 
 const events = ref([])
 const loading = ref(true)
@@ -77,16 +77,20 @@ const carouselRef = ref(null)
 async function loadRelatedEvents() {
   loading.value = true
   try {
-    // Se não há tags, busca eventos de Réveillon por padrão
-    const tagToSearch = props.eventTags.length > 0 ? props.eventTags[0] : 'REVEILLON'
+    console.log('🔍 Carregando eventos relacionados...')
 
-    // Busca eventos com as mesmas tags, excluindo o evento atual
-    const relatedEvents = await fetchEventsByTag(tagToSearch)
+    // Se não há tags, busca eventos de Réveillon por padrão (usando tag correta)
+    const tagToSearch = props.eventTags.length > 0 ? props.eventTags[0] : 'REVEILLONS'
+
+    // Busca eventos com as mesmas tags do Supabase, excluindo o evento atual
+    const relatedEvents = await fetchEventsByTag(tagToSearch, { limit: 20 })
 
     // Filtra o evento atual e limita a 6 eventos
     events.value = relatedEvents.filter((event) => event.id !== props.currentEventId).slice(0, 6)
+
+    console.log('✅ Eventos relacionados carregados:', events.value.length)
   } catch (error) {
-    console.error('Erro ao carregar eventos relacionados:', error)
+    console.error('❌ Erro ao carregar eventos relacionados:', error)
     events.value = []
   } finally {
     loading.value = false
