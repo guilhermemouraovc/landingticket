@@ -6,7 +6,7 @@ export function useSupabaseEvents() {
   const loading = ref(false)
   const error = ref(null)
 
-  async function fetchEvents({ limit = 60 } = {}) {
+  async function fetchEvents({ limit = 200 } = {}) {
     loading.value = true
     error.value = null
     try {
@@ -26,7 +26,7 @@ export function useSupabaseEvents() {
     }
   }
 
-  async function fetchEventsByTag(tagName, { limit = 60 } = {}) {
+  async function fetchEventsByTag(tagName, { limit = 200 } = {}) {
     loading.value = true
     error.value = null
     try {
@@ -36,13 +36,14 @@ export function useSupabaseEvents() {
         .from('view_events_by_tag')
         .select('event_id')
         .eq('tag_name', tagName)
+        .limit(1000) // Aumentar limite da view também
 
       console.log('📊 Resultado view_events_by_tag:', { tagRows, error: e1 })
 
       if (e1) throw e1
       const ids = (tagRows || []).map((r) => r.event_id)
 
-      console.log('🎯 IDs encontrados:', ids)
+      console.log('🎯 IDs encontrados:', ids.length, 'eventos')
 
       if (!ids.length) return []
 
@@ -53,7 +54,7 @@ export function useSupabaseEvents() {
         .order('start_date', { ascending: true })
         .limit(limit)
 
-      console.log('📊 Eventos encontrados:', data?.length)
+      console.log('📊 Eventos carregados:', data?.length)
 
       if (e2) throw e2
       return (data || []).map(toEventCardFromSb)
@@ -86,7 +87,7 @@ export function useSupabaseEvents() {
     }
   }
 
-  async function fetchFeaturedEvents({ limit = 25 } = {}) {
+  async function fetchFeaturedEvents({ limit = 50 } = {}) {
     loading.value = true
     error.value = null
     try {
@@ -107,7 +108,7 @@ export function useSupabaseEvents() {
     }
   }
 
-  async function fetchAllEvents(limit = 60) {
+  async function fetchAllEvents(limit = 200) {
     return fetchEvents({ limit })
   }
 

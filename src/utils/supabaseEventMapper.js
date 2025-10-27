@@ -183,6 +183,7 @@ export function toEventDetailFromSb(row) {
   const parsedDate = parseDate(row.start_date)
   const dateBadge = buildDateBadge(parsedDate)
   const image = resolveImage(row)
+  const priceInfo = formatPriceInfo(row)
 
   return {
     id: row.id,
@@ -199,6 +200,8 @@ export function toEventDetailFromSb(row) {
     whatsapp: row.whatsapp || null,
     whatsappMessage: row.whatsapp_message || 'Olá! Tenho interesse no evento.',
     shareUrl: row.share_url || null,
+    // Informações de preço
+    ...priceInfo,
     // Campos adicionais para compatibilidade
     tags: Array.isArray(row.tags) ? row.tags.map((t) => t.name) : [],
     images: Array.isArray(row.images) ? row.images : [],

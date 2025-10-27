@@ -92,8 +92,26 @@
               </div>
             </div>
 
+            <!-- Seção de Preços -->
+            <div v-if="event.hasPrice" class="pricing-section q-mt-xl">
+              <div class="pricing-info">
+                <div
+                  v-if="event.installments && event.installmentValue"
+                  class="installment-details"
+                >
+                  <span class="installment-prefix">{{ event.installments }}x de</span>
+                  <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
+                  <span class="installment-suffix">sem juros</span>
+                </div>
+                <div v-if="event.fullPrice" class="cash-price">
+                  ou {{ event.formattedFullPrice }} à vista
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão de Comprar -->
             <q-btn
-              class="buy-btn q-mt-xl"
+              class="buy-btn q-mt-lg"
               color="warning"
               text-color="black"
               label="Comprar"
@@ -506,9 +524,61 @@ function getEventTags(eventData) {
   font-size: 0.9rem;
 }
 
+/* ==================== SEÇÃO DE PREÇOS ==================== */
+.pricing-section {
+  display: flex;
+  justify-content: flex-end;
+  margin: 24px 0;
+
+  transform: translateY(-270px) translateX(-100px);
+}
+
+.pricing-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.installment-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.installment-prefix {
+  font-size: 24px;
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+}
+
+.installment-value {
+  font-size: 63.41px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.installment-suffix {
+  font-size: 24.66px;
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+}
+
+.cash-price {
+  font-size: 16px;
+  font-weight: 500;
+  color: #d1d5db;
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
 .buy-btn {
-  /* Centraliza e mantém 434px das extremidades em viewports >= 1440px */
-  width: min(572px, calc(100vw - 868px));
+  /* Botão centralizado abaixo dos preços */
+  width: 572px;
   height: 57px;
   border-radius: 10px !important;
   font-size: 16px;
@@ -588,6 +658,40 @@ function getEventTags(eventData) {
     width: 80px;
     height: 80px;
     border-radius: 16px;
+  }
+
+  /* Responsividade para seção de preços */
+  .pricing-section {
+    justify-content: center;
+  }
+
+  .pricing-info {
+    align-items: center;
+  }
+
+  .installment-details {
+    align-items: center;
+  }
+
+  .installment-prefix {
+    font-size: 14px;
+  }
+
+  .installment-value {
+    font-size: 28px;
+  }
+
+  .installment-suffix {
+    font-size: 14px;
+  }
+
+  .cash-price {
+    font-size: 14px;
+  }
+
+  .buy-btn {
+    width: 100%;
+    height: 50px;
   }
 }
 
