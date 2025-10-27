@@ -8,82 +8,83 @@
       </div>
 
       <!-- Carousel real -->
-      <q-carousel
-        v-else
-        v-model="activeSlide"
-        animated
-        infinite
-        swipeable
-        autoplay
-        height="440px"
-        control-color="white"
-        navigation-position="bottom"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        class="featured-carousel"
-      >
-        <q-carousel-slide v-for="ev in featured" :key="ev.id" :name="ev.id" class="q-pa-none">
-          <div class="featured-wrap">
-            <div class="featured-grid rounded-borders overflow-hidden shadow-2">
-              <!-- Imagem -->
-              <div class="featured-img">
-                <q-img
-                  :src="ev.image"
-                  :alt="`Imagem do evento ${ev.title}`"
-                  fit="cover"
-                  class="full"
-                  :ratio="16 / 9"
-                  spinner-color="white"
-                  loading="lazy"
-                />
-              </div>
-
-              <!-- Painel -->
-              <div class="featured-panel">
-                <div class="panel-inner">
-                  <div class="event-title q-mb-sm">{{ ev.title }}</div>
-
-                  <div v-if="ev.description" class="featured-description text-body1 q-mt-xs">
-                    {{ ev.description }}
-                  </div>
-
-                  <div class="q-mt-md q-gutter-sm">
-                    <div class="row items-center event-meta">
-                      <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-                      <span>{{ ev.date }}</span>
-                    </div>
-                    <div class="row items-center event-meta">
-                      <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-                      <span>{{ ev.location }}</span>
-                    </div>
-                  </div>
-
-                  <q-btn
-                    class="q-mt-lg featured-cta"
-                    color="warning"
-                    text-color="black"
-                    unelevated
-                    no-caps
-                    label="Ver detalhes"
-                    :aria-label="`Ver detalhes do evento ${ev.title}`"
-                    :to="ev.link || '#'"
+      <div v-else class="carousel-container">
+        <q-carousel
+          v-model="activeSlide"
+          animated
+          infinite
+          swipeable
+          autoplay
+          height="440px"
+          control-color="transparent"
+          navigation-position="bottom"
+          transition-prev="slide-right"
+          transition-next="slide-left"
+          class="featured-carousel"
+        >
+          <q-carousel-slide v-for="ev in featured" :key="ev.id" :name="ev.id" class="q-pa-none">
+            <div class="featured-wrap">
+              <div class="featured-grid rounded-borders overflow-hidden shadow-2">
+                <!-- Imagem -->
+                <div class="featured-img">
+                  <q-img
+                    :src="ev.image"
+                    :alt="`Imagem do evento ${ev.title}`"
+                    fit="cover"
+                    class="full"
+                    :ratio="16 / 9"
+                    spinner-color="white"
+                    loading="lazy"
                   />
+                </div>
+
+                <!-- Painel -->
+                <div class="featured-panel">
+                  <div class="panel-inner">
+                    <div class="event-title q-mb-sm">{{ ev.title }}</div>
+
+                    <div v-if="ev.description" class="featured-description text-body1 q-mt-xs">
+                      {{ ev.description }}
+                    </div>
+
+                    <div class="q-mt-md q-gutter-sm">
+                      <div class="row items-center event-meta">
+                        <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <span>{{ ev.date }}</span>
+                      </div>
+                      <div class="row items-center event-meta">
+                        <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <span>{{ ev.location }}</span>
+                      </div>
+                    </div>
+
+                    <q-btn
+                      class="q-mt-lg featured-cta"
+                      color="warning"
+                      text-color="black"
+                      unelevated
+                      no-caps
+                      label="Ver detalhes"
+                      :aria-label="`Ver detalhes do evento ${ev.title}`"
+                      :to="ev.link || '#'"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
+          </q-carousel-slide>
+        </q-carousel>
 
-      <!-- Paginação separada -->
-      <div class="pagination-dots">
-        <button
-          v-for="(event, index) in featured"
-          :key="event.id"
-          :class="['pagination-dot', { 'pagination-dot--active': activeSlide === event.id }]"
-          :aria-label="`Ir para slide ${index + 1}`"
-          @click="activeSlide = event.id"
-        />
+        <!-- Paginação separada -->
+        <div class="pagination-dots">
+          <button
+            v-for="(event, index) in featured"
+            :key="event.id"
+            :class="['pagination-dot', { 'pagination-dot--active': activeSlide === event.id }]"
+            :aria-label="`Ir para slide ${index + 1}`"
+            @click="activeSlide = event.id"
+          />
+        </div>
       </div>
     </section>
 
@@ -473,6 +474,12 @@ async function filterEventsByCategory(categoryLabel) {
 .featured-carousel {
   background: transparent !important;
 }
+
+/* Esconde os controles nativos do Quasar carousel */
+.featured-carousel :deep(.q-carousel__control) {
+  display: none;
+}
+
 .featured-carousel .q-carousel__slide {
   display: flex;
   align-items: center;
@@ -525,7 +532,7 @@ async function filterEventsByCategory(categoryLabel) {
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 20px;
+  padding: 40px;
   width: 100%;
   min-height: 100%;
 }
