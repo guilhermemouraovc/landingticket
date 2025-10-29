@@ -229,6 +229,7 @@ import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
 import { useEvents } from 'src/composables/useEvents'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
@@ -243,6 +244,9 @@ const {
   fetchEventsByTag: fetchEventsByTagSupabase,
   fetchAllEvents: fetchAllEventsSupabase,
 } = useSupabaseEvents()
+
+// Composable para gerenciar tags (categorias dinâmicas)
+const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -262,15 +266,14 @@ const loadingCarousels = ref(true)
 const selectedCategory = ref(null)
 const filteredEvents = ref([])
 
-// categorias fixas usadas nos botoes tiles
-const categories = ref([
-  { label: 'Carnaval', icon: 'celebration' },
-  { label: 'Festivais', icon: 'park' },
-  { label: 'Semana Santa', icon: 'holiday_village' },
-  { label: 'Ano Novo', icon: 'auto_awesome' },
-  { label: 'Boate', icon: 'nightlife' },
-  { label: 'Calourada', icon: 'school' },
-])
+// categorias dinâmicas do Supabase
+const categories = ref([])
+
+// Helper para obter tagName a partir do label
+function getTagNameByLabel(label) {
+  const c = categories.value.find(x => x.label === label)
+  return c?.tagName || null
+}
 
 // Escuta eventos do header
 function handleCategorySelected(event) {
@@ -287,6 +290,16 @@ function handleCategorySelected(event) {
 
 // boot das seções
 onMounted(async () => {
+  // Carrega tags dinâmicas do Supabase
+  try {
+    const tags = await fetchTags()
+    categories.value = mapToCategoryButtons(tags)
+    console.log('✅ Tags carregadas:', categories.value.length)
+  } catch (e) {
+    console.error('❌ Erro ao carregar tags:', e)
+    categories.value = []
+  }
+
   // Adiciona listener para eventos do header
   window.addEventListener('categorySelected', handleCategorySelected)
 
@@ -425,25 +438,17 @@ async function filterEventsByCategory(categoryLabel) {
   try {
     console.log('🔍 Filtrando eventos por categoria:', categoryLabel)
 
-    // Mapeamento de categorias para tags do Supabase
-    const categoryMap = {
-      Carnaval: 'CARNAVAL',
-      Festivais: 'FESTIVAISS',
-      'Ano Novo': 'REVEILLONS',
-      'Semana Santa': 'SemanaSanta',
-      Boate: 'Boate',
-      Calourada: 'Calourada',
-    }
-
-    const tagName = categoryMap[categoryLabel]
-    if (tagName) {
-      // Usar Supabase ao invés do Strapi
-      filteredEvents.value = await fetchEventsByTagSupabase(tagName, { limit: 100 })
-      console.log('✅ Eventos filtrados:', filteredEvents.value.length)
-    } else {
+    // Usa mapeamento dinâmico das tags
+    const tagName = getTagNameByLabel(categoryLabel)
+    if (!tagName) {
       console.warn('⚠️ Categoria não mapeada:', categoryLabel)
       filteredEvents.value = []
+      return
     }
+
+    // Usar Supabase com tagName dinâmico
+    filteredEvents.value = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    console.log('✅ Eventos filtrados:', filteredEvents.value.length)
   } catch (err) {
     console.error('❌ Falha ao filtrar eventos por categoria:', err)
     filteredEvents.value = []

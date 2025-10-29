@@ -196,10 +196,11 @@
 </template>
 
 <script setup>
-import { ref, watch, provide } from 'vue'
+import { ref, watch, provide, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
 import { useQuasar } from 'quasar'
+import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 
 const router = useRouter()
 const route = useRoute()
@@ -208,19 +209,15 @@ const drawer = ref(false)
 const filterDrawer = ref(false)
 const $q = useQuasar()
 
+// Composable para carregar tags dinâmicas
+const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
+
 // Estado das categorias expansíveis
 const showCategories = ref(false)
 const selectedCategory = ref(null)
 
-// Categorias disponíveis
-const categories = ref([
-  { label: 'Carnaval', icon: 'celebration' },
-  { label: 'Festivais', icon: 'park' },
-  { label: 'Semana Santa', icon: 'holiday_village' },
-  { label: 'Ano Novo', icon: 'auto_awesome' },
-  { label: 'Boate', icon: 'nightlife' },
-  { label: 'Calourada', icon: 'school' },
-])
+// Categorias disponíveis (carregadas dinamicamente)
+const categories = ref([])
 
 // Estado dos filtros
 const filters = ref({
@@ -232,6 +229,18 @@ const filters = ref({
 
 // Debounce timer
 let debounceTimer = null
+
+// Carrega categorias ao montar o componente
+onMounted(async () => {
+  try {
+    const tags = await fetchTags()
+    categories.value = mapToCategoryButtons(tags)
+    console.log('✅ Tags carregadas no header:', categories.value.length)
+  } catch (e) {
+    console.error('❌ Erro ao carregar tags no header:', e)
+    categories.value = []
+  }
+})
 
 // Função para alternar a exibição das categorias
 function toggleCategories() {
