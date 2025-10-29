@@ -3,7 +3,6 @@
     class="event-card"
     :class="[`event-card--${variant}`, { 'event-card--clickable': clickable }]"
     flat
-    bordered
     :clickable="clickable"
     v-ripple="clickable"
     @click="handleClick"
@@ -49,6 +48,21 @@
         <div class="meta-item">
           <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
           <span>{{ event.location || 'Local a definir' }}</span>
+        </div>
+      </div>
+
+      <!-- Seção de Preços -->
+      <div v-if="event.hasPrice && showPrice" class="event-card__price-section q-mt-md">
+        <!-- Preço Parcelado (se existir) -->
+        <div v-if="event.installments && event.installmentValue" class="price-installment">
+          <span class="installment-label">{{ event.installments }}x de</span>
+          <div class="installment-value">{{ event.formattedInstallmentValue }}</div>
+          <span class="installment-info">sem juros</span>
+        </div>
+
+        <!-- Preço À Vista -->
+        <div v-if="event.fullPrice" class="price-full">
+          ou {{ event.formattedFullPrice }} à vista
         </div>
       </div>
 
@@ -139,6 +153,12 @@ const props = defineProps({
     type: String,
     default: '18px',
   },
+
+  // Mostrar preços
+  showPrice: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 // Emits
@@ -176,6 +196,8 @@ function handleClick() {
     transform 0.2s ease,
     box-shadow 0.2s ease;
   overflow: hidden;
+  border: none;
+  outline: none;
 }
 
 .event-card--clickable {
@@ -190,8 +212,8 @@ function handleClick() {
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
 .event-card:focus-visible {
-  outline: 3px solid #35c7ee;
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: 0 0 0 3px #35c7ee;
 }
 
 /* ==================== VARIANTES ==================== */
@@ -216,16 +238,16 @@ function handleClick() {
 
 .event-card__body {
   flex: 1;
-  padding: 20px 22px 18px;
+  padding: 15px 15px 13px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   color: #1f2937;
 }
 
 .event-card__title {
   font-size: 1.05rem;
-  line-height: 1.35;
+  line-height: 1.05;
   color: #1f2937;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -280,6 +302,50 @@ function handleClick() {
 
 /* ==================== RESPONSIVIDADE ==================== */
 
+/* ==================== PREÇOS ==================== */
+
+.event-card__price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /*padding-top: 6px;
+  /* border-top: 1px solid #e5e7eb; */ /* Remover a linha também */
+}
+
+.price-installment {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.installment-label {
+  font-size: 0.85rem;
+  color: #00b5e2;
+  font-weight: 500;
+}
+
+.installment-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #00b5e2;
+  line-height: 1.2;
+}
+
+.installment-info {
+  font-size: 0.85rem;
+  color: #00b5e2;
+  font-weight: 400;
+}
+
+.price-full {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* ==================== RESPONSIVIDADE ==================== */
+
 @media (max-width: 768px) {
   .event-card--carousel {
     flex: 0 0 280px;
@@ -296,6 +362,10 @@ function handleClick() {
 
   .event-card__meta {
     font-size: 0.9rem;
+  }
+
+  .installment-value {
+    font-size: 1.5rem;
   }
 }
 </style>

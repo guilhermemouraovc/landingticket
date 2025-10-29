@@ -11,7 +11,7 @@
         </div>
 
         <!-- Título centralizado -->
-        <div class="page-title">Réveillon</div>
+        <div class="page-title">Festivais</div>
 
         <!-- Linha divisória -->
         <div class="title-divider"></div>
@@ -28,9 +28,9 @@
       <!-- Mensagem de nenhum resultado -->
       <div v-else-if="items.length === 0" class="no-results" role="status">
         <q-icon name="celebration" size="64px" color="grey-6" aria-hidden="true" />
-        <div class="no-results-title">Nenhum evento de Réveillon encontrado</div>
+        <div class="no-results-title">Nenhum evento de Festivais encontrado</div>
         <div class="no-results-text">
-          Não encontramos eventos de Réveillon no momento. Volte mais tarde!
+          Não encontramos eventos de Festivais no momento. Volte mais tarde!
         </div>
         <q-btn
           color="primary"
@@ -43,16 +43,40 @@
       </div>
 
       <!-- Grid de eventos -->
-      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Réveillon">
-        <EventCard
+      <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Festivais">
+        <q-card
           v-for="card in items"
           :key="card.id"
-          :event="card"
-          variant="grid"
-          image-height="215px"
-          :show-price="true"
+          flat
+          clickable
+          v-ripple
           @click="goToEvent(card)"
-        />
+          class="event-card"
+          role="listitem"
+          :aria-label="`Evento: ${card.title}. ${card.date}. ${card.location}`"
+          tabindex="0"
+          @keydown.enter="goToEvent(card)"
+          @keydown.space.prevent="goToEvent(card)"
+        >
+          <q-img
+            :src="card.image"
+            :alt="`Imagem do evento ${card.title}`"
+            ratio="16/9"
+            height="215px"
+            loading="lazy"
+          />
+          <q-card-section>
+            <div class="event-title q-mb-xs">{{ card.title }}</div>
+            <div class="row items-center event-meta q-mt-xs">
+              <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+              <span>{{ card.date }}</span>
+            </div>
+            <div class="row items-center event-meta q-mt-xs">
+              <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+              <span>{{ card.location }}</span>
+            </div>
+          </q-card-section>
+        </q-card>
       </div>
     </div>
   </q-page>
@@ -64,22 +88,21 @@ import { useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
-import EventCard from 'src/components/EventCard.vue'
 
 const router = useRouter()
 const items = ref([])
 const loading = ref(true)
 
-// Composable para gerenciar eventos do Supabase
-const { fetchEventsByTag } = useSupabaseEvents()
+// Composable para gerenciar eventos
+const { fetchEventsByTag: fetchEventsByTagSupabase } = useSupabaseEvents()
 
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
   { label: 'Início', to: '/', icon: 'home' },
-  { label: 'Réveillon', to: null },
+  { label: 'Festivais', to: null },
 ])
 
-onMounted(loadReveillonEvents)
+onMounted(loadFestivaisEvents)
 
 function goToEvent(card) {
   if (card?.link) {
@@ -87,35 +110,25 @@ function goToEvent(card) {
   }
 }
 
-async function loadReveillonEvents() {
+async function loadFestivaisEvents() {
   loading.value = true
   try {
-    console.log('🔍 Carregando eventos de Réveillon...')
+    console.log('🔍 Carregando eventos de Festivais...')
 
-    // Usar a tag correta 'REVEILLONS' conforme o banco de dados
-    let events = await fetchEventsByTag('REVEILLONS', { limit: 100 })
-
-    if (!events.length) {
-      console.log('🔄 Tentando com "reveillon" (minúsculo)...')
-      events = await fetchEventsByTag('reveillon', { limit: 100 })
-    }
-
-    if (!events.length) {
-      console.log('🔄 Tentando com "REVEILLON" (singular)...')
-      events = await fetchEventsByTag('REVEILLON', { limit: 100 })
-    }
+    // Busca eventos do Supabase usando a tag correta 'FESTIVAISS'
+    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
+    console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
 
     items.value = events
-    console.log('✅ Eventos de Réveillon carregados:', events.length)
+    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (e) {
-    console.error('❌ Falha ao carregar eventos de Réveillon', e)
+    console.error('❌ Falha ao carregar eventos de Festivais', e)
     items.value = []
   } finally {
     loading.value = false
   }
 }
 
-// Adicionar esta função
 function goBack() {
   router.push('/')
 }
@@ -221,15 +234,6 @@ function goBack() {
   height: 24px;
 }
 
-/* Esconder elementos antigos */
-.list-header {
-  display: none;
-}
-
-.list-title {
-  display: none;
-}
-
 .no-results {
   display: flex;
   flex-direction: column;
@@ -256,9 +260,59 @@ function goBack() {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 320px);
+  grid-template-columns: repeat(auto-fill, 400px);
   gap: 40px;
   justify-content: center;
+}
+
+.event-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  overflow: hidden;
+  border: none;
+  outline: none;
+}
+
+.event-card:hover,
+.event-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
+}
+
+.event-card .q-card-section {
+  flex: 1;
+  padding: 16px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-title {
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.event-meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.event-meta__icon {
+  color: #ec4899;
+  font-size: 18px;
 }
 
 @media (max-width: 768px) {
@@ -277,63 +331,8 @@ function goBack() {
   outline-offset: 2px;
 }
 
-/* Adicionar estes estilos do botão customizado */
-.back-button-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.back-button-container:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.back-icon {
-  width: 56px;
-  height: 56px;
-  background-color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.back-text {
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  font-family:
-    'Poppins',
-    system-ui,
-    -apple-system,
-    sans-serif;
-}
-
-.back-button-container:focus-visible {
-  outline: 2px solid #35c7ee;
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-
-.back-arrow-icon {
-  color: #35c7ee !important;
-}
-
-.back-arrow-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon svg {
-  width: 24px;
-  height: 24px;
+.event-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #35c7ee;
 }
 </style>

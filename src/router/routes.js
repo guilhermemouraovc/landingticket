@@ -24,6 +24,11 @@
         name: 'carnaval',
         component: () => import('pages/CarnavalPage.vue'),
       },
+      {
+        path: 'festivais',
+        name: 'festivais',
+        component: () => import('pages/FestivaisPage.vue'),
+      },
     ],
   },
 

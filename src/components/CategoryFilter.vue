@@ -45,8 +45,24 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { CATEGORIES } from 'src/constants/config'
+import { ref, computed, onMounted } from 'vue'
+import { useSupabaseTags } from 'src/composables/useSupabaseTags'
+
+// Composable para carregar tags dinâmicas
+const { fetchTags, mapToCategoryChips } = useSupabaseTags()
+const rawCategories = ref([])
+
+// Carrega categorias ao montar o componente
+onMounted(async () => {
+  try {
+    const tags = await fetchTags()
+    rawCategories.value = mapToCategoryChips(tags)
+    console.log('✅ Tags carregadas no filtro:', rawCategories.value.length)
+  } catch (e) {
+    console.error('❌ Erro ao carregar tags no filtro:', e)
+    rawCategories.value = []
+  }
+})
 
 // Props
 const props = defineProps({
@@ -60,7 +76,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 // Computed
-const categories = computed(() => CATEGORIES)
+const categories = computed(() => rawCategories.value)
 
 const selectedCategories = computed(() => props.modelValue)
 

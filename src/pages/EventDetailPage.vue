@@ -58,12 +58,13 @@
               <q-btn
                 unelevated
                 rounded
-                color="primary"
-                icon="share"
+                color="transparent"
                 class="event-share"
                 aria-label="Compartilhar evento"
                 @click="shareEvent"
-              />
+              >
+                <img src="/export.svg" alt="Compartilhar" class="share-icon" />
+              </q-btn>
             </div>
 
             <div class="event-meta">
@@ -91,8 +92,26 @@
               </div>
             </div>
 
+            <!-- Seção de Preços -->
+            <div v-if="event.hasPrice" class="pricing-section q-mt-xl">
+              <div class="pricing-info">
+                <div
+                  v-if="event.installments && event.installmentValue"
+                  class="installment-details"
+                >
+                  <span class="installment-prefix">{{ event.installments }}x de</span>
+                  <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
+                  <span class="installment-suffix">sem juros</span>
+                </div>
+                <div v-if="event.fullPrice" class="cash-price">
+                  ou {{ event.formattedFullPrice }} à vista
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão de Comprar -->
             <q-btn
-              class="buy-btn q-mt-xl"
+              class="buy-btn"
               color="warning"
               text-color="black"
               label="Comprar"
@@ -108,16 +127,23 @@
             </q-btn>
 
             <div class="event-section q-mt-xl">
-              <div class="section-title">Descricao do Evento</div>
+              <div class="section-title">Descrição do Evento</div>
               <p class="section-text">{{ event.description }}</p>
             </div>
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
-              <div class="section-title">Informacoes adicionais</div>
+              <div class="section-title">Informações Adicionais</div>
               <p class="section-text">{{ event.additionalInfo }}</p>
             </div>
           </div>
         </q-card>
+
+        <!-- Carrossel de eventos relacionados -->
+        <RelatedEventsCarousel
+          v-if="event"
+          :current-event-id="event.id"
+          :event-tags="getEventTags(event)"
+        />
       </div>
     </div>
   </q-page>
@@ -126,8 +152,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import { useQuasar } from 'quasar'
 const openingWhatsapp = ref(false)
 
@@ -138,8 +165,8 @@ const DEFAULT_WHATSAPP_MESSAGE = 'Olá! Tenho interesse no evento.'
 const route = useRoute()
 const router = useRouter()
 
-// Composable para gerenciar eventos
-const { fetchEventById, loading, error: apiError } = useEvents()
+// Composable para gerenciar eventos do Supabase
+const { fetchEventById, loading, error: apiError } = useSupabaseEvents()
 
 // Estado base da tela
 const error = ref('')
@@ -263,6 +290,43 @@ function goBack() {
 function goHome() {
   router.push('/')
 }
+
+// Função para extrair tags do evento
+function getEventTags(eventData) {
+  console.log('🏷️ Extraindo tags do evento:', eventData)
+
+  // Tenta extrair tags de diferentes estruturas possíveis
+  if (eventData.tags && Array.isArray(eventData.tags) && eventData.tags.length > 0) {
+    console.log('✅ Tags encontradas no evento:', eventData.tags)
+    return eventData.tags
+  }
+
+  // Se não há tags específicas, tenta inferir pela categoria baseada no título
+  const title = (eventData.title || '').toLowerCase()
+  console.log('📝 Inferindo tag pelo título:', title)
+
+  if (title.includes('réveillon') || title.includes('reveillon') || title.includes('amoré')) {
+    console.log('🎆 Tag inferida: REVEILLONS')
+    return ['REVEILLONS'] // Tag correta do Supabase
+  }
+  if (title.includes('carnaval') || title.includes('carvalheira')) {
+    console.log('🎭 Tag inferida: CARNAVAL')
+    return ['CARNAVAL'] // Tag correta do Supabase
+  }
+  if (
+    title.includes('são joão') ||
+    title.includes('sao joao') ||
+    title.includes('joão') ||
+    title.includes('festival')
+  ) {
+    console.log('🎪 Tag inferida: FESTIVAISS')
+    return ['FESTIVAISS'] // Tag correta do Supabase
+  }
+
+  // Padrão: Réveillon
+  console.log('⚠️ Nenhuma tag específica encontrada, usando padrão: REVEILLONS')
+  return ['REVEILLONS']
+}
 </script>
 
 <style scoped>
@@ -382,6 +446,7 @@ function goHome() {
 
 .event-heading {
   gap: 16px;
+  margin-bottom: 0; /* Pode ajustar se necessário */
 }
 
 .event-highlight {
@@ -390,7 +455,17 @@ function goHome() {
 }
 
 .event-share {
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent !important;
+  padding: 8px;
+  min-width: 48px;
+  min-height: 48px;
+  box-shadow: none !important;
+}
+
+.share-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
 
 .event-meta {
@@ -399,12 +474,14 @@ function goHome() {
   margin-top: 20px;
 }
 
+/* Remover a indentação dos meta-items */
 .meta-item {
   display: flex;
   align-items: center;
   gap: 16px;
   background: transparent !important;
-  padding: 16px 20px;
+  padding: 16px 0;
+  margin-left: 0; /* Garantir sem margem */
   border-radius: 0 !important;
   box-shadow: none !important;
 }
@@ -463,34 +540,88 @@ function goHome() {
   font-size: 0.9rem;
 }
 
+/* ==================== SEÇÃO DE PREÇOS ==================== */
+.pricing-section {
+  display: flex;
+  justify-content: flex-end;
+  margin: 24px 0;
+
+  transform: translateY(-270px) translateX(-100px);
+}
+
+.pricing-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.installment-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.installment-prefix {
+  font-size: 24px;
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+}
+
+.installment-value {
+  font-size: 63.41px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.installment-suffix {
+  font-size: 24.66px;
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+}
+
+.cash-price {
+  font-size: 16px;
+  font-weight: 500;
+  color: #d1d5db;
+  line-height: 1.2;
+  margin-top: 24.66px; /* Distância exata conforme protótipo */
+}
+
 .buy-btn {
-  /* Centraliza e mantém 434px das extremidades em viewports >= 1440px */
-  width: min(572px, calc(100vw - 868px));
+  width: 572px;
   height: 57px;
   border-radius: 10px !important;
   font-size: 16px;
-  font-weight: 600; /* semibold */
+  font-weight: 600;
   line-height: 1;
   margin-left: auto;
   margin-right: auto;
   display: block;
+  margin-top: -200px; /* Bem próximo */
+  margin-bottom: 150px;
 }
 
 .event-section {
-  background: rgba(255, 255, 255, 0.04);
-  padding: 24px;
-  border-radius: 20px;
+  background: transparent; /* Sem fundo */
+  padding: 24px 0; /* Remove padding horizontal para alinhar com o título */
+  border-radius: 0; /* Remove border-radius */
 }
 
 .section-title {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 24px;
   margin-bottom: 12px;
 }
 
 .section-text {
   margin: 0;
   color: #e5e7eb;
+  font-size: 20px;
   line-height: 1.7;
 }
 
@@ -545,6 +676,48 @@ function goHome() {
     width: 80px;
     height: 80px;
     border-radius: 16px;
+  }
+
+  /* Responsividade para seção de preços */
+  .pricing-section {
+    justify-content: center;
+  }
+
+  .pricing-info {
+    align-items: center;
+  }
+
+  .installment-details {
+    align-items: center;
+  }
+
+  .installment-prefix {
+    font-size: 14px;
+  }
+
+  .installment-value {
+    font-size: 28px;
+  }
+
+  .installment-suffix {
+    font-size: 14px;
+    font-weight: 400;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .cash-price {
+    font-size: 14px;
+    font-weight: 400;
+    color: #d1d5db;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .buy-btn {
+    width: 100%;
+    height: 50px;
   }
 }
 

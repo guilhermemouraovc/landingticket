@@ -8,73 +8,82 @@
       </div>
 
       <!-- Carousel real -->
-      <q-carousel
-        v-else
-        v-model="activeSlide"
-        animated
-        infinite
-        swipeable
-        autoplay
-        height="440px"
-        control-color="white"
-        navigation
-        navigation-position="bottom"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        class="featured-carousel"
-      >
-        <q-carousel-slide v-for="ev in featured" :key="ev.id" :name="ev.id" class="q-pa-none">
-          <div class="featured-wrap">
-            <div class="featured-grid rounded-borders overflow-hidden shadow-2">
-              <!-- Imagem -->
-              <div class="featured-img">
-                <q-img
-                  :src="ev.image"
-                  :alt="`Imagem do evento ${ev.title}`"
-                  fit="cover"
-                  class="full"
-                  :ratio="16 / 9"
-                  spinner-color="white"
-                  loading="lazy"
-                />
-              </div>
-
-              <!-- Painel -->
-              <div class="featured-panel">
-                <div class="panel-inner">
-                  <div class="event-title q-mb-sm">{{ ev.title }}</div>
-
-                  <div v-if="ev.description" class="featured-description text-body1 q-mt-xs">
-                    {{ ev.description }}
-                  </div>
-
-                  <div class="q-mt-md q-gutter-sm">
-                    <div class="row items-center event-meta">
-                      <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-                      <span>{{ ev.date }}</span>
-                    </div>
-                    <div class="row items-center event-meta">
-                      <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-                      <span>{{ ev.location }}</span>
-                    </div>
-                  </div>
-
-                  <q-btn
-                    class="q-mt-lg featured-cta"
-                    color="warning"
-                    text-color="black"
-                    unelevated
-                    no-caps
-                    label="Ver detalhes"
-                    :aria-label="`Ver detalhes do evento ${ev.title}`"
-                    :to="ev.link || '#'"
+      <div v-else class="carousel-container">
+        <q-carousel
+          v-model="activeSlide"
+          animated
+          infinite
+          swipeable
+          autoplay
+          height="440px"
+          control-color="transparent"
+          navigation-position="bottom"
+          transition-prev="slide-right"
+          transition-next="slide-left"
+          class="featured-carousel"
+        >
+          <q-carousel-slide v-for="ev in featured" :key="ev.id" :name="ev.id" class="q-pa-none">
+            <div class="featured-wrap">
+              <div class="featured-grid rounded-borders overflow-hidden shadow-2">
+                <!-- Imagem -->
+                <div class="featured-img">
+                  <q-img
+                    :src="ev.image"
+                    :alt="`Imagem do evento ${ev.title}`"
+                    fit="cover"
+                    class="full"
+                    :ratio="16 / 9"
+                    spinner-color="white"
+                    loading="lazy"
                   />
+                </div>
+
+                <!-- Painel -->
+                <div class="featured-panel">
+                  <div class="panel-inner">
+                    <div class="event-title q-mb-sm">{{ ev.title }}</div>
+
+                    <div v-if="ev.description" class="featured-description text-body1 q-mt-xs">
+                      {{ ev.description }}
+                    </div>
+
+                    <div class="q-mt-md q-gutter-sm">
+                      <div class="row items-center event-meta">
+                        <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <span>{{ ev.date }}</span>
+                      </div>
+                      <div class="row items-center event-meta">
+                        <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <span>{{ ev.location }}</span>
+                      </div>
+                    </div>
+
+                    <q-btn
+                      class="q-mt-lg featured-cta"
+                      unelevated
+                      no-caps
+                      label="Ver Detalhes"
+                      :aria-label="`Ver detalhes do evento ${ev.title}`"
+                      :to="ev.link || '#'"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </q-carousel-slide>
-      </q-carousel>
+          </q-carousel-slide>
+        </q-carousel>
+
+        <!-- Paginação separada -->
+        <div class="pagination-dots">
+          <button
+            v-for="(event, index) in featured"
+            :key="event.id"
+            :class="['pagination-dot', { 'pagination-dot--active': activeSlide === event.id }]"
+            :aria-label="`Ir para slide ${index + 1}`"
+            @click="activeSlide = event.id"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- CATEGORIAS -->
@@ -140,9 +149,10 @@
         />
 
         <EventSectionCarousel
-          title="São João"
+          title="Festivais"
           :items="saoJoaoEvents"
           see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'festivais' }"
           :default-image="DEFAULT_IMAGE"
         />
 
@@ -160,81 +170,51 @@
     <footer class="footer" role="contentinfo">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <img
-            src="/logo.svg"
-            alt="TicketPE - Eventos em Pernambuco"
-            class="footer-logo"
-            loading="lazy"
-          />
-
-          <div class="row q-gutter-md">
-            <q-btn
-              flat
-              no-caps
-              label="Compre Conosco"
-              class="text-white"
-              aria-label="Comprar ingressos conosco"
+          <div class="footer-logo-container">
+            <img
+              src="/ticketpe.svg"
+              alt="TicketPE - Eventos em Pernambuco"
+              class="footer-logo"
+              loading="lazy"
             />
+          </div>
+
+          <div class="social-icons row q-gutter-md">
+            <a href="#" class="social-link" aria-label="WhatsApp">
+              <img src="/whatsapp.svg" alt="WhatsApp" class="social-icon" />
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <img src="/insta.svg" alt="Instagram" class="social-icon" />
+            </a>
+            <a href="#" class="social-link" aria-label="TikTok">
+              <img src="/tiktok.svg" alt="TikTok" class="social-icon" />
+            </a>
           </div>
         </div>
 
         <q-separator dark />
 
         <div class="footer-links row justify-between q-mt-lg">
-          <div>
-            <div class="text-subtitle2 q-bold q-mb-sm">Links Úteis</div>
-            <div>Eventos em Destaque</div>
-            <div>Próximos Eventos</div>
-            <div>Blog</div>
-            <div>Programação Completa</div>
+          <div class="footer-column">
+            <div class="footer-title">Links Úteis</div>
+            <div class="footer-link">Programação Completa</div>
           </div>
 
-          <!-- Contato -->
-          <div>
-            <div class="text-subtitle2 text-bold q-mb-sm">Contato</div>
-            <div>ajuda@ticketpe.com.br</div>
-            <div class="row q-gutter-md q-mt-sm" role="list" aria-label="Redes sociais">
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-facebook"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no Facebook"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-instagram"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no Instagram"
-              />
-              <q-btn
-                flat
-                round
-                dense
-                icon="mdi-tiktok"
-                size="md"
-                class="social-icon"
-                aria-label="Seguir no TikTok"
-              />
-            </div>
+          <div class="footer-column">
+            <div class="footer-title">Contato</div>
+            <div class="footer-link">ajuda@ticketpe.com.br</div>
           </div>
 
-          <!-- Suporte -->
-          <div>
-            <div class="text-subtitle2 text-bold q-mb-sm">Suporte</div>
-            <div>Termos de Uso</div>
-            <div>Polí­tica de Privacidade</div>
+          <div class="footer-column">
+            <div class="footer-title">Suporte</div>
+            <div class="footer-link">Termos de Uso</div>
+            <div class="footer-link">Política de Privacidade</div>
           </div>
         </div>
 
         <q-separator dark class="q-mt-lg" />
 
-        <div class="text-center q-mt-md">© 2025 Ticketpe. Todos os direitos reservados.</div>
+        <div class="footer-copyright">© 2025 ticketpe. Todos os direitos reservados.</div>
       </div>
     </footer>
   </q-page>
@@ -245,13 +225,22 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
-// Composable para gerenciar eventos
-const { fetchEvents, fetchEventsByTag, fetchAllEvents } = useEvents()
+// Composable para gerenciar eventos (Supabase)
+const {
+  fetchFeaturedEvents,
+  fetchEvents: fetchEventsSupabase,
+  fetchEventsByTag: fetchEventsByTagSupabase,
+  fetchAllEvents: fetchAllEventsSupabase,
+} = useSupabaseEvents()
+
+// Composable para gerenciar tags (categorias dinâmicas)
+const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -271,15 +260,14 @@ const loadingCarousels = ref(true)
 const selectedCategory = ref(null)
 const filteredEvents = ref([])
 
-// categorias fixas usadas nos botoes tiles
-const categories = ref([
-  { label: 'Carnaval', icon: 'celebration' },
-  { label: 'São João', icon: 'park' },
-  { label: 'Semana Santa', icon: 'holiday_village' },
-  { label: 'Ano Novo', icon: 'auto_awesome' },
-  { label: 'Boate', icon: 'nightlife' },
-  { label: 'Calourada', icon: 'school' },
-])
+// categorias dinâmicas do Supabase
+const categories = ref([])
+
+// Helper para obter tagName a partir do label
+function getTagNameByLabel(label) {
+  const c = categories.value.find(x => x.label === label)
+  return c?.tagName || null
+}
 
 // Escuta eventos do header
 function handleCategorySelected(event) {
@@ -296,6 +284,16 @@ function handleCategorySelected(event) {
 
 // boot das seções
 onMounted(async () => {
+  // Carrega tags dinâmicas do Supabase
+  try {
+    const tags = await fetchTags()
+    categories.value = mapToCategoryButtons(tags)
+    console.log('✅ Tags carregadas:', categories.value.length)
+  } catch (e) {
+    console.error('❌ Erro ao carregar tags:', e)
+    categories.value = []
+  }
+
   // Adiciona listener para eventos do header
   window.addEventListener('categorySelected', handleCategorySelected)
 
@@ -304,7 +302,7 @@ onMounted(async () => {
   loadingFeatured.value = false
 
   // Carrega carrosséis em paralelo
-  await Promise.all([loadReveillon(), loadCarnaval(), loadSaoJoao(), loadAllEvents()])
+  await Promise.all([loadReveillon(), loadCarnaval(), loadFestivais(), loadAllEvents()])
   loadingCarousels.value = false
 })
 
@@ -315,51 +313,80 @@ onUnmounted(() => {
 
 async function loadFeatured() {
   try {
-    const events = await fetchEvents({ 'pagination[pageSize]': 25 })
+    // Primeiro tenta buscar eventos em destaque do Supabase
+    let events = await fetchFeaturedEvents({ limit: 25 })
+
+    // Se não há eventos em destaque, busca eventos recentes do Supabase
+    if (!events.length) {
+      console.log('🔄 Nenhum evento em destaque encontrado, buscando eventos recentes...')
+      events = await fetchEventsSupabase({ limit: 25 })
+    }
+
     featured.value = events
     activeSlide.value = events[0]?.id ?? null
   } catch (err) {
-    console.error('Falha ao carregar festas', err)
+    console.error('Falha ao carregar eventos em destaque', err)
     featured.value = []
   }
 }
 
 async function loadReveillon() {
   try {
-    reveillonEvents.value = await fetchEventsByTag('REVEILLON')
+    console.log('🔍 Carregando eventos de Réveillon...')
+
+    // Usar o mesmo método que na ReveillonPage e outras categorias
+    reveillonEvents.value = await fetchEventsByTagSupabase('REVEILLONS', { limit: 100 })
+
+    console.log('✅ Eventos de Réveillon carregados:', reveillonEvents.value.length)
   } catch (err) {
-    console.error('Falha ao carregar reveillon', err)
+    console.error('❌ Falha ao carregar reveillon', err)
     reveillonEvents.value = []
   }
 }
 
 async function loadCarnaval() {
   try {
-    carnavalEvents.value = await fetchEventsByTag('CARNAVAIS', {
-      'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-    })
+    console.log('🔍 Carregando eventos de Carnaval...')
+
+    // Primeiro tenta buscar do Supabase usando a tag 'CARNAVAL' ou 'carnavais'
+    let events = await fetchEventsByTagSupabase('CARNAVAL', { limit: 100 })
+
+    // Se não encontrou eventos com 'CARNAVAL', tenta 'carnavais' (slug)
+    if (!events.length) {
+      console.log('🔄 Tentando com slug "carnavais"...')
+      events = await fetchEventsByTagSupabase('carnavais', { limit: 100 })
+    }
+
+    carnavalEvents.value = events
+    console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (err) {
-    console.error('Falha ao carregar carnaval', err)
+    console.error('❌ Falha ao carregar carnaval', err)
     carnavalEvents.value = []
   }
 }
 
-async function loadSaoJoao() {
+async function loadFestivais() {
   try {
-    saoJoaoEvents.value = await fetchEventsByTag('SaoJoao', {
-      'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-    })
+    console.log('🔍 Carregando eventos de Festivais...')
+
+    // Busca eventos do Supabase usando a tag correta 'FESTIVAISS'
+    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
+    console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
+
+    saoJoaoEvents.value = events
+    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (err) {
-    console.error('Falha ao carregar São João', err)
+    console.error('❌ Falha ao carregar Festivais', err)
     saoJoaoEvents.value = []
   }
 }
 
 async function loadAllEvents() {
   try {
-    allEvents.value = await fetchAllEvents(60)
+    allEvents.value = await fetchAllEventsSupabase(100)
+    console.log('✅ Programação completa carregada:', allEvents.value.length)
   } catch (err) {
-    console.error('Falha ao carregar programação completa', err)
+    console.error('❌ Falha ao carregar programação completa', err)
     allEvents.value = []
   }
 }
@@ -380,24 +407,21 @@ function toggleCategory(categoryLabel) {
 async function filterEventsByCategory(categoryLabel) {
   loadingCarousels.value = true
   try {
-    // Mapeamento de categorias para tags da API
-    const categoryMap = {
-      Carnaval: 'CARNAVAIS',
-      'São João': 'SaoJoao',
-      'Ano Novo': 'REVEILLON',
-      'Semana Santa': 'SemanaSanta',
-      Boate: 'Boate',
-      Calourada: 'Calourada',
+    console.log('🔍 Filtrando eventos por categoria:', categoryLabel)
+
+    // Usa mapeamento dinâmico das tags
+    const tagName = getTagNameByLabel(categoryLabel)
+    if (!tagName) {
+      console.warn('⚠️ Categoria não mapeada:', categoryLabel)
+      filteredEvents.value = []
+      return
     }
 
-    const tagName = categoryMap[categoryLabel]
-    if (tagName) {
-      filteredEvents.value = await fetchEventsByTag(tagName)
-    } else {
-      filteredEvents.value = []
-    }
+    // Usar Supabase com tagName dinâmico
+    filteredEvents.value = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    console.log('✅ Eventos filtrados:', filteredEvents.value.length)
   } catch (err) {
-    console.error('Falha ao filtrar eventos', err)
+    console.error('❌ Falha ao filtrar eventos por categoria:', err)
     filteredEvents.value = []
   } finally {
     loadingCarousels.value = false
@@ -410,6 +434,7 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   max-width: 1200px;
   margin: 0 auto;
+  margin-bottom: 100px; /* Adiciona gap de 250px entre o carrossel e o footer */
 }
 /* fundo */
 .bg-landing {
@@ -425,6 +450,12 @@ async function filterEventsByCategory(categoryLabel) {
 .featured-carousel {
   background: transparent !important;
 }
+
+/* Esconde os controles nativos do Quasar carousel */
+.featured-carousel :deep(.q-carousel__control) {
+  display: none;
+}
+
 .featured-carousel .q-carousel__slide {
   display: flex;
   align-items: center;
@@ -477,7 +508,7 @@ async function filterEventsByCategory(categoryLabel) {
   flex-direction: column;
   justify-content: center;
   gap: 12px;
-  padding: 20px;
+  padding: 40px;
   width: 100%;
   min-height: 100%;
 }
@@ -493,15 +524,40 @@ async function filterEventsByCategory(categoryLabel) {
 .featured-carousel {
   position: relative;
 }
-.featured-carousel .q-carousel__navigation {
-  position: absolute;
-  bottom: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+/* ==================== PAGINAÇÃO SEPARADA ==================== */
+.pagination-dots {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 0 20px;
 }
-.featured-carousel .q-carousel__navigation .q-btn {
-  opacity: 0.85;
+
+.pagination-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.pagination-dot:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.pagination-dot--active {
+  background-color: white;
+  border-color: white;
+  transform: scale(1.2);
+}
+
+.pagination-dot:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 2px;
 }
 
 /* ================= CATEGORIAS ================= */
@@ -578,7 +634,7 @@ async function filterEventsByCategory(categoryLabel) {
 /* Estado ativo da categoria */
 .cat-btn--active {
   background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
-  border-color: transparent !important;
+  border: none !important;
   color: white !important;
 }
 
@@ -592,11 +648,14 @@ async function filterEventsByCategory(categoryLabel) {
   height: 44px;
   border-radius: 8px;
   min-width: 142px;
+  background-color: #ffe100 !important;
+  color: #000 !important;
 }
 .featured-cta .q-btn__content {
   font-family: 'Poppins', sans-serif;
   font-weight: 600; /* semibold */
   font-size: 14px;
+  color: #000 !important;
 }
 
 .event-title {
@@ -620,18 +679,146 @@ async function filterEventsByCategory(categoryLabel) {
 
 /* ================= FOOTER ================= */
 .footer {
-  background-color: #161f2f;
-  padding: 32px 40px;
+  background-color: #1a202c;
+  padding: 32px 0;
   color: white;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
+
+.footer-wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (min-width: 1600px) {
+  .footer-wrap {
+    max-width: 1600px;
+    padding: 0 60px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .footer-wrap {
+    max-width: 1800px;
+    padding: 0 80px;
+  }
+}
+
+.footer-logo-container {
+  display: flex;
+  align-items: center;
+}
+
 .footer-logo {
-  height: 60px;
-  width: auto;
+  height: 60.26px;
+  width: 240px;
   display: block;
   object-fit: contain;
 }
-.footer-links div {
-  margin-bottom: 2px;
+
+.social-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-2px);
+}
+
+.social-icon {
+  width: 55.8px;
+  height: 55.8px;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.footer-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #35c7ee;
+}
+
+.footer-copyright {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #d1d5db;
+  text-align: left;
+  margin-top: 16px;
+}
+
+/* Telas grandes */
+@media (min-width: 1200px) {
+  .footer-links {
+    gap: 60px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .footer-links {
+    gap: 80px;
+  }
+}
+
+/* Telas pequenas */
+@media (max-width: 768px) {
+  .footer-wrap {
+    padding: 0 20px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
 }
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */

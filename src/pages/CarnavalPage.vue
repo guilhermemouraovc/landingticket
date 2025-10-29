@@ -1,16 +1,20 @@
 <template>
   <q-page class="bg-landing">
     <div class="list-wrap">
-      <div class="list-header">
-        <q-btn
-          flat
-          round
-          icon="arrow_back"
-          to="/"
-          class="q-mr-md"
-          aria-label="Voltar para página inicial"
-        />
-        <div class="list-title">Carnaval</div>
+      <!-- Header com título centralizado -->
+      <div class="page-header">
+        <div class="back-button-container" @click="goBack">
+          <div class="back-icon">
+            <q-icon name="arrow_back" size="24px" class="back-arrow-icon" />
+          </div>
+          <span class="back-text">Voltar</span>
+        </div>
+
+        <!-- Título centralizado -->
+        <div class="page-title">Carnaval</div>
+
+        <!-- Linha divisória -->
+        <div class="title-divider"></div>
       </div>
 
       <!-- Breadcrumbs -->
@@ -40,40 +44,15 @@
 
       <!-- Grid de eventos -->
       <div v-else class="cards-grid" role="list" aria-label="Lista de eventos de Carnaval">
-        <q-card
+        <EventCard
           v-for="card in items"
           :key="card.id"
-          flat
-          bordered
-          clickable
-          v-ripple
+          :event="card"
+          variant="grid"
+          image-height="215px"
+          :show-price="true"
           @click="goToEvent(card)"
-          class="event-card"
-          role="listitem"
-          :aria-label="`Evento: ${card.title}. ${card.date}. ${card.location}`"
-          tabindex="0"
-          @keydown.enter="goToEvent(card)"
-          @keydown.space.prevent="goToEvent(card)"
-        >
-          <q-img
-            :src="card.image"
-            :alt="`Imagem do evento ${card.title}`"
-            ratio="16/9"
-            height="180px"
-            loading="lazy"
-          />
-          <q-card-section>
-            <div class="event-title q-mb-xs">{{ card.title }}</div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.date }}</span>
-            </div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.location }}</span>
-            </div>
-          </q-card-section>
-        </q-card>
+        />
       </div>
     </div>
   </q-page>
@@ -82,16 +61,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import EventCard from 'src/components/EventCard.vue'
 
 const router = useRouter()
 const items = ref([])
 const loading = ref(true)
 
-// Composable para gerenciar eventos
-const { fetchEventsByTag } = useEvents()
+// Composable para gerenciar eventos do Supabase
+const { fetchEventsByTag } = useSupabaseEvents()
 
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
@@ -110,15 +90,34 @@ function goToEvent(card) {
 async function loadCarnavalEvents() {
   loading.value = true
   try {
-    items.value = await fetchEventsByTag('CARNAVAIS', {
-      'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-    })
+    console.log('🔍 Carregando eventos de Carnaval...')
+
+    // Tenta diferentes variações da tag
+    let events = await fetchEventsByTag('CARNAVAL', { limit: 100 })
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "carnavais" (slug)...')
+      events = await fetchEventsByTag('carnavais', { limit: 100 })
+    }
+
+    if (!events.length) {
+      console.log('🔄 Tentando com "CARNAVAIS" (plural)...')
+      events = await fetchEventsByTag('CARNAVAIS', { limit: 100 })
+    }
+
+    items.value = events
+    console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (e) {
-    console.error('Falha ao carregar eventos de Carnaval', e)
+    console.error('❌ Falha ao carregar eventos de Carnaval', e)
     items.value = []
   } finally {
     loading.value = false
   }
+}
+
+// Adicionar esta função
+function goBack() {
+  router.push('/')
 }
 </script>
 
@@ -129,23 +128,106 @@ async function loadCarnavalEvents() {
 }
 
 .list-wrap {
-  padding: 0 80px 64px;
-  max-width: 1200px;
+  padding: 0 20px 64px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
-.list-header {
+/* Novo header da página */
+.page-header {
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Título da página */
+.page-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* semibold */
+  font-size: 32px;
+  color: #fff;
+  text-align: center;
+}
+
+/* Linha divisória */
+.title-divider {
+  width: 100%;
+  max-width: 1440px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 auto;
+}
+
+/* Botão de voltar customizado */
+.back-button-container {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 24px 0;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  align-self: flex-start; /* Posiciona à esquerda */
+}
+
+.back-button-container:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-icon {
+  width: 56px;
+  height: 56px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-text {
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.back-button-container:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.back-arrow-icon {
+  color: #35c7ee !important;
+}
+
+.back-arrow-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Esconder elementos antigos */
+.list-header {
+  display: none;
 }
 
 .list-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  color: #fff;
+  display: none;
 }
 
 .no-results {
@@ -174,8 +256,9 @@ async function loadCarnavalEvents() {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, 320px);
+  gap: 40px;
+  justify-content: center;
 }
 
 .event-card {
@@ -189,6 +272,8 @@ async function loadCarnavalEvents() {
     transform 0.2s ease,
     box-shadow 0.2s ease;
   overflow: hidden;
+  border: none;
+  outline: none;
 }
 
 .event-card:hover,
@@ -199,7 +284,7 @@ async function loadCarnavalEvents() {
 
 .event-card .q-card-section {
   flex: 1;
-  padding: 20px 22px 18px;
+  padding: 16px 20px 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -228,11 +313,12 @@ async function loadCarnavalEvents() {
 
 @media (max-width: 768px) {
   .list-wrap {
-    padding: 0 40px 40px;
+    padding: 0 16px 40px;
   }
 
   .cards-grid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 }
 
@@ -242,7 +328,67 @@ async function loadCarnavalEvents() {
 }
 
 .event-card:focus-visible {
-  outline: 3px solid #35c7ee;
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: 0 0 0 3px #35c7ee;
+}
+
+/* Adicionar estes estilos do botão customizado */
+.back-button-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button-container:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-icon {
+  width: 56px;
+  height: 56px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-text {
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.back-button-container:focus-visible {
+  outline: 2px solid #35c7ee;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.back-arrow-icon {
+  color: #35c7ee !important;
+}
+
+.back-arrow-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon svg {
+  width: 24px;
+  height: 24px;
 }
 </style>

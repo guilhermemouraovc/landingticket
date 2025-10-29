@@ -4,10 +4,8 @@
     <div class="section-header">
       <div class="section-info">
         <div class="section-title">{{ title }}</div>
-        <div v-if="items.length" class="section-divider">/ {{ items.length }} eventos</div>
-      </div>
-
-      <div class="header-actions">
+        <div class="section-divider">|</div>
+        <!-- Movido o botão Ver Tudo para cá, substituindo a contagem -->
         <q-btn
           v-if="seeAllLink"
           flat
@@ -19,30 +17,28 @@
           :aria-label="`Ver todos os eventos de ${title}`"
           :to="seeAllLink"
         />
+      </div>
+
+      <div class="header-actions">
+        <!-- Removido o botão Ver Tudo daqui -->
 
         <div class="nav-buttons" role="group" aria-label="Controles de navegação do carrossel">
-          <q-btn
-            dense
-            round
-            color="white"
-            text-color="primary"
-            icon="chevron_left"
+          <button
             class="nav-btn"
-            aria-label="Navegar para eventos anteriores"
-            :disable="!canScrollLeft"
             @click="scroll(-scrollStep)"
-          />
-          <q-btn
-            dense
-            round
-            color="white"
-            text-color="primary"
-            icon="chevron_right"
+            :disabled="!canScrollLeft"
+            aria-label="Navegar para eventos anteriores"
+          >
+            <img src="/LEFT.svg" alt="Anterior" />
+          </button>
+          <button
             class="nav-btn"
-            aria-label="Navegar para próximos eventos"
-            :disable="!canScrollRight"
             @click="scroll(scrollStep)"
-          />
+            :disabled="!canScrollRight"
+            aria-label="Navegar para próximos eventos"
+          >
+            <img src="/RIGHT.svg" alt="Próximo" />
+          </button>
         </div>
       </div>
     </div>
@@ -60,7 +56,7 @@
           :key="card.id"
           :event="card"
           variant="carousel"
-          image-height="220px"
+          image-height="200px"
           :default-image="defaultImage"
           @click="openCard(card)"
         />
@@ -146,7 +142,7 @@ onMounted(() => {
 .section-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
 }
 
 .section-title {
@@ -155,8 +151,10 @@ onMounted(() => {
 }
 
 .section-divider {
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0 2px;
 }
 
 .header-actions {
@@ -175,11 +173,35 @@ onMounted(() => {
 
 .nav-buttons {
   display: flex;
-  gap: 8px;
+  gap: 16px;
 }
 
 .nav-btn {
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.nav-btn:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-btn img {
+  width: 44px;
+  height: 44px;
+  display: block;
 }
 
 .cards-viewport {
@@ -226,6 +248,7 @@ onMounted(() => {
 .nav-btn:focus-visible {
   outline: 2px solid #35c7ee;
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .see-all:focus-visible {
