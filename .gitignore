@@ -39,3 +39,5 @@ yarn-error.log*
 # Cursor AI files
 .specstory/
 .cursorindexignore
+.cursor/
+.cursor*
