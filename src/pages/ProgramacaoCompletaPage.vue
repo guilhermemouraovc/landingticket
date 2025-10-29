@@ -150,7 +150,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
-import { normalizeString } from 'src/utils/eventMapper'
+import { normalizeString } from 'src/utils/stringUtils'
 import { CATEGORIES } from 'src/constants/config'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'

@@ -524,7 +524,7 @@ function applyFilters() {
 
 .category-btn--active {
   background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
-  border-color: transparent !important;
+  border: none !important;
   color: white !important;
 }
 

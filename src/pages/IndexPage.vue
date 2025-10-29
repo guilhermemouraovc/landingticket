@@ -60,11 +60,9 @@
 
                     <q-btn
                       class="q-mt-lg featured-cta"
-                      color="warning"
-                      text-color="black"
                       unelevated
                       no-caps
-                      label="Ver detalhes"
+                      label="Ver Detalhes"
                       :aria-label="`Ver detalhes do evento ${ev.title}`"
                       :to="ev.link || '#'"
                     />
@@ -227,17 +225,13 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
-import { useEvents } from 'src/composables/useEvents'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
-// Composable para gerenciar eventos (Strapi - legado)
-const { fetchEvents, fetchEventsByTag } = useEvents()
-
-// Composable para gerenciar eventos (Supabase - novo)
+// Composable para gerenciar eventos (Supabase)
 const {
   fetchFeaturedEvents,
   fetchEvents: fetchEventsSupabase,
@@ -328,12 +322,6 @@ async function loadFeatured() {
       events = await fetchEventsSupabase({ limit: 25 })
     }
 
-    // Se ainda não há eventos do Supabase, usa fallback do Strapi
-    if (!events.length) {
-      console.log('🔄 Fallback para Strapi...')
-      events = await fetchEvents({ 'pagination[pageSize]': 25 })
-    }
-
     featured.value = events
     activeSlide.value = events[0]?.id ?? null
   } catch (err) {
@@ -369,14 +357,6 @@ async function loadCarnaval() {
       events = await fetchEventsByTagSupabase('carnavais', { limit: 100 })
     }
 
-    // Fallback para Strapi se não encontrou no Supabase
-    if (!events.length) {
-      console.log('🔄 Fallback para Strapi (Carnaval)...')
-      events = await fetchEventsByTag('CARNAVAIS', {
-        'filters[$and][1][tag][tagname][$ne]': 'REVEILLON',
-      })
-    }
-
     carnavalEvents.value = events
     console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (err) {
@@ -389,18 +369,9 @@ async function loadFestivais() {
   try {
     console.log('🔍 Carregando eventos de Festivais...')
 
-    // Primeiro tenta buscar do Supabase usando a tag correta 'FESTIVAISS'
+    // Busca eventos do Supabase usando a tag correta 'FESTIVAISS'
     let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
     console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
-
-    // Fallback para Strapi se não encontrou no Supabase
-    if (!events.length) {
-      console.log('🔄 Fallback para Strapi (Festivais)...')
-      events = await fetchEventsByTag('FESTIVAISS', {
-        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-      })
-      console.log('📊 Eventos encontrados no Strapi:', events.length)
-    }
 
     saoJoaoEvents.value = events
     console.log('✅ Total de eventos de Festivais carregados:', events.length)
@@ -663,7 +634,7 @@ async function filterEventsByCategory(categoryLabel) {
 /* Estado ativo da categoria */
 .cat-btn--active {
   background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
-  border-color: transparent !important;
+  border: none !important;
   color: white !important;
 }
 
@@ -677,11 +648,14 @@ async function filterEventsByCategory(categoryLabel) {
   height: 44px;
   border-radius: 8px;
   min-width: 142px;
+  background-color: #ffe100 !important;
+  color: #000 !important;
 }
 .featured-cta .q-btn__content {
   font-family: 'Poppins', sans-serif;
   font-weight: 600; /* semibold */
   font-size: 14px;
+  color: #000 !important;
 }
 
 .event-title {

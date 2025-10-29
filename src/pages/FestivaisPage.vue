@@ -85,7 +85,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useEvents } from 'src/composables/useEvents'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
@@ -95,7 +94,6 @@ const items = ref([])
 const loading = ref(true)
 
 // Composable para gerenciar eventos
-const { fetchEventsByTag } = useEvents()
 const { fetchEventsByTag: fetchEventsByTagSupabase } = useSupabaseEvents()
 
 // Breadcrumbs
@@ -117,18 +115,9 @@ async function loadFestivaisEvents() {
   try {
     console.log('🔍 Carregando eventos de Festivais...')
 
-    // Primeiro tenta buscar do Supabase usando a tag correta 'FESTIVAISS'
+    // Busca eventos do Supabase usando a tag correta 'FESTIVAISS'
     let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
     console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
-
-    // Fallback para Strapi se não encontrou no Supabase
-    if (!events.length) {
-      console.log('🔄 Fallback para Strapi (Festivais)...')
-      events = await fetchEventsByTag('FESTIVAISS', {
-        'filters[$and][1][tag][tagname][$ne]': 'CARNAVAIS',
-      })
-      console.log('📊 Eventos encontrados no Strapi:', events.length)
-    }
 
     items.value = events
     console.log('✅ Total de eventos de Festivais carregados:', events.length)

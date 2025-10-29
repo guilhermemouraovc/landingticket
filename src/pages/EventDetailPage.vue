@@ -127,12 +127,12 @@
             </q-btn>
 
             <div class="event-section q-mt-xl">
-              <div class="section-title">Descricao do Evento</div>
+              <div class="section-title">Descrição do Evento</div>
               <p class="section-text">{{ event.description }}</p>
             </div>
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
-              <div class="section-title">Informacoes adicionais</div>
+              <div class="section-title">Informações Adicionais</div>
               <p class="section-text">{{ event.additionalInfo }}</p>
             </div>
           </div>
