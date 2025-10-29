@@ -232,8 +232,47 @@ onMounted(() => {
   padding-right: var(--peek);
 }
 
-/* Responsividade: ajustar peek em telas menores */
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 599px) {
+  .event-section {
+    margin-top: 40px;
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+  }
+
+  .cards-viewport {
+    --fade: 20px;
+    scroll-padding-right: 120px;
+  }
+
+  .cards-row {
+    --peek: calc(var(--card-width) * 0.3);
+    gap: 16px;
+  }
+
+  .nav-buttons {
+    gap: 12px;
+  }
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-btn img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
   .cards-viewport {
     --fade: 24px;
     scroll-padding-right: 160px;
@@ -241,6 +280,7 @@ onMounted(() => {
 
   .cards-row {
     --peek: calc(var(--card-width) * 0.5);
+    gap: 20px;
   }
 }
 

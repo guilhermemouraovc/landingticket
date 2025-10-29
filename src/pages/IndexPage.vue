@@ -15,7 +15,7 @@
           infinite
           swipeable
           autoplay
-          height="440px"
+          :height="$q.screen.lt.sm ? 'auto' : '440px'"
           control-color="transparent"
           navigation-position="bottom"
           transition-prev="slide-right"
@@ -222,12 +222,15 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
+
+const $q = useQuasar()
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
@@ -265,7 +268,7 @@ const categories = ref([])
 
 // Helper para obter tagName a partir do label
 function getTagNameByLabel(label) {
-  const c = categories.value.find(x => x.label === label)
+  const c = categories.value.find((x) => x.label === label)
   return c?.tagName || null
 }
 
@@ -434,7 +437,21 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   max-width: 1200px;
   margin: 0 auto;
-  margin-bottom: 100px; /* Adiciona gap de 250px entre o carrossel e o footer */
+  margin-bottom: 100px;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .event-groups {
+    padding: 0 16px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .event-groups {
+    padding: 0 40px;
+  }
 }
 /* fundo */
 .bg-landing {
@@ -446,6 +463,13 @@ async function filterEventsByCategory(categoryLabel) {
 .destaque {
   background-color: #2a3447;
   padding: 40px 0;
+}
+
+/* Mobile: menos padding vertical */
+@media (max-width: 599px) {
+  .destaque {
+    padding: 24px 0;
+  }
 }
 .featured-carousel {
   background: transparent !important;
@@ -469,6 +493,31 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   box-sizing: border-box;
 }
+
+/* Mobile */
+@media (max-width: 599px) {
+  .featured-wrap {
+    padding: 0 16px;
+    height: auto;
+  }
+
+  .featured-carousel {
+    height: auto !important;
+  }
+
+  .featured-carousel .q-carousel__slide {
+    padding: 0 !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .featured-wrap {
+    padding: 0 40px;
+    height: 400px;
+  }
+}
+
 .featured-grid {
   display: grid;
   grid-template-columns: 60% 40%;
@@ -478,9 +527,21 @@ async function filterEventsByCategory(categoryLabel) {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+/* Mobile: layout em coluna (imagem em cima, info embaixo) com altura fixa */
+@media (max-width: 599px) {
+  .featured-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 358px auto;
+    height: auto;
+    min-height: 568px;
+    border-radius: 24px;
+  }
+}
 .featured-img {
   overflow: hidden;
 }
+
 .featured-img .q-img__content img {
   object-fit: cover;
   width: 100%;
@@ -491,8 +552,21 @@ async function filterEventsByCategory(categoryLabel) {
   width: 100%;
   height: 100%;
 }
+
 .featured-img .full img {
   object-fit: cover;
+}
+
+/* Mobile: imagem com altura fixa e radius apenas no topo */
+@media (max-width: 599px) {
+  .featured-img {
+    height: 358px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .featured-img .full {
+    height: 358px;
+  }
 }
 .featured-panel {
   background: #fff;
@@ -512,6 +586,16 @@ async function filterEventsByCategory(categoryLabel) {
   width: 100%;
   min-height: 100%;
 }
+
+/* Mobile: padding ajustado e layout vertical com altura mínima fixa */
+@media (max-width: 599px) {
+  .panel-inner {
+    padding: 24px 20px;
+    gap: 16px;
+    justify-content: flex-start;
+    min-height: 210px;
+  }
+}
 .featured-description {
   color: #4b5563;
   max-height: 84px;
@@ -520,6 +604,13 @@ async function filterEventsByCategory(categoryLabel) {
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+/* Mobile: esconde a descrição para economizar espaço */
+@media (max-width: 599px) {
+  .featured-description {
+    display: none;
+  }
 }
 .featured-carousel {
   position: relative;
@@ -560,17 +651,69 @@ async function filterEventsByCategory(categoryLabel) {
   outline-offset: 2px;
 }
 
+/* Mobile: bolinhas conforme protótipo com borda mais grossa */
+@media (max-width: 599px) {
+  .pagination-dots {
+    gap: 16px;
+    margin-top: 24px;
+    padding: 0;
+    height: 14px;
+  }
+
+  .pagination-dot {
+    width: 14px;
+    height: 14px;
+    border-width: 2.5px;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .pagination-dot--active {
+    background-color: white;
+    border-color: white;
+    transform: scale(1);
+  }
+
+  .pagination-dot:hover {
+    transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
 /* ================= CATEGORIAS ================= */
 .categories {
   background-color: #2a3447;
   margin-top: 30px;
   padding: 60px 0;
 }
+
+/* Mobile: menos espaçamento */
+@media (max-width: 599px) {
+  .categories {
+    margin-top: 32px;
+    padding: 40px 0;
+  }
+}
 .categories-wrap {
   width: calc(100vw - 160px);
   max-width: 1760px;
   margin: 0 auto;
   padding: 0 80px;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .categories-wrap {
+    padding: 0 16px;
+    width: calc(100vw - 32px);
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .categories-wrap {
+    padding: 0 40px;
+    width: calc(100vw - 80px);
+  }
 }
 .cat-grid {
   display: flex;
@@ -582,12 +725,38 @@ async function filterEventsByCategory(categoryLabel) {
   margin: 0 auto;
 }
 
-/* Responsividade para dispositivos móveis */
-@media (max-width: 768px) {
-  .categories-wrap {
-    padding: 0 40px;
+/* Mobile: grid 2 colunas conforme protótipo */
+@media (max-width: 599px) {
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    justify-content: stretch;
+    max-width: 100%;
   }
 
+  .cat-btn {
+    min-width: auto;
+    width: 100%;
+    height: 56px;
+    font-size: 15px;
+    border-radius: 16px !important;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .cat-btn .q-icon {
+    font-size: 22px;
+    margin-right: 8px;
+  }
+
+  .cat-btn .q-btn__content {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
   .cat-grid {
     gap: 12px;
     justify-content: space-around;
@@ -651,11 +820,27 @@ async function filterEventsByCategory(categoryLabel) {
   background-color: #ffe100 !important;
   color: #000 !important;
 }
+
 .featured-cta .q-btn__content {
   font-family: 'Poppins', sans-serif;
   font-weight: 600; /* semibold */
   font-size: 14px;
   color: #000 !important;
+}
+
+/* Mobile: botão full width */
+@media (max-width: 599px) {
+  .featured-cta {
+    width: 100%;
+    height: 48px;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  .featured-cta .q-btn__content {
+    font-size: 16px;
+    font-weight: 600;
+  }
 }
 
 .event-title {
@@ -666,6 +851,21 @@ async function filterEventsByCategory(categoryLabel) {
   color: #1f2937;
 }
 
+/* Mobile: título menor com altura fixa (2 linhas max) */
+@media (max-width: 599px) {
+  .event-title {
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 700;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 62px;
+  }
+}
+
 .event-meta {
   font-family: 'Poppins', sans-serif;
   font-weight: 400; /* regular */
@@ -673,8 +873,34 @@ async function filterEventsByCategory(categoryLabel) {
   color: #1f2937;
 }
 
+/* Mobile: meta menor com altura fixa */
+@media (max-width: 599px) {
+  .event-meta {
+    font-size: 14px;
+    min-height: 22px;
+  }
+
+  .event-meta .q-icon {
+    font-size: 18px;
+  }
+
+  .event-meta span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .event-meta__icon {
   color: #8b5cf6; /* roxo */
+}
+
+/* Mobile: ajuste de ícone */
+@media (max-width: 599px) {
+  .event-meta__icon {
+    color: #ec4899; /* rosa/pink como no protótipo */
+  }
 }
 
 /* ================= FOOTER ================= */
@@ -799,10 +1025,32 @@ async function filterEventsByCategory(categoryLabel) {
   }
 }
 
-/* Telas pequenas */
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 599px) {
   .footer-wrap {
-    padding: 0 20px;
+    padding: 0 16px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 768px) {
+  .footer-wrap {
+    padding: 0 40px;
   }
 
   .footer-links {

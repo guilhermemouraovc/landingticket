@@ -166,7 +166,7 @@ const emit = defineEmits(['click'])
 
 // Computed
 const metaLayoutClass = computed(() => {
-  return props.variant === 'carousel' ? 'meta-layout--column' : 'meta-layout--column'
+  return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
 })
 
 const truncatedDescription = computed(() => {
@@ -184,7 +184,7 @@ function handleClick() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* ==================== BASE ==================== */
 .event-card {
   display: flex;
@@ -346,6 +346,7 @@ function handleClick() {
 
 /* ==================== RESPONSIVIDADE ==================== */
 
+/* Tablet (até 768px) */
 @media (max-width: 768px) {
   .event-card--carousel {
     flex: 0 0 280px;
@@ -366,6 +367,59 @@ function handleClick() {
 
   .installment-value {
     font-size: 1.5rem;
+  }
+}
+
+/* Mobile (até 599px - breakpoint sm do Quasar) */
+@media (max-width: 599px) {
+  .event-card--carousel {
+    flex: 0 0 240px;
+    width: 240px;
+  }
+
+  .event-card__body {
+    padding: 12px 14px 12px;
+    gap: 6px;
+  }
+
+  .event-card__title {
+    font-size: 0.95rem;
+    line-height: 1.15;
+  }
+
+  .event-card__description {
+    font-size: 0.85rem;
+  }
+
+  .event-card__meta {
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+
+  /* Controla a altura visual da imagem no mobile */
+  .event-card__image {
+    height: 180px !important;
+  }
+
+  .installment-label {
+    font-size: 0.8rem;
+  }
+
+  .installment-value {
+    font-size: 1.35rem;
+  }
+
+  .installment-info {
+    font-size: 0.8rem;
+  }
+
+  .price-full {
+    font-size: 0.85rem;
+  }
+
+  /* No mobile, força meta sempre em coluna para economizar espaço */
+  .event-card__meta {
+    flex-direction: column;
   }
 }
 </style>

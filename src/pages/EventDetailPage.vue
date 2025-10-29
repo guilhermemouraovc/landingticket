@@ -43,6 +43,17 @@
             spinner-color="white"
             loading="eager"
           />
+          <!-- Botão de share mobile (dentro da imagem) -->
+          <q-btn
+            unelevated
+            rounded
+            color="white"
+            class="event-share event-share--mobile"
+            aria-label="Compartilhar evento"
+            @click="shareEvent"
+          >
+            <img src="/export.svg" alt="Compartilhar" class="share-icon" />
+          </q-btn>
         </div>
 
         <q-card class="event-card">
@@ -55,11 +66,12 @@
                 </div>
               </div>
 
+              <!-- Botão de share desktop -->
               <q-btn
                 unelevated
                 rounded
                 color="transparent"
-                class="event-share"
+                class="event-share event-share--desktop"
                 aria-label="Compartilhar evento"
                 @click="shareEvent"
               >
@@ -349,6 +361,7 @@ function getEventTags(eventData) {
   overflow: hidden;
   margin-bottom: 0;
   box-shadow: none;
+  position: relative;
 }
 
 .event-hero :where(.q-img__content, .q-img__image, img) {
@@ -460,6 +473,14 @@ function getEventTags(eventData) {
   min-width: 48px;
   min-height: 48px;
   box-shadow: none !important;
+}
+
+.event-share--mobile {
+  display: none;
+}
+
+.event-share--desktop {
+  display: flex;
 }
 
 .share-icon {
@@ -645,58 +666,165 @@ function getEventTags(eventData) {
 
 @media (max-width: 599px) {
   .event-page {
-    padding: 24px 0 60px;
+    padding: 16px 0 60px;
+    background-color: #2a3447;
+  }
+
+  .event-container {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .event-toolbar {
+    margin-bottom: 16px;
+  }
+
+  .back-button-container {
+    gap: 8px;
+    padding: 4px;
+  }
+
+  .back-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .back-text {
+    font-size: 14px;
+  }
+
+  .event-hero-wrap {
+    border-radius: 16px 16px 0 0;
+    margin: 0 -16px;
   }
 
   .event-card {
     background: #2a3447;
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 16px 16px;
     box-shadow: none;
+    margin: 0 -16px;
   }
 
   .event-body {
-    padding: 20px;
+    padding: 24px 20px;
+    background: #2a3447;
   }
 
   .event-hero {
-    height: 220px;
+    height: 200px;
+  }
+
+  .event-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 24px;
   }
 
   .event-heading .text-h4 {
-    font-size: 32px;
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .event-share--desktop {
+    display: none;
+  }
+
+  .event-share--mobile {
+    display: flex;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: white !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .event-share--mobile .share-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .event-meta {
+    gap: 16px;
+    margin-top: 16px;
   }
 
   .meta-item {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
   }
 
-  .meta-badge,
+  .meta-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    grid-template-rows: 18px 1fr;
+    flex-shrink: 0;
+  }
+
+  .badge-month {
+    font-size: 0.65rem;
+    line-height: 18px;
+  }
+
+  .badge-day {
+    font-size: 1.2rem;
+  }
+
   .meta-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .meta-icon .q-icon {
+    font-size: 24px;
+  }
+
+  .meta-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .meta-subtitle {
+    font-size: 0.85rem;
   }
 
   /* Responsividade para seção de preços */
   .pricing-section {
-    justify-content: center;
+    justify-content: flex-start;
+    transform: none;
+    margin: 24px 0;
   }
 
   .pricing-info {
-    align-items: center;
+    align-items: flex-start;
+    width: 100%;
   }
 
   .installment-details {
-    align-items: center;
+    align-items: flex-start;
+    gap: 4px;
   }
 
   .installment-prefix {
     font-size: 14px;
+    color: white;
   }
 
   .installment-value {
-    font-size: 28px;
+    font-size: 32px;
+    color: white;
   }
 
   .installment-suffix {
@@ -704,7 +832,7 @@ function getEventTags(eventData) {
     font-weight: 400;
     color: white;
     line-height: 1.2;
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 
   .cash-price {
@@ -712,12 +840,34 @@ function getEventTags(eventData) {
     font-weight: 400;
     color: #d1d5db;
     line-height: 1.2;
-    margin-bottom: 20px;
+    margin-top: 8px;
+    margin-bottom: 0;
   }
 
   .buy-btn {
     width: 100%;
-    height: 50px;
+    height: 48px;
+    border-radius: 8px !important;
+    font-size: 16px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .event-section {
+    padding: 16px 0;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .section-text {
+    font-size: 14px;
+    line-height: 1.6;
   }
 }
 
