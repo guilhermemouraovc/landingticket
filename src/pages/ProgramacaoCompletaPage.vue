@@ -565,6 +565,22 @@ function goBack() {
   }
 }
 
+/* Mobile: ícones roxos conforme protótipo */
+@media (max-width: 599px) {
+  .event-meta__icon {
+    color: #d907f2 !important;
+  }
+
+  .event-meta:first-of-type {
+    color: #d907f2;
+    font-weight: 600;
+  }
+
+  .event-meta:first-of-type span {
+    color: #d907f2;
+  }
+}
+
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
 .q-btn:focus-visible {
   outline: 2px solid #35c7ee;

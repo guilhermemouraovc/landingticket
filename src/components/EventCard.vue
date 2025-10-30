@@ -380,20 +380,21 @@ function handleClick() {
   .event-card__body {
     padding: 12px 14px 12px;
     gap: 6px;
+    height: 167px; /* altura fixa da área branca com textos no mobile */
+    overflow: hidden;
   }
 
   .event-card__title {
-    font-size: 0.95rem;
-    line-height: 1.15;
+    font-size: 1.1rem; /* título mais destacado como no protótipo */
+    line-height: 1.2;
   }
 
   .event-card__description {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .event-card__meta {
-    font-size: 0.85rem;
-    gap: 6px;
+    margin-top: 6px !important;
   }
 
   /* Controla a altura visual da imagem no mobile */
@@ -401,12 +402,23 @@ function handleClick() {
     height: 180px !important;
   }
 
+  /* Cores do protótipo: meta ícones e data em roxo */
+  .meta-icon {
+    color: #d907f2 !important;
+  }
+
+  /* deixa a data (primeiro item) com roxo e mais ênfase */
+  .event-card__meta .meta-item:first-child span {
+    color: #d907f2;
+    font-weight: 600;
+  }
+
   .installment-label {
     font-size: 0.8rem;
   }
 
   .installment-value {
-    font-size: 1.35rem;
+    font-size: 1.5rem; /* preço parcelado mais forte no mobile */
   }
 
   .installment-info {
