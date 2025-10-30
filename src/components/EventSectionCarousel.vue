@@ -246,28 +246,40 @@ onMounted(() => {
     font-size: 1.15rem;
   }
 
+  /* Remove o fade/transparência e permite cards estourarem o padding */
+  .event-section {
+    margin-left: -16px; /* estoura o padding do container pai pela esquerda */
+    margin-right: -30px; /* estoura o padding do container pai pela direita */
+    padding-left: 16px; /* mantém o alinhamento do header */
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+    padding-right: 16px; /* compensa o estouro */
+  }
+
   .cards-viewport {
-    --fade: 20px;
-    scroll-padding-right: 120px;
+    --fade: 0px; /* remove fade */
+    scroll-padding-right: 0;
+    margin: 0; /* sem margin */
+    padding-left: 0; /* sem padding esquerdo */
+    padding-right: 0; /* sem padding direito */
+  }
+
+  .cards-viewport.fade-right {
+    mask-image: none; /* remove máscara de fade */
   }
 
   .cards-row {
-    --peek: calc(var(--card-width) * 0.3);
+    --peek: 0px; /* remove o peek, cards vão até a borda */
     gap: 16px;
+    padding-left: 0; /* primeiro card cola na borda */
+    padding-right: 16px; /* apenas o espaço do último card até a borda */
   }
 
+  /* Esconde os botões de navegação no mobile */
   .nav-buttons {
-    gap: 12px;
-  }
-
-  .nav-btn {
-    width: 36px;
-    height: 36px;
-  }
-
-  .nav-btn img {
-    width: 36px;
-    height: 36px;
+    display: none;
   }
 }
 

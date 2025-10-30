@@ -44,10 +44,10 @@
           <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
         </div>
 
-        <!-- Localização -->
+        <!-- Localização (city - state) -->
         <div class="meta-item">
           <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
-          <span>{{ event.location || 'Local a definir' }}</span>
+          <span>{{ event.cityState || event.location || 'Local a definir' }}</span>
         </div>
       </div>
 
@@ -339,7 +339,7 @@ function handleClick() {
 
 .price-full {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: #626262;
   font-weight: 400;
   margin-top: 4px;
 }
@@ -373,8 +373,8 @@ function handleClick() {
 /* Mobile (até 599px - breakpoint sm do Quasar) */
 @media (max-width: 599px) {
   .event-card--carousel {
-    flex: 0 0 240px;
-    width: 240px;
+    flex: 0 0 280px;
+    width: 280px;
   }
 
   .event-card__body {
@@ -385,7 +385,7 @@ function handleClick() {
   }
 
   .event-card__title {
-    font-size: 1.1rem; /* título mais destacado como no protótipo */
+    font-size: 18px; /* título conforme protótipo */
     line-height: 1.2;
   }
 
@@ -395,6 +395,16 @@ function handleClick() {
 
   .event-card__meta {
     margin-top: 6px !important;
+    font-size: 10px; /* data e localização em 12px */
+    gap: 6px;
+  }
+
+  .meta-item {
+    gap: 6px;
+  }
+
+  .meta-icon {
+    font-size: 16px !important; /* ícone proporcional ao texto */
   }
 
   /* Controla a altura visual da imagem no mobile */
@@ -429,9 +439,15 @@ function handleClick() {
     font-size: 0.85rem;
   }
 
-  /* No mobile, força meta sempre em coluna para economizar espaço */
+  /* No mobile, coloca data e localização lado a lado como no protótipo */
   .event-card__meta {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .meta-item {
+    flex-shrink: 0;
   }
 }
 </style>
