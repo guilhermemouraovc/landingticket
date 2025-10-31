@@ -466,7 +466,11 @@ function getEventTags(eventData) {
 
 .event-heading {
   gap: 16px;
-  margin-bottom: 0; /* Pode ajustar se necessário */
+  margin-bottom: 0;
+  margin-left: -36px;
+  margin-right: -36px;
+  padding-left: 0;
+  padding-right: 0; /* Pode ajustar se necessário */
 }
 
 .event-highlight {
@@ -486,10 +490,10 @@ function getEventTags(eventData) {
 
 .event-share--desktop {
   display: flex;
-  width: 45.6px;
-  height: 45.6px;
-  min-width: 45.6px;
-  min-height: 45.6px;
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  min-height: 68px;
   align-items: center;
   justify-content: center;
   transform: translateY(-10px);
@@ -502,8 +506,8 @@ function getEventTags(eventData) {
 }
 
 .share-icon--desktop {
-  width: 45.6px;
-  height: 45.6px;
+  width: 56px;
+  height: 56px;
 }
 
 .event-meta {
@@ -583,7 +587,10 @@ function getEventTags(eventData) {
   display: flex;
   justify-content: flex-end;
   margin: 24px 0;
-
+  margin-left: -36px;
+  margin-right: -36px;
+  padding-left: 0;
+  padding-right: 0;
   transform: translateY(-270px) translateX(-100px);
 }
 
@@ -602,31 +609,31 @@ function getEventTags(eventData) {
 }
 
 .installment-prefix {
-  font-size: 24px;
+  font-size: 17.57px;
   font-weight: 500;
   color: white;
   line-height: 1.2;
 }
 
 .installment-value {
-  font-size: 63.41px;
+  font-size: 45.18px;
   font-weight: 700;
   color: white;
   line-height: 1;
 }
 
 .installment-suffix {
-  font-size: 24.66px;
+  font-size: 17.57px;
   font-weight: 500;
   color: white;
   line-height: 1.2;
 }
 
 .cash-price {
-  font-size: 16px;
+  font-size: 17.57px;
   font-weight: 500;
   color: #d1d5db;
-  line-height: 1.2;
+  line-height: 0.5;
   margin-top: 24.66px; /* Distância exata conforme protótipo */
 }
 

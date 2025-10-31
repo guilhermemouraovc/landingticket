@@ -170,14 +170,14 @@
     <footer class="footer" role="contentinfo">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <div class="footer-logo-container">
+          <router-link to="/" class="footer-logo-container">
             <img
               src="/ticketpe.svg"
               alt="TicketPE - Eventos em Pernambuco"
               class="footer-logo"
               loading="lazy"
             />
-          </div>
+          </router-link>
 
           <div class="social-icons row q-gutter-md">
             <a href="#" class="social-link" aria-label="WhatsApp">
@@ -207,7 +207,7 @@
 
           <div class="footer-column">
             <div class="footer-title">Suporte</div>
-            <div class="footer-link">Termos de Uso</div>
+            <router-link to="/termos-de-uso" class="footer-link">Termos de Uso</router-link>
             <div class="footer-link">Política de Privacidade</div>
           </div>
         </div>
@@ -939,6 +939,13 @@ async function filterEventsByCategory(categoryLabel) {
 .footer-logo-container {
   display: flex;
   align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.footer-logo-container:hover {
+  opacity: 0.9;
 }
 
 .footer-logo {
@@ -997,10 +1004,20 @@ async function filterEventsByCategory(categoryLabel) {
   color: #d1d5db;
   cursor: pointer;
   transition: color 0.2s ease;
+  text-decoration: none;
+  display: block;
 }
 
 .footer-link:hover {
   color: #35c7ee;
+}
+
+a.footer-link {
+  text-decoration: none;
+}
+
+a.footer-link:hover {
+  text-decoration: none;
 }
 
 .footer-copyright {

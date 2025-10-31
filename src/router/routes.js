@@ -29,6 +29,11 @@
         name: 'festivais',
         component: () => import('pages/FestivaisPage.vue'),
       },
+      {
+        path: 'termos-de-uso',
+        name: 'termos-de-uso',
+        component: () => import('pages/TermosDeUsoPage.vue'),
+      },
     ],
   },
 

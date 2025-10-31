@@ -5,14 +5,16 @@
       <q-toolbar class="custom-toolbar">
         <div class="header-inner">
           <!-- LOGO -->
-          <div class="row items-center">
-            <img
-              src="/logo.svg"
-              alt="TicketPE - Eventos em Pernambuco"
-              style="width: 220px"
-              class="q-mr-sm"
-            />
-          </div>
+          <router-link to="/" class="logo-link">
+            <div class="row items-center">
+              <img
+                src="/logo.svg"
+                alt="TicketPE - Eventos em Pernambuco"
+                style="width: 220px"
+                class="q-mr-sm"
+              />
+            </div>
+          </router-link>
 
           <!-- MENU DESKTOP -->
           <div class="row items-center gt-sm">
@@ -386,6 +388,17 @@ function applyFilters() {
 /* espaço entre elementos da header */
 .header-inner .gt-sm {
   column-gap: 26px;
+}
+
+/* Logo clicável */
+.logo-link {
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.logo-link:hover {
+  opacity: 0.9;
 }
 
 /* ==================== CONTAINER DE FILTROS UNIFICADO ==================== */
