@@ -38,7 +38,7 @@
             :src="event.image"
             :alt="`Imagem destacada do evento ${event.title}`"
             class="event-hero"
-            height="440px"
+            :ratio="1120 / 309"
             fit="cover"
             spinner-color="white"
             loading="eager"
@@ -58,7 +58,7 @@
 
         <q-card class="event-card">
           <div class="event-body">
-            <div class="event-heading row items-start justify-between q-mb-lg">
+            <div class="event-heading row items-center justify-between q-mb-lg">
               <div>
                 <div class="text-h4 text-weight-bold text-white event-title">{{ event.title }}</div>
                 <div v-if="event.highlight" class="event-highlight text-body2">
@@ -75,7 +75,7 @@
                 aria-label="Compartilhar evento"
                 @click="shareEvent"
               >
-                <img src="/export.svg" alt="Compartilhar" class="share-icon" />
+                <img src="/export.svg" alt="Compartilhar" class="share-icon share-icon--desktop" />
               </q-btn>
             </div>
 
@@ -349,19 +349,28 @@ function getEventTags(eventData) {
 }
 
 .event-container {
-  width: min(1280px, calc(100vw - 160px));
-  max-width: 1280px;
+  width: 1120px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 /* Hero grande com cantos arredondados e recorte */
 .event-hero-wrap {
-  /* Unifica visualmente com o quadro de conteúdo */
-  border-radius: 24px 24px 0 0;
+  /* Todas as bordas arredondadas */
+  border-radius: 24px;
   overflow: hidden;
-  margin-bottom: 0;
+  margin-bottom: 24px;
   box-shadow: none;
   position: relative;
+  width: 1120px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.event-hero {
+  width: 1120px;
+  max-width: 100%;
+  height: 309px;
 }
 
 .event-hero :where(.q-img__content, .q-img__image, img) {
@@ -425,7 +434,7 @@ function getEventTags(eventData) {
 
 .event-card {
   background: #2a3447;
-  border-radius: 0 0 24px 24px;
+  border-radius: 24px;
   box-shadow: none;
 }
 
@@ -436,7 +445,7 @@ function getEventTags(eventData) {
 
 /* Título mais destacado, estilo cartão grande */
 .event-heading .text-h4 {
-  font-size: 64px;
+  font-size: 45.6px;
   line-height: 1.15;
 }
 
@@ -467,9 +476,7 @@ function getEventTags(eventData) {
 
 .event-share {
   background: transparent !important;
-  padding: 8px;
-  min-width: 48px;
-  min-height: 48px;
+  padding: 0;
   box-shadow: none !important;
 }
 
@@ -479,12 +486,24 @@ function getEventTags(eventData) {
 
 .event-share--desktop {
   display: flex;
+  width: 45.6px;
+  height: 45.6px;
+  min-width: 45.6px;
+  min-height: 45.6px;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-10px);
 }
 
 .share-icon {
   width: 64px;
   height: 64px;
   object-fit: contain;
+}
+
+.share-icon--desktop {
+  width: 45.6px;
+  height: 45.6px;
 }
 
 .event-meta {
@@ -623,6 +642,8 @@ function getEventTags(eventData) {
   display: block;
   margin-top: -200px; /* Bem próximo */
   margin-bottom: 150px;
+  background-color: #ffe100 !important;
+  color: black !important;
 }
 
 .event-section {
@@ -649,8 +670,14 @@ function getEventTags(eventData) {
     width: calc(100vw - 40px);
   }
 
+  .event-hero-wrap {
+    width: 100%;
+  }
+
   .event-hero {
-    height: 320px;
+    width: 100%;
+    height: auto;
+    min-height: 240px;
   }
 
   .event-body {
@@ -658,7 +685,7 @@ function getEventTags(eventData) {
   }
 
   .event-heading .text-h4 {
-    font-size: 44px;
+    font-size: 45.6px;
   }
 }
 
@@ -692,13 +719,13 @@ function getEventTags(eventData) {
   }
 
   .event-hero-wrap {
-    border-radius: 16px 16px 0 0;
-    margin: 0 -16px;
+    border-radius: 16px;
+    margin: 0 -16px 16px -16px;
   }
 
   .event-card {
     background: #2a3447;
-    border-radius: 0 0 16px 16px;
+    border-radius: 16px;
     box-shadow: none;
     margin: 0 -16px;
   }
@@ -708,8 +735,15 @@ function getEventTags(eventData) {
     background: #2a3447;
   }
 
+  .event-hero-wrap {
+    width: 100%;
+    margin: 0;
+  }
+
   .event-hero {
-    height: 200px;
+    width: 100%;
+    height: auto;
+    min-height: 180px;
   }
 
   .event-heading {
@@ -719,7 +753,7 @@ function getEventTags(eventData) {
   }
 
   .event-heading .text-h4 {
-    font-size: 24px;
+    font-size: 32px;
     line-height: 1.3;
   }
 
