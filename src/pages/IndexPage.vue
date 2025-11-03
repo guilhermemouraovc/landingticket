@@ -125,7 +125,7 @@
 
     <!-- BANNER CARD -->
     <BannerCard
-      image="https://i.postimg.cc/BvKKyNgG/carva-sem-taxa-200px-3.png"
+      image="/semjuros_margemcorreta.png"
       cta-link="/programacao?q=Carvalheira na Ladeira"
     />
 
@@ -286,6 +286,9 @@ const filteredEvents = ref([])
 // categorias dinâmicas do Supabase
 const categories = ref([])
 
+// Flag para evitar loop de eventos
+const isInternalCategoryChange = ref(false)
+
 // Helper para obter tagName a partir do label
 function getTagNameByLabel(label) {
   const c = categories.value.find((x) => x.label === label)
@@ -324,6 +327,17 @@ function getSectionIdByLabel(label) {
     .replace(/\s+/g, '-') // Espaços viram hífens
 }
 
+// Helper para obter eventos de categorias fixas
+function getEventsForFixedCategory(sectionId) {
+  const fixedCategoriesMap = {
+    reveillon: reveillonEvents.value,
+    carnaval: carnavalEvents.value,
+    festivais: saoJoaoEvents.value,
+    'programacao-completa': allEvents.value,
+  }
+  return fixedCategoriesMap[sectionId] || []
+}
+
 // Função para fazer scroll suave até uma seção
 async function scrollToSection(sectionId) {
   if (!sectionId) return
@@ -351,11 +365,26 @@ async function scrollToSection(sectionId) {
 
 // Escuta eventos do header
 function handleCategorySelected(event) {
+  // Se a mudança é interna, ignora o evento para evitar loop
+  if (isInternalCategoryChange.value) {
+    isInternalCategoryChange.value = false
+    return
+  }
+
   const category = event.detail.category
   selectedCategory.value = category
 
   if (category) {
-    filterEventsByCategory(category)
+    const sectionId = getSectionIdByLabel(category)
+
+    // Se é uma categoria fixa, usa os eventos pré-carregados
+    if (fixedSectionIds.includes(sectionId)) {
+      filteredEvents.value = getEventsForFixedCategory(sectionId)
+      scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
+    } else {
+      // Para categorias dinâmicas, filtra eventos
+      filterEventsByCategory(category)
+    }
   } else {
     // Se categoria foi desmarcada, volta aos carrosséis normais
     filteredEvents.value = []
@@ -476,6 +505,9 @@ const fixedSectionIds = ['reveillon', 'carnaval', 'festivais', 'programacao-comp
 
 // Filtro por categoria
 function toggleCategory(categoryLabel) {
+  // Marca como mudança interna para evitar loop de eventos
+  isInternalCategoryChange.value = true
+
   if (selectedCategory.value === categoryLabel) {
     // Se já está selecionada, deseleciona
     selectedCategory.value = null
@@ -483,12 +515,15 @@ function toggleCategory(categoryLabel) {
   } else {
     const sectionId = getSectionIdByLabel(categoryLabel)
 
-    // Se é uma categoria fixa (já tem carrossel), apenas faz scroll até o carrossel
+    // Seleciona a categoria (para todas, não apenas dinâmicas)
+    selectedCategory.value = categoryLabel
+
+    // Se é uma categoria fixa (já tem carrossel), usa os eventos pré-carregados
     if (fixedSectionIds.includes(sectionId)) {
+      filteredEvents.value = getEventsForFixedCategory(sectionId)
       scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
     } else {
-      // Para outras categorias, seleciona e filtra eventos
-      selectedCategory.value = categoryLabel
+      // Para outras categorias, filtra eventos
 
       // Faz scroll até o carrossel correspondente após filtrar
       filterEventsByCategory(categoryLabel).then(async () => {
@@ -497,6 +532,15 @@ function toggleCategory(categoryLabel) {
       })
     }
   }
+
+  // Emite evento para sincronizar com o header (após um pequeno delay para garantir que o DOM foi atualizado)
+  setTimeout(() => {
+    window.dispatchEvent(
+      new CustomEvent('categorySelected', {
+        detail: { category: selectedCategory.value },
+      }),
+    )
+  }, 50)
 }
 
 async function filterEventsByCategory(categoryLabel) {
@@ -954,7 +998,7 @@ async function filterEventsByCategory(categoryLabel) {
     width: 100%;
     height: 48px;
     font-size: 16px;
-    margin-top: 8px;
+    margin-top: 12px;
   }
 
   .featured-cta .q-btn__content {
@@ -974,7 +1018,7 @@ async function filterEventsByCategory(categoryLabel) {
 /* Mobile: título menor com altura fixa (2 linhas max) */
 @media (max-width: 599px) {
   .event-title {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.3;
     font-weight: 700;
     display: -webkit-box;

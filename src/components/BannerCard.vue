@@ -8,9 +8,9 @@
         @click="handleClick"
       >
         <q-img
-          :src="image"
-          :ratio="1920 / 200"
-          fit="cover"
+          :src="bannerImage"
+          v-bind="bannerRatio ? { ratio: bannerRatio } : {}"
+          :fit="imageFit"
           spinner-color="primary"
           loading="lazy"
           class="banner-img"
@@ -40,8 +40,11 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { computed } from 'vue'
 
 const router = useRouter()
+const $q = useQuasar()
 
 const props = defineProps({
   image: {
@@ -73,6 +76,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+})
+
+const imageFit = computed(() => {
+  return $q.screen.lt.sm ? 'contain' : 'cover'
+})
+
+const bannerImage = computed(() => {
+  if ($q.screen.lt.sm) {
+    return '/SEMJUROS_MOBILEGRANDE.png'
+  }
+  return props.image
+})
+
+const bannerRatio = computed(() => {
+  // No mobile, não usar ratio fixo para que a imagem use seu tamanho natural
+  return $q.screen.lt.sm ? undefined : 1920 / 200
 })
 
 const emit = defineEmits(['click'])
@@ -193,6 +212,15 @@ const handleClick = () => {
 
   .banner-card-wrap {
     padding: 0 16px;
+  }
+
+  .banner-img {
+    min-height: auto;
+    height: auto;
+  }
+
+  .banner-img :deep(.q-img__container) {
+    height: auto !important;
   }
 
   .banner-overlay {
