@@ -134,6 +134,7 @@ function clearCategories() {
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  outline: none !important;
 }
 
 .category-chip:hover {

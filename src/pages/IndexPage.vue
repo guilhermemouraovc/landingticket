@@ -49,11 +49,11 @@
 
                     <div class="q-mt-md q-gutter-sm">
                       <div class="row items-center event-meta">
-                        <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <q-icon name="event" class="q-mr-sm event-meta__icon" color="purple-7" aria-hidden="true" />
                         <span>{{ ev.date }}</span>
                       </div>
                       <div class="row items-center event-meta">
-                        <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <q-icon name="place" class="q-mr-sm event-meta__icon" color="purple-7" aria-hidden="true" />
                         <span>{{ ev.location }}</span>
                       </div>
                     </div>
@@ -172,9 +172,9 @@
         <div class="footer-top row items-center justify-between q-mb-lg">
           <router-link to="/" class="footer-logo-container">
             <img
-              src="/ticketpe.svg"
+              src="/logo.svg"
               alt="TicketPE - Eventos em Pernambuco"
-              class="footer-logo"
+              style="width: 220px"
               loading="lazy"
             />
           </router-link>
@@ -780,6 +780,7 @@ async function filterEventsByCategory(categoryLabel) {
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
+  outline: none !important;
 }
 .cat-btn:hover {
   background: #35c7ee !important;
@@ -882,6 +883,7 @@ async function filterEventsByCategory(categoryLabel) {
 
   .event-meta .q-icon {
     font-size: 18px;
+    color: #d907f2 !important;
   }
 
   .event-meta span {
@@ -893,14 +895,12 @@ async function filterEventsByCategory(categoryLabel) {
 }
 
 .event-meta__icon {
-  color: #8b5cf6; /* roxo */
+  color: #d907f2 !important; /* roxo do protótipo */
 }
 
-/* Mobile: ajuste de ícone */
-@media (max-width: 599px) {
-  .event-meta__icon {
-    color: #ec4899; /* rosa/pink como no protótipo */
-  }
+/* Força a cor nos ícones do Quasar */
+.event-meta .q-icon {
+  color: #d907f2 !important;
 }
 
 /* ================= FOOTER ================= */
@@ -919,13 +919,12 @@ async function filterEventsByCategory(categoryLabel) {
 .footer-wrap {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 80px;
 }
 
 @media (min-width: 1600px) {
   .footer-wrap {
     max-width: 1600px;
-    padding: 0 60px;
   }
 }
 
@@ -946,13 +945,6 @@ async function filterEventsByCategory(categoryLabel) {
 
 .footer-logo-container:hover {
   opacity: 0.9;
-}
-
-.footer-logo {
-  height: 60.26px;
-  width: 240px;
-  display: block;
-  object-fit: contain;
 }
 
 .social-icons {

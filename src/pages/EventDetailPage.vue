@@ -482,6 +482,12 @@ function getEventTags(eventData) {
   background: transparent !important;
   padding: 0;
   box-shadow: none !important;
+  transition: none !important;
+}
+
+.event-share:hover {
+  transform: none !important;
+  opacity: 1 !important;
 }
 
 .event-share--mobile {
@@ -497,6 +503,11 @@ function getEventTags(eventData) {
   align-items: center;
   justify-content: center;
   transform: translateY(-10px);
+  transition: none !important;
+}
+
+.event-share--desktop:hover {
+  transform: translateY(-10px) !important;
 }
 
 .share-icon {
@@ -651,6 +662,10 @@ function getEventTags(eventData) {
   margin-bottom: 150px;
   background-color: #ffe100 !important;
   color: black !important;
+}
+
+.buy-btn:hover {
+  background-color: #c3ac02 !important;
 }
 
 .event-section {

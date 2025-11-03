@@ -90,7 +90,18 @@ body {
 }
 
 .q-chip:hover {
-  transform: scale(1.05);
+  transform: scale(1);
+}
+.q-chip--outline {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.q-chip--outline::before,
+.q-chip--outline::after {
+  display: none !important;
+}
+.q-chip--outline:hover {
+  box-shadow: none !important;
 }
 
 /* Transição para imagens carregando */

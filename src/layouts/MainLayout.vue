@@ -20,6 +20,7 @@
           <div class="row items-center gt-sm">
             <!-- Container de filtros unificado -->
             <div
+              v-if="!isEventDetailPage"
               class="filter-container"
               :class="{ 'filter-container--active': showCategories }"
               @click="toggleCategories"
@@ -46,6 +47,7 @@
               <span class="filter-text">Filtros</span>
             </div>
             <q-input
+              v-if="!isEventDetailPage"
               class="search-pill q-my-xs"
               filled
               square-rounded
@@ -78,30 +80,60 @@
       <div class="categories-drawer" :class="{ 'categories-drawer--open': showCategories }">
         <div class="categories-content">
           <div class="categories-grid">
-            <q-btn
-              v-for="category in categories"
-              :key="category.label"
-              outline
-              square-rounded
-              no-caps
-              class="category-btn"
-              :class="{ 'category-btn--active': selectedCategory === category.label }"
-              color="white"
-              text-color="white"
-              :icon="category.icon"
-              :label="category.label"
-              :aria-label="`Filtrar eventos de ${category.label}`"
-              @click="selectCategory(category.label)"
-            />
-            <q-btn
-              flat
-              round
-              dense
-              icon="add"
-              class="add-category-btn"
-              color="white"
-              aria-label="Adicionar mais categorias"
-            />
+            <!-- Se tem categoria selecionada e não está expandido, mostra apenas a selecionada -->
+            <template v-if="selectedCategory && !showAllCategories">
+              <q-btn
+                v-for="category in categories.filter(c => c.label === selectedCategory)"
+                :key="category.label"
+                outline
+                square-rounded
+                no-caps
+                class="category-btn category-btn--active"
+                color="white"
+                text-color="white"
+                :icon="category.icon"
+                :label="category.label"
+                :aria-label="`Filtrar eventos de ${category.label}`"
+                @click="selectCategory(category.label)"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="add"
+                class="add-category-btn"
+                color="white"
+                aria-label="Mostrar mais categorias"
+                @click="expandCategories"
+              />
+            </template>
+            <!-- Caso contrário, mostra todas -->
+            <template v-else>
+              <q-btn
+                v-for="category in categories"
+                :key="category.label"
+                outline
+                square-rounded
+                no-caps
+                class="category-btn"
+                :class="{ 'category-btn--active': selectedCategory === category.label }"
+                color="white"
+                text-color="white"
+                :icon="category.icon"
+                :label="category.label"
+                :aria-label="`Filtrar eventos de ${category.label}`"
+                @click="selectCategory(category.label)"
+              />
+              <q-btn
+                flat
+                round
+                dense
+                icon="add"
+                class="add-category-btn"
+                color="white"
+                aria-label="Adicionar mais categorias"
+              />
+            </template>
           </div>
         </div>
       </div>
@@ -198,7 +230,7 @@
 </template>
 
 <script setup>
-import { ref, watch, provide, onMounted } from 'vue'
+import { ref, watch, provide, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
 import { useQuasar } from 'quasar'
@@ -217,9 +249,15 @@ const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
 // Estado das categorias expansíveis
 const showCategories = ref(false)
 const selectedCategory = ref(null)
+const showAllCategories = ref(false) // Controla se mostra todas ou apenas a selecionada
 
 // Categorias disponíveis (carregadas dinamicamente)
 const categories = ref([])
+
+// Detectar se estamos na página de detalhes do evento
+const isEventDetailPage = computed(() => {
+  return route.name === 'event-detail'
+})
 
 // Estado dos filtros
 const filters = ref({
@@ -247,6 +285,10 @@ onMounted(async () => {
 // Função para alternar a exibição das categorias
 function toggleCategories() {
   showCategories.value = !showCategories.value
+  // Reseta showAllCategories quando fecha a gaveta
+  if (!showCategories.value) {
+    showAllCategories.value = false
+  }
 }
 
 // Função para selecionar uma categoria
@@ -254,9 +296,11 @@ function selectCategory(categoryLabel) {
   if (selectedCategory.value === categoryLabel) {
     // Se já está selecionada, deseleciona
     selectedCategory.value = null
+    showAllCategories.value = false
   } else {
     // Seleciona nova categoria
     selectedCategory.value = categoryLabel
+    showAllCategories.value = false
   }
 
   // Emite evento para a página atual
@@ -265,6 +309,11 @@ function selectCategory(categoryLabel) {
       detail: { category: selectedCategory.value },
     }),
   )
+}
+
+// Função para expandir e mostrar todas as categorias
+function expandCategories() {
+  showAllCategories.value = true
 }
 
 // Provide para comunicação com páginas filhas
@@ -377,10 +426,18 @@ function applyFilters() {
   .header-inner {
     max-width: 1600px;
   }
+
+  .categories-grid {
+    max-width: 1600px;
+  }
 }
 
 @media (min-width: 1920px) {
   .header-inner {
+    max-width: 1800px;
+  }
+
+  .categories-grid {
     max-width: 1800px;
   }
 }
@@ -510,9 +567,10 @@ function applyFilters() {
 }
 
 .categories-grid {
-  width: calc(100vw - 160px);
-  max-width: 1760px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: 0 80px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -526,6 +584,7 @@ function applyFilters() {
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
+  outline: none !important;
 }
 
 .category-btn:hover {
