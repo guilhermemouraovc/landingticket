@@ -34,35 +34,15 @@
       <div v-else class="carousel-container">
         <div class="carousel-wrapper" ref="carouselRef" @scroll="updateScrollState">
           <div class="carousel-track">
-            <div
+            <EventCard
               v-for="event in events"
               :key="event.id"
+              :event="event"
+              variant="grid"
               class="carousel-item"
+              image-height="215px"
               @click="goToEvent(event)"
-            >
-              <q-card class="event-card" flat>
-                <q-img
-                  :src="event.image"
-                  :alt="`Imagem do evento ${event.title}`"
-                  height="215px"
-                  ratio="16/9"
-                  loading="lazy"
-                />
-                <q-card-section class="event-card__body">
-                  <div class="event-card__title">{{ event.title }}</div>
-                  <div class="event-card__meta">
-                    <div class="meta-item">
-                      <q-icon name="event" class="meta-icon" aria-hidden="true" />
-                      <span>{{ event.date }}</span>
-                    </div>
-                    <div class="meta-item">
-                      <q-icon name="place" class="meta-icon" aria-hidden="true" />
-                      <span>{{ event.location }}</span>
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
+            />
           </div>
         </div>
       </div>
@@ -75,6 +55,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
+import EventCard from 'src/components/EventCard.vue'
 
 const props = defineProps({
   currentEventId: {
@@ -335,61 +316,10 @@ onMounted(() => {
   cursor: pointer;
 }
 
-/* Event card styles */
-.event-card {
+/* Ajustes específicos para o carrossel */
+.carousel-item :deep(.event-card) {
   width: 400px;
   height: 395px;
-  border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  overflow: hidden;
-  border: none;
-  outline: none;
-  position: relative; /* Permite que o hover saia dos limites */
-  z-index: 1; /* Ficar sobre outros elementos */
-}
-
-.event-card:hover {
-  transform: translateY(-8px); /* Subir mais */
-  box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
-  z-index: 10; /* Ficar por cima */
-}
-
-.event-card__body {
-  flex: 1;
-  padding: 16px 20px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.event-card__title {
-  font-size: 1.05rem;
-  line-height: 1.35;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.event-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  color: #6b7280;
-}
-
-.meta-icon {
-  color: #ec4899;
-  font-size: 18px;
 }
 
 /* Loading and empty states */
@@ -424,6 +354,10 @@ onMounted(() => {
     padding: 40px 0;
   }
 
+  .related-events-container {
+    padding: 0 16px;
+  }
+
   .header-container {
     margin-bottom: 20px;
   }
@@ -433,7 +367,7 @@ onMounted(() => {
   }
 
   .navigation-arrows {
-    gap: 8px;
+    display: none; /* Esconde as setinhas no mobile */
   }
 
   .nav-button {
@@ -449,19 +383,23 @@ onMounted(() => {
 
   .carousel-wrapper {
     height: 350px;
+    margin-left: -16px; /* Permite que os cards estourem um pouco à esquerda */
+    margin-right: -16px;
+    padding-left: 16px; /* Mantém o primeiro card alinhado */
+    padding-right: 16px; /* Espaço no final para indicar scroll */
+  }
+
+  .carousel-track {
+    gap: 16px; /* Reduzido de 40px para 16px no mobile */
   }
 
   .carousel-item {
     flex: 0 0 280px;
   }
 
-  .event-card {
+  .carousel-item :deep(.event-card) {
     width: 280px;
     height: 350px;
-  }
-
-  .event-card__body {
-    padding: 12px 16px 16px;
   }
 }
 </style>

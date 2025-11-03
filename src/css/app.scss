@@ -1,12 +1,16 @@
 // app global css in SCSS form
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-/* ==================== PREVENÇÃO DE SCROLL HORIZONTAL ==================== */
+/* ==================== PREVENÇÃO DE SCROLL HORIZONTAL E FUNDO UNIFORME ==================== */
 html,
 body {
   overflow-x: hidden;
   max-width: 100vw;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background-color: #2a3447 !important;
+  min-height: 100%;
 }
 
 * {
@@ -15,10 +19,49 @@ body {
 
 .q-layout {
   overflow-x: hidden;
+  background-color: #2a3447 !important;
 }
 
 .q-page-container {
   overflow-x: hidden;
+  background-color: #2a3447 !important;
+}
+
+/* Desktop: altura mínima para garantir que o fundo cubra toda a tela */
+@media (min-width: 600px) {
+  .q-page-container {
+    min-height: 100vh;
+  }
+}
+
+/* Previne espaço branco extra no final da página no mobile */
+@media (max-width: 599px) {
+  html,
+  body {
+    background-color: #2a3447 !important;
+    min-height: 100%;
+  }
+  
+  .q-page {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    background-color: #2a3447 !important;
+  }
+  
+  .q-page-container {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    background-color: #2a3447 !important;
+    min-height: auto !important;
+  }
+  
+  .q-layout {
+    background-color: #2a3447 !important;
+  }
+  
+  .main-container {
+    background-color: transparent;
+  }
 }
 
 /* Permitir que o footer ocupe toda a largura */
@@ -90,7 +133,18 @@ body {
 }
 
 .q-chip:hover {
-  transform: scale(1.05);
+  transform: scale(1);
+}
+.q-chip--outline {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.q-chip--outline::before,
+.q-chip--outline::after {
+  display: none !important;
+}
+.q-chip--outline:hover {
+  box-shadow: none !important;
 }
 
 /* Transição para imagens carregando */

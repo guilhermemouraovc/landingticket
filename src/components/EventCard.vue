@@ -32,37 +32,37 @@
       </div>
 
       <!-- Descrição (opcional) -->
-      <div v-if="showDescription && event.description" class="event-card__description q-mt-xs">
+      <div v-if="showDescription && event.description" class="event-card__description">
         {{ truncatedDescription }}
       </div>
 
       <!-- Meta informações (data e localização) -->
-      <div class="event-card__meta q-mt-md" :class="metaLayoutClass">
+      <div class="event-card__meta" :class="metaLayoutClass">
         <!-- Data -->
         <div class="meta-item">
           <q-icon :name="dateIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
           <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
         </div>
 
-        <!-- Localização -->
+        <!-- Localização (city - state) -->
         <div class="meta-item">
           <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
-          <span>{{ event.location || 'Local a definir' }}</span>
+          <span>{{ event.cityState || event.location || 'Local a definir' }}</span>
         </div>
       </div>
 
       <!-- Seção de Preços -->
-      <div v-if="event.hasPrice && showPrice" class="event-card__price-section q-mt-md">
+      <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
+        <!-- Preço À Vista -->
+        <div v-if="event.fullPrice" class="price-full">
+          {{ event.formattedFullPrice }}
+        </div>
+
         <!-- Preço Parcelado (se existir) -->
         <div v-if="event.installments && event.installmentValue" class="price-installment">
           <span class="installment-label">{{ event.installments }}x de</span>
-          <div class="installment-value">{{ event.formattedInstallmentValue }}</div>
+          <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
           <span class="installment-info">sem juros</span>
-        </div>
-
-        <!-- Preço À Vista -->
-        <div v-if="event.fullPrice" class="price-full">
-          ou {{ event.formattedFullPrice }} à vista
         </div>
       </div>
 
@@ -166,7 +166,7 @@ const emit = defineEmits(['click'])
 
 // Computed
 const metaLayoutClass = computed(() => {
-  return props.variant === 'carousel' ? 'meta-layout--column' : 'meta-layout--column'
+  return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
 })
 
 const truncatedDescription = computed(() => {
@@ -184,7 +184,7 @@ function handleClick() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* ==================== BASE ==================== */
 .event-card {
   display: flex;
@@ -238,16 +238,18 @@ function handleClick() {
 
 .event-card__body {
   flex: 1;
-  padding: 15px 15px 13px;
+  padding: 15px 15px 15px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   color: #1f2937;
 }
 
 .event-card__title {
-  font-size: 1.05rem;
-  line-height: 1.05;
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 600; /* Semibold */
+  line-height: 1.2;
   color: #1f2937;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -271,13 +273,17 @@ function handleClick() {
 
 .event-card__meta {
   display: flex;
-  gap: 8px;
-  color: #6b7280;
-  font-size: 0.95rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 35px;
+  color: #000000;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .meta-layout--column {
-  flex-direction: column;
+  flex-direction: row; /* Sempre lado a lado */
 }
 
 .meta-layout--row {
@@ -288,16 +294,17 @@ function handleClick() {
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .meta-icon {
-  color: #ec4899;
+  color: #d907f2; /* Roxo do protótipo */
+  font-size: 16px;
 }
 
 .meta-highlight {
-  color: #ec4899;
-  font-weight: 600;
+  color: #000000; /* Texto preto */
+  font-weight: 400;
 }
 
 /* ==================== RESPONSIVIDADE ==================== */
@@ -307,45 +314,49 @@ function handleClick() {
 .event-card__price-section {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  /*padding-top: 6px;
-  /* border-top: 1px solid #e5e7eb; */ /* Remover a linha também */
+  gap: 8px;
+}
+
+.price-full {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px; /* tamanho 100 no design */
+  font-weight: 600; /* Semibold */
+  color: #000000;
+  line-height: 1.2;
 }
 
 .price-installment {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
 }
 
 .installment-label {
-  font-size: 0.85rem;
-  color: #00b5e2;
-  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px; /* tamanho 41 no design */
+  color: #008ec1;
+  font-weight: 400;
 }
 
 .installment-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #00b5e2;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px; /* tamanho 41 no design */
+  font-weight: 400;
+  color: #008ec1;
   line-height: 1.2;
 }
 
 .installment-info {
-  font-size: 0.85rem;
-  color: #00b5e2;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px; /* tamanho 41 no design */
+  color: #008ec1;
   font-weight: 400;
-}
-
-.price-full {
-  font-size: 0.9rem;
-  color: #6b7280;
-  font-weight: 400;
-  margin-top: 4px;
 }
 
 /* ==================== RESPONSIVIDADE ==================== */
 
+/* Tablet (até 768px) */
 @media (max-width: 768px) {
   .event-card--carousel {
     flex: 0 0 280px;
@@ -357,15 +368,91 @@ function handleClick() {
   }
 
   .event-card__title {
-    font-size: 1rem;
+    font-size: 18px;
   }
 
   .event-card__meta {
-    font-size: 0.9rem;
+    font-size: 12px;
   }
 
-  .installment-value {
-    font-size: 1.5rem;
+  .price-full {
+    font-size: 24px;
+  }
+
+  .installment-label,
+  .installment-value,
+  .installment-info {
+    font-size: 10px;
+  }
+}
+
+/* Mobile (até 599px - breakpoint sm do Quasar) */
+@media (max-width: 599px) {
+  .event-card--carousel {
+    flex: 0 0 280px;
+    width: 280px;
+  }
+
+  .event-card__body {
+    padding: 12px 14px 12px;
+    gap: 8px;
+    height: 167px; /* altura fixa da área branca com textos no mobile */
+    overflow: hidden;
+  }
+
+  .event-card__title {
+    font-size: 18px; /* título conforme protótipo */
+    line-height: 1.2;
+  }
+
+  .event-card__description {
+    font-size: 0.75rem;
+  }
+
+  .event-card__meta {
+    font-size: 12px;
+    gap: 24px;
+  }
+
+  .meta-item {
+    gap: 6px;
+  }
+
+  .meta-icon {
+    font-size: 16px !important;
+    color: #d907f2 !important;
+  }
+
+  /* Controla a altura visual da imagem no mobile */
+  .event-card__image {
+    height: 180px !important;
+  }
+
+  /* Texto sempre em preto */
+  .event-card__meta .meta-item span {
+    color: #000000;
+    font-weight: 400;
+  }
+
+  .price-full {
+    font-size: 24px;
+  }
+
+  .installment-label,
+  .installment-value,
+  .installment-info {
+    font-size: 10px;
+  }
+
+  /* No mobile, coloca data e localização lado a lado como no protótipo */
+  .event-card__meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .meta-item {
+    flex-shrink: 0;
   }
 }
 </style>

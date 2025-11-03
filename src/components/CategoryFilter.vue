@@ -10,9 +10,13 @@
         v-for="category in categories"
         :key="category.id"
         clickable
-        :outline="!selectedCategories.includes(category.id)"
-        :color="selectedCategories.includes(category.id) ? category.color : 'grey-3'"
-        :text-color="selectedCategories.includes(category.id) ? 'white' : 'grey-8'"
+        flat
+        :color="selectedCategories.includes(category.id) ? category.color : undefined"
+        :text-color="
+          selectedCategories.includes(category.id)
+            ? {}
+            : { backgroundColor: '#e5e7eb', color: '#374151' }
+        "
         :icon="category.icon"
         class="category-chip"
         :aria-label="`${category.name}. ${selectedCategories.includes(category.id) ? 'Selecionado' : 'Não selecionado'}`"
@@ -134,6 +138,67 @@ function clearCategories() {
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.2s ease;
+  outline: none !important;
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  position: relative;
+}
+
+/* Borda branca grossa usando pseudo-elemento para mascarar stroke cinza */
+.category-chip :deep(.q-chip--colored) {
+  border: none !important;
+  position: relative;
+}
+
+.category-chip :deep(.q-chip--colored::before) {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: white;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.category-chip :deep(.q-chip) {
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.category-chip :deep(.q-chip__content) {
+  border: none !important;
+  border-color: transparent !important;
+}
+
+.category-chip :deep(.q-chip__content::before),
+.category-chip :deep(.q-chip__content::after) {
+  display: none !important;
+  border: none !important;
+}
+
+.category-chip:not(.q-chip--colored) {
+  border: none !important;
+  border-color: transparent !important;
+}
+
+/* Remove qualquer borda do Quasar aplicada por cores */
+.category-chip :deep(.q-chip--selected),
+.category-chip :deep(.q-chip--clickable) {
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Remove stroke de elementos SVG internos se houver */
+.category-chip :deep(svg),
+.category-chip :deep(path) {
+  stroke: none !important;
 }
 
 .category-chip:hover {

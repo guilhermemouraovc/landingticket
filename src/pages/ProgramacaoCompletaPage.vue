@@ -108,39 +108,13 @@
 
       <!-- Grid de eventos -->
       <div v-else class="cards-grid" role="list" aria-label="Lista de eventos">
-        <q-card
+        <EventCard
           v-for="card in filteredItems"
           :key="card.id"
-          flat
-          clickable
-          v-ripple
-          @click="goToEvent(card)"
-          class="event-card"
-          role="listitem"
-          :aria-label="`Evento: ${card.title}. ${card.date}. ${card.location}`"
-          tabindex="0"
-          @keydown.enter="goToEvent(card)"
-          @keydown.space.prevent="goToEvent(card)"
-        >
-          <q-img
-            :src="card.image"
-            :alt="`Imagem do evento ${card.title}`"
-            ratio="16/9"
-            height="215px"
-            loading="lazy"
-          />
-          <q-card-section>
-            <div class="event-title q-mb-xs">{{ card.title }}</div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.date }}</span>
-            </div>
-            <div class="row items-center event-meta q-mt-xs">
-              <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-              <span>{{ card.location }}</span>
-            </div>
-          </q-card-section>
-        </q-card>
+          :event="card"
+          variant="grid"
+          @click="goToEvent"
+        />
       </div>
     </div>
   </q-page>
@@ -154,6 +128,7 @@ import { normalizeString } from 'src/utils/stringUtils'
 import { CATEGORIES } from 'src/constants/config'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
+import EventCard from 'src/components/EventCard.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -314,7 +289,7 @@ function goBack() {
 }
 
 .list-wrap {
-  padding: 0 20px 64px;
+  padding: 0 80px 64px;
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -497,64 +472,20 @@ function goBack() {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 400px);
+  grid-template-columns: repeat(3, 1fr);
   gap: 40px;
-  justify-content: center;
 }
 
-/* Cards com mesma formatação do carrossel */
-.event-card {
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  overflow: hidden;
-  border: none;
-  outline: none;
+/* Responsividade - Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
 }
 
-.event-card:hover,
-.event-card:focus-within {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
-}
-
-.event-card .q-card-section {
-  flex: 1;
-  padding: 16px 20px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.event-title {
-  font-size: 1.05rem;
-  line-height: 1.35;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.event-meta {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  color: #6b7280;
-}
-
-.event-meta__icon {
-  color: #ec4899;
-  font-size: 18px;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
+/* Responsividade - Mobile */
+@media (max-width: 767px) {
   .list-wrap {
     padding: 0 16px 40px;
   }
@@ -569,11 +500,6 @@ function goBack() {
 .q-btn:focus-visible {
   outline: 2px solid #35c7ee;
   outline-offset: 2px;
-}
-
-.event-card:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px #35c7ee;
 }
 
 .q-chip:focus-visible {

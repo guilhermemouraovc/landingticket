@@ -79,6 +79,16 @@ function formatPriceInfo(row) {
   }
 }
 
+/**
+ * Formata cidade e estado
+ */
+function formatCityStateSimple(city, state) {
+  if (!city && !state) return 'Local a definir'
+  if (!state) return city
+  if (!city) return state
+  return city + ' - ' + state
+}
+
 export function toEventCardFromSb(row) {
   const priceInfo = formatPriceInfo(row)
 
@@ -95,6 +105,7 @@ export function toEventCardFromSb(row) {
     description: row.description,
     date: formatDateRange(row.start_date, row.end_date),
     location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
+    cityState: formatCityStateSimple(row.city, row.state), // city - state apenas
     image: row.image_url || '/logo.svg',
     link: { name: 'event-detail', params: { id: row.id } },
     // Informações de preço

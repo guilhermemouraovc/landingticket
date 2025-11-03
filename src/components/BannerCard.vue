@@ -185,36 +185,18 @@ const handleClick = () => {
   font-weight: 600;
 }
 
-/* Responsividade */
-@media (max-width: 1024px) {
-  .banner-card-wrap {
-    padding: 0 40px;
-  }
-
-  .banner-overlay {
-    padding: 0 40px;
-  }
-
-  .banner-title {
-    font-size: 32px;
-  }
-
-  .banner-subtitle {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 599px) {
   .banner-card-section {
     padding: 20px 0;
   }
 
   .banner-card-wrap {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 
   .banner-overlay {
-    padding: 0 20px;
+    padding: 0 16px;
     background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.1) 0%,
@@ -230,15 +212,55 @@ const handleClick = () => {
   }
 
   .banner-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .banner-subtitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .banner-cta {
     width: 100%;
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .banner-card-wrap {
+    padding: 0 40px;
+  }
+
+  .banner-overlay {
+    padding: 0 40px;
+  }
+
+  .banner-title {
+    font-size: 28px;
+  }
+
+  .banner-subtitle {
+    font-size: 15px;
+  }
+}
+
+/* Desktop médio */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .banner-card-wrap {
+    padding: 0 40px;
+  }
+
+  .banner-overlay {
+    padding: 0 40px;
+  }
+
+  .banner-title {
+    font-size: 32px;
+  }
+
+  .banner-subtitle {
+    font-size: 16px;
   }
 }
 </style>

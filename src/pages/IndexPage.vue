@@ -15,7 +15,8 @@
           infinite
           swipeable
           autoplay
-          height="440px"
+          :autoplay-interval="autoplayInterval"
+          :height="$q.screen.lt.sm ? 'auto' : '440px'"
           control-color="transparent"
           navigation-position="bottom"
           transition-prev="slide-right"
@@ -49,12 +50,25 @@
 
                     <div class="q-mt-md q-gutter-sm">
                       <div class="row items-center event-meta">
-                        <q-icon name="event" class="q-mr-sm event-meta__icon" aria-hidden="true" />
+                        <q-icon
+                          name="event"
+                          class="q-mr-sm event-meta__icon"
+                          color="purple-7"
+                          aria-hidden="true"
+                        />
                         <span>{{ ev.date }}</span>
                       </div>
                       <div class="row items-center event-meta">
-                        <q-icon name="place" class="q-mr-sm event-meta__icon" aria-hidden="true" />
-                        <span>{{ ev.location }}</span>
+                        <q-icon
+                          name="place"
+                          class="q-mr-sm event-meta__icon"
+                          color="purple-7"
+                          aria-hidden="true"
+                        />
+                        <span class="event-location-desktop">{{ ev.location }}</span>
+                        <span class="event-location-mobile">{{
+                          ev.cityState || ev.location || 'Local a definir'
+                        }}</span>
                       </div>
                     </div>
 
@@ -87,7 +101,7 @@
     </section>
 
     <!-- CATEGORIAS -->
-    <section class="categories" aria-label="Categorias de eventos">
+    <section class="categories categories--hide-mobile" aria-label="Categorias de eventos">
       <div class="categories-wrap">
         <div class="cat-grid">
           <q-btn
@@ -124,6 +138,7 @@
       <!-- Eventos filtrados por categoria -->
       <template v-else-if="selectedCategory">
         <EventSectionCarousel
+          :section-id="getSectionIdByLabel(selectedCategory)"
           :title="`Eventos de ${selectedCategory}`"
           :items="filteredEvents"
           :default-image="DEFAULT_IMAGE"
@@ -133,6 +148,7 @@
       <!-- Carrosséis normais -->
       <template v-else>
         <EventSectionCarousel
+          section-id="reveillon"
           title="Réveillon"
           :items="reveillonEvents"
           see-all-label="Ver Tudo"
@@ -141,6 +157,7 @@
         />
 
         <EventSectionCarousel
+          section-id="carnaval"
           title="Carnaval"
           :items="carnavalEvents"
           see-all-label="Ver Tudo"
@@ -149,6 +166,7 @@
         />
 
         <EventSectionCarousel
+          section-id="festivais"
           title="Festivais"
           :items="saoJoaoEvents"
           see-all-label="Ver Tudo"
@@ -157,6 +175,7 @@
         />
 
         <EventSectionCarousel
+          section-id="programacao-completa"
           title="Programação completa"
           :items="allEvents"
           see-all-label="Ver Tudo"
@@ -170,14 +189,14 @@
     <footer class="footer" role="contentinfo">
       <div class="footer-wrap">
         <div class="footer-top row items-center justify-between q-mb-lg">
-          <div class="footer-logo-container">
+          <router-link to="/" class="footer-logo-container">
             <img
-              src="/ticketpe.svg"
+              src="/logo.svg"
               alt="TicketPE - Eventos em Pernambuco"
-              class="footer-logo"
+              style="width: 220px"
               loading="lazy"
             />
-          </div>
+          </router-link>
 
           <div class="social-icons row q-gutter-md">
             <a href="#" class="social-link" aria-label="WhatsApp">
@@ -207,7 +226,7 @@
 
           <div class="footer-column">
             <div class="footer-title">Suporte</div>
-            <div class="footer-link">Termos de Uso</div>
+            <router-link to="/termos-de-uso" class="footer-link">Termos de Uso</router-link>
             <div class="footer-link">Política de Privacidade</div>
           </div>
         </div>
@@ -221,13 +240,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
+
+const $q = useQuasar()
 
 const DEFAULT_IMAGE = DEFAULT_IMAGES.eventPlaceholder
 
@@ -251,6 +273,7 @@ const reveillonEvents = ref([])
 const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
 const allEvents = ref([])
+const autoplayInterval = ref(3000) // em milissegundos
 
 // Estados de loading
 const loadingFeatured = ref(true)
@@ -265,8 +288,65 @@ const categories = ref([])
 
 // Helper para obter tagName a partir do label
 function getTagNameByLabel(label) {
-  const c = categories.value.find(x => x.label === label)
+  const c = categories.value.find((x) => x.label === label)
   return c?.tagName || null
+}
+
+// Helper para converter label de categoria em ID de seção
+function getSectionIdByLabel(label) {
+  // Mapeamento fixo dos carrosséis principais
+  const fixedMap = {
+    Réveillon: 'reveillon',
+    Reveillon: 'reveillon',
+    REVEILLONS: 'reveillon',
+    Carnaval: 'carnaval',
+    CARNAVAL: 'carnaval',
+    Carnavais: 'carnaval',
+    Festivais: 'festivais',
+    FESTIVAISS: 'festivais',
+    'Programação completa': 'programacao-completa',
+    'Programação Completa': 'programacao-completa',
+  }
+
+  // Se já está mapeado, retorna
+  if (fixedMap[label]) {
+    return fixedMap[label]
+  }
+
+  // Caso contrário, converte o label para slug
+  // Remove acentos e caracteres especiais, converte para minúsculas
+  return label
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+    .trim()
+    .replace(/\s+/g, '-') // Espaços viram hífens
+}
+
+// Função para fazer scroll suave até uma seção
+async function scrollToSection(sectionId) {
+  if (!sectionId) return
+
+  // Aguarda o próximo ciclo de atualização do Vue para garantir que o DOM foi atualizado
+  await nextTick()
+
+  // Aguarda um pouco mais para garantir que os elementos foram renderizados
+  setTimeout(() => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const offset = 120 // Offset para não colar no topo (header fixo)
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      })
+    } else {
+      console.warn(`⚠️ Seção com ID "${sectionId}" não encontrada`)
+    }
+  }, 150)
 }
 
 // Escuta eventos do header
@@ -391,6 +471,9 @@ async function loadAllEvents() {
   }
 }
 
+// IDs das seções fixas que já existem como carrosséis
+const fixedSectionIds = ['reveillon', 'carnaval', 'festivais', 'programacao-completa']
+
 // Filtro por categoria
 function toggleCategory(categoryLabel) {
   if (selectedCategory.value === categoryLabel) {
@@ -398,9 +481,21 @@ function toggleCategory(categoryLabel) {
     selectedCategory.value = null
     filteredEvents.value = []
   } else {
-    // Seleciona nova categoria e filtra eventos
-    selectedCategory.value = categoryLabel
-    filterEventsByCategory(categoryLabel)
+    const sectionId = getSectionIdByLabel(categoryLabel)
+
+    // Se é uma categoria fixa (já tem carrossel), apenas faz scroll até o carrossel
+    if (fixedSectionIds.includes(sectionId)) {
+      scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
+    } else {
+      // Para outras categorias, seleciona e filtra eventos
+      selectedCategory.value = categoryLabel
+
+      // Faz scroll até o carrossel correspondente após filtrar
+      filterEventsByCategory(categoryLabel).then(async () => {
+        // Aguarda o DOM atualizar com os eventos filtrados antes de fazer scroll
+        await scrollToSection(sectionId)
+      })
+    }
   }
 }
 
@@ -414,7 +509,7 @@ async function filterEventsByCategory(categoryLabel) {
     if (!tagName) {
       console.warn('⚠️ Categoria não mapeada:', categoryLabel)
       filteredEvents.value = []
-      return
+      return Promise.resolve()
     }
 
     // Usar Supabase com tagName dinâmico
@@ -426,6 +521,9 @@ async function filterEventsByCategory(categoryLabel) {
   } finally {
     loadingCarousels.value = false
   }
+
+  // Retorna promise para permitir aguardar o carregamento
+  return Promise.resolve()
 }
 </script>
 
@@ -434,18 +532,39 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   max-width: 1200px;
   margin: 0 auto;
-  margin-bottom: 100px; /* Adiciona gap de 250px entre o carrossel e o footer */
+  margin-bottom: 100px;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .event-groups {
+    padding: 0 16px;
+    margin-bottom: 0;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .event-groups {
+    padding: 0 40px;
+  }
 }
 /* fundo */
 .bg-landing {
   background-color: #2a3447;
-  min-height: 100vh;
 }
 
 /* ================= CARROSSEL ================= */
 .destaque {
   background-color: #2a3447;
   padding: 40px 0;
+}
+
+/* Mobile: menos padding vertical */
+@media (max-width: 599px) {
+  .destaque {
+    padding: 24px 0;
+  }
 }
 .featured-carousel {
   background: transparent !important;
@@ -469,6 +588,31 @@ async function filterEventsByCategory(categoryLabel) {
   padding: 0 80px;
   box-sizing: border-box;
 }
+
+/* Mobile */
+@media (max-width: 599px) {
+  .featured-wrap {
+    padding: 0 16px;
+    height: auto;
+  }
+
+  .featured-carousel {
+    height: auto !important;
+  }
+
+  .featured-carousel .q-carousel__slide {
+    padding: 0 !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .featured-wrap {
+    padding: 0 40px;
+    height: 400px;
+  }
+}
+
 .featured-grid {
   display: grid;
   grid-template-columns: 60% 40%;
@@ -478,9 +622,21 @@ async function filterEventsByCategory(categoryLabel) {
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+/* Mobile: layout em coluna (imagem em cima, info embaixo) com altura fixa */
+@media (max-width: 599px) {
+  .featured-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 358px auto;
+    height: auto;
+    min-height: 568px;
+    border-radius: 24px;
+  }
+}
 .featured-img {
   overflow: hidden;
 }
+
 .featured-img .q-img__content img {
   object-fit: cover;
   width: 100%;
@@ -491,8 +647,21 @@ async function filterEventsByCategory(categoryLabel) {
   width: 100%;
   height: 100%;
 }
+
 .featured-img .full img {
   object-fit: cover;
+}
+
+/* Mobile: imagem com altura fixa e radius apenas no topo */
+@media (max-width: 599px) {
+  .featured-img {
+    height: 358px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .featured-img .full {
+    height: 358px;
+  }
 }
 .featured-panel {
   background: #fff;
@@ -512,6 +681,25 @@ async function filterEventsByCategory(categoryLabel) {
   width: 100%;
   min-height: 100%;
 }
+
+/* Mobile: padding ajustado e layout vertical com altura mínima fixa */
+@media (max-width: 599px) {
+  .panel-inner {
+    padding: 8px 20px 24px 20px; /* Reduzido padding-top de 12px para 8px */
+    gap: 6px; /* Reduzido gap de 12px para 6px */
+    justify-content: flex-start;
+    min-height: 210px;
+  }
+
+  /* Reduz espaçamento entre título e elementos abaixo */
+  .panel-inner .event-title {
+    margin-bottom: -3px !important;
+  }
+
+  .panel-inner .q-mt-md {
+    margin-top: -5px !important;
+  }
+}
 .featured-description {
   color: #4b5563;
   max-height: 84px;
@@ -520,6 +708,13 @@ async function filterEventsByCategory(categoryLabel) {
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+/* Mobile: esconde a descrição para economizar espaço */
+@media (max-width: 599px) {
+  .featured-description {
+    display: none;
+  }
 }
 .featured-carousel {
   position: relative;
@@ -560,17 +755,84 @@ async function filterEventsByCategory(categoryLabel) {
   outline-offset: 2px;
 }
 
+/* Mobile: bolinhas minimalistas e próximas */
+@media (max-width: 599px) {
+  .pagination-dots {
+    gap: 12px;
+    margin-top: 24px;
+    padding: 0;
+    /* Remover height: 8px; que estava causando o problema */
+    align-items: center; /* Centralizar verticalmente */
+  }
+
+  .pagination-dot {
+    width: 12px;
+    height: 12px;
+    min-width: 8px; /* Garantir largura mínima */
+    min-height: 8px; /* Garantir altura mínima */
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: transparent;
+    border-radius: 50%; /* Forçar círculo perfeito */
+    box-sizing: border-box; /* Bordas dentro do tamanho */
+    flex-shrink: 0; /* Não comprimir */
+    padding: 0; /* Resetar padding padrão do botão */
+    line-height: 1; /* Resetar line-height */
+    vertical-align: middle; /* Alinhamento vertical */
+  }
+
+  .pagination-dot--active {
+    background-color: white;
+    border-color: white;
+    transform: none;
+  }
+
+  .pagination-dot:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
 /* ================= CATEGORIAS ================= */
 .categories {
   background-color: #2a3447;
   margin-top: 30px;
   padding: 60px 0;
 }
+
+/* Mobile: menos espaçamento */
+@media (max-width: 599px) {
+  .categories {
+    margin-top: 32px;
+    padding: 40px 0;
+  }
+
+  /* Esconde a seção de categorias no mobile */
+  .categories--hide-mobile {
+    display: none !important;
+  }
+}
 .categories-wrap {
   width: calc(100vw - 160px);
   max-width: 1760px;
   margin: 0 auto;
   padding: 0 80px;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .categories-wrap {
+    padding: 0 16px;
+    width: calc(100vw - 32px);
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .categories-wrap {
+    padding: 0 40px;
+    width: calc(100vw - 80px);
+  }
 }
 .cat-grid {
   display: flex;
@@ -582,12 +844,38 @@ async function filterEventsByCategory(categoryLabel) {
   margin: 0 auto;
 }
 
-/* Responsividade para dispositivos móveis */
-@media (max-width: 768px) {
-  .categories-wrap {
-    padding: 0 40px;
+/* Mobile: grid 2 colunas conforme protótipo */
+@media (max-width: 599px) {
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    justify-content: stretch;
+    max-width: 100%;
   }
 
+  .cat-btn {
+    min-width: auto;
+    width: 100%;
+    height: 56px;
+    font-size: 15px;
+    border-radius: 16px !important;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .cat-btn .q-icon {
+    font-size: 22px;
+    margin-right: 8px;
+  }
+
+  .cat-btn .q-btn__content {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
   .cat-grid {
     gap: 12px;
     justify-content: space-around;
@@ -611,6 +899,7 @@ async function filterEventsByCategory(categoryLabel) {
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
+  outline: none !important;
 }
 .cat-btn:hover {
   background: #35c7ee !important;
@@ -651,11 +940,27 @@ async function filterEventsByCategory(categoryLabel) {
   background-color: #ffe100 !important;
   color: #000 !important;
 }
+
 .featured-cta .q-btn__content {
   font-family: 'Poppins', sans-serif;
   font-weight: 600; /* semibold */
   font-size: 14px;
   color: #000 !important;
+}
+
+/* Mobile: botão full width */
+@media (max-width: 599px) {
+  .featured-cta {
+    width: 100%;
+    height: 48px;
+    font-size: 16px;
+    margin-top: 8px;
+  }
+
+  .featured-cta .q-btn__content {
+    font-size: 16px;
+    font-weight: 600;
+  }
 }
 
 .event-title {
@@ -666,6 +971,22 @@ async function filterEventsByCategory(categoryLabel) {
   color: #1f2937;
 }
 
+/* Mobile: título menor com altura fixa (2 linhas max) */
+@media (max-width: 599px) {
+  .event-title {
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 700;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 62px;
+    margin-bottom: 0 !important; /* Removido espaçamento abaixo do título */
+  }
+}
+
 .event-meta {
   font-family: 'Poppins', sans-serif;
   font-weight: 400; /* regular */
@@ -673,8 +994,53 @@ async function filterEventsByCategory(categoryLabel) {
   color: #1f2937;
 }
 
+/* Mobile: meta menor com altura fixa */
+@media (max-width: 599px) {
+  .event-meta {
+    font-size: 14px;
+    min-height: 22px;
+  }
+
+  .event-meta .q-icon {
+    font-size: 18px;
+    color: #d907f2 !important;
+  }
+
+  .event-meta span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Mostra apenas cidade-estado no mobile - SEMPRE */
+  .event-location-desktop {
+    display: none !important;
+  }
+
+  .event-location-mobile {
+    display: block !important;
+  }
+}
+
+/* Desktop: mostra localização completa */
+@media (min-width: 600px) {
+  .event-location-desktop {
+    display: block !important;
+  }
+
+  .event-location-mobile {
+    display: none !important;
+  }
+}
+
 .event-meta__icon {
-  color: #8b5cf6; /* roxo */
+  color: #d907f2 !important; /* roxo do protótipo */
+}
+
+/* Força a cor nos ícones do Quasar */
+.event-meta .q-icon {
+  color: #d907f2 !important;
 }
 
 /* ================= FOOTER ================= */
@@ -693,13 +1059,12 @@ async function filterEventsByCategory(categoryLabel) {
 .footer-wrap {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 80px;
 }
 
 @media (min-width: 1600px) {
   .footer-wrap {
     max-width: 1600px;
-    padding: 0 60px;
   }
 }
 
@@ -713,13 +1078,13 @@ async function filterEventsByCategory(categoryLabel) {
 .footer-logo-container {
   display: flex;
   align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.footer-logo {
-  height: 60.26px;
-  width: 240px;
-  display: block;
-  object-fit: contain;
+.footer-logo-container:hover {
+  opacity: 0.9;
 }
 
 .social-icons {
@@ -771,10 +1136,20 @@ async function filterEventsByCategory(categoryLabel) {
   color: #d1d5db;
   cursor: pointer;
   transition: color 0.2s ease;
+  text-decoration: none;
+  display: block;
 }
 
 .footer-link:hover {
   color: #35c7ee;
+}
+
+a.footer-link {
+  text-decoration: none;
+}
+
+a.footer-link:hover {
+  text-decoration: none;
 }
 
 .footer-copyright {
@@ -799,10 +1174,37 @@ async function filterEventsByCategory(categoryLabel) {
   }
 }
 
-/* Telas pequenas */
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 599px) {
   .footer-wrap {
-    padding: 0 20px;
+    padding: 0 16px;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+
+  .footer {
+    margin-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 32px);
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 768px) {
+  .footer-wrap {
+    padding: 0 40px;
   }
 
   .footer-links {
