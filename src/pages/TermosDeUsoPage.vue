@@ -5,7 +5,7 @@
       <div class="page-header">
         <div class="back-button-container" @click="goBack">
           <div class="back-icon">
-            <q-icon name="arrow_back" size="24px" class="back-arrow-icon" />
+            <q-icon name="arrow_back" size="32px" class="back-arrow-icon" />
           </div>
           <span class="back-text">Voltar</span>
         </div>
@@ -27,101 +27,125 @@
         </div>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">1. Aceitação dos Termos</h2>
+          <h2 class="legal-section-title">1. INTRODUÇÃO</h2>
           <p class="legal-text">
-            Ao acessar e utilizar o site TicketPE, você concorda em cumprir e estar vinculado aos seguintes Termos de Uso. 
-            Se você não concorda com qualquer parte destes termos, não deve utilizar este site.
+            Bem-vindo à Ticketpe! Estes Termos de Uso regulam o acesso e a utilização do nosso site e serviços de venda de ingressos. Ao utilizar nossa plataforma, você concorda com os termos abaixo. Caso não concorde, não utilize nossos serviços.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">2. Descrição do Serviço</h2>
+          <h2 class="legal-section-title">2. DEFINIÇÕES</h2>
           <p class="legal-text">
-            O TicketPE é uma plataforma digital que disponibiliza informações sobre eventos culturais, shows, festivais e 
-            outras atividades recreativas realizadas em Pernambuco. Nosso objetivo é facilitar o acesso dos usuários a 
-            informações atualizadas sobre eventos locais.
+            <strong>Usuário:</strong> Qualquer pessoa que acessa o site Ticketpe.
+          </p>
+          <p class="legal-text">
+            <strong>Comprador:</strong> Usuário que adquire ingressos por meio da plataforma.
+          </p>
+          <p class="legal-text">
+            <strong>Organizador:</strong> Responsável pela realização do evento.
+          </p>
+          <p class="legal-text">
+            <strong>Ingressos:</strong> Direitos de acesso a eventos vendidos na plataforma.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">3. Uso do Site</h2>
+          <h2 class="legal-section-title">3. CADASTRO E CONTA DO USUÁRIO</h2>
           <p class="legal-text">
-            Você concorda em utilizar o TicketPE apenas para fins legais e de maneira que não viole os direitos de terceiros 
-            ou restrinja ou iniba o uso deste site por terceiros. É proibido:
-          </p>
-          <ul class="legal-list">
-            <li>Utilizar o site de forma fraudulenta ou enganosa;</li>
-            <li>Reproduzir, duplicar, copiar ou vender qualquer parte do site sem autorização prévia;</li>
-            <li>Realizar engenharia reversa ou tentar extrair o código-fonte do site;</li>
-            <li>Transmitir qualquer vírus, malware ou código malicioso;</li>
-            <li>Utilizar robôs, spiders ou outros métodos automatizados para acessar o site sem autorização.</li>
-          </ul>
-        </section>
-
-        <section class="legal-section">
-          <h2 class="legal-section-title">4. Informações de Eventos</h2>
-          <p class="legal-text">
-            Embora nos esforcemos para manter as informações sobre eventos precisas e atualizadas, não garantimos a 
-            exatidão, completude ou atualidade de todas as informações exibidas. Os organizadores dos eventos são 
-            responsáveis pelas informações fornecidas sobre seus eventos.
+            3.1. Para efetuar compras, o usuário deve criar uma conta com informações verdadeiras e atualizadas.
           </p>
           <p class="legal-text">
-            O TicketPE não se responsabiliza por alterações, cancelamentos ou modificações em eventos que sejam 
-            comunicadas pelos organizadores após a publicação inicial.
+            3.2. O usuário é responsável pela confidencialidade de seus dados de login e senha.
+          </p>
+          <p class="legal-text">
+            3.3. A Ticketpe pode suspender ou excluir contas em caso de suspeita de fraude ou descumprimento destes termos.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">5. Links para Terceiros</h2>
+          <h2 class="legal-section-title">4. COMPRA DE INGRESSOS</h2>
           <p class="legal-text">
-            O TicketPE pode conter links para sites de terceiros, incluindo plataformas de venda de ingressos, redes sociais 
-            e sites dos organizadores dos eventos. Não nos responsabilizamos pelo conteúdo, políticas de privacidade ou 
-            práticas de sites de terceiros. Recomendamos que você leia os termos de uso e políticas de privacidade de 
-            qualquer site de terceiro que visitar.
+            4.1. A compra de ingressos está sujeita à disponibilidade e aprovação do pagamento.
+          </p>
+          <p class="legal-text">
+            4.2. Após a confirmação do pagamento, o ingresso será disponibilizado ao usuário de forma digital.
+          </p>
+          <p class="legal-text">
+            4.3. Os preços dos ingressos podem variar e estão sujeitos à política dos organizadores.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">6. Propriedade Intelectual</h2>
+          <h2 class="legal-section-title">5. CANCELAMENTO E REEMBOLSO</h2>
           <p class="legal-text">
-            Todo o conteúdo do TicketPE, incluindo textos, gráficos, logotipos, ícones, imagens, áudios, downloads digitais 
-            e compilações de dados, é propriedade do TicketPE ou de seus fornecedores de conteúdo e está protegido pelas 
-            leis brasileiras e internacionais de direitos autorais e propriedade intelectual.
+            5.1. Não serão aceitos cancelamentos ou pedidos de estorno após a compra, salvo nos casos previstos em lei.
+          </p>
+          <p class="legal-text">
+            5.2. Em caso de cancelamento do evento, o organizador será responsável pelo reembolso.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">7. Limitação de Responsabilidade</h2>
+          <h2 class="legal-section-title">6. RESPONSABILIDADE DO USUÁRIO</h2>
           <p class="legal-text">
-            O TicketPE é fornecido "como está" e "conforme disponível". Não garantimos que o site funcionará sem 
-            interrupções ou erros, ou que quaisquer defeitos serão corrigidos. Não nos responsabilizamos por quaisquer 
-            danos diretos, indiretos, incidentais, especiais ou consequenciais decorrentes do uso ou da incapacidade de 
-            usar o site.
+            6.1. O usuário se compromete a utilizar a plataforma de forma legal e ética.
+          </p>
+          <p class="legal-text">
+            6.2. A revenda de ingressos é permitida, independentemente de autorização prévia.
+          </p>
+          <p class="legal-text">
+            6.3. O usuário é responsável pela veracidade das informações fornecidas no cadastro e compra.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">8. Modificações nos Termos</h2>
+          <h2 class="legal-section-title">7. RESPONSABILIDADE DO TICKETS PE</h2>
           <p class="legal-text">
-            Reservamo-nos o direito de modificar estes Termos de Uso a qualquer momento. As alterações entrarão em vigor 
-            imediatamente após a publicação no site. O uso continuado do site após tais modificações constitui sua aceitação 
-            dos novos termos. Recomendamos que você revise periodicamente esta página para estar ciente de quaisquer alterações.
+            7.1. A Ticketpe atua como intermediário entre o usuário e o organizador do evento.
+          </p>
+          <p class="legal-text">
+            7.2. Não somos responsáveis pela realização, cancelamento, qualidade ou qualquer alteração no evento.
+          </p>
+          <p class="legal-text">
+            7.3. Não garantimos disponibilidade contínua da plataforma, podendo ocorrer interrupções por manutenção ou falhas técnicas.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">9. Lei Aplicável</h2>
+          <h2 class="legal-section-title">8. PRIVACIDADE E PROTEÇÃO DE DADOS</h2>
           <p class="legal-text">
-            Estes Termos de Uso são regidos pelas leis da República Federativa do Brasil. Qualquer disputa relacionada a 
-            estes termos será submetida à jurisdição exclusiva dos tribunais competentes de Pernambuco, Brasil.
+            8.1. Os dados pessoais dos usuários são coletados e tratados conforme nossa Política de Privacidade.
+          </p>
+          <p class="legal-text">
+            8.2. Não compartilhamos informações pessoais com terceiros sem consentimento do usuário, exceto quando necessário para a execução dos serviços.
           </p>
         </section>
 
         <section class="legal-section">
-          <h2 class="legal-section-title">10. Contato</h2>
+          <h2 class="legal-section-title">9. MODIFICAÇÕES NOS TERMOS DE USO</h2>
           <p class="legal-text">
-            Se você tiver dúvidas sobre estes Termos de Uso, entre em contato conosco através do e-mail: 
-            <a href="mailto:ajuda@ticketpe.com.br" class="legal-link">ajuda@ticketpe.com.br</a>
+            9.1. A Ticketpe pode alterar estes termos a qualquer momento, sendo as mudanças comunicadas no site.
+          </p>
+          <p class="legal-text">
+            9.2. O uso contínuo da plataforma após modificações significa a aceitação dos novos termos.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h2 class="legal-section-title">10. DISPOSIÇÕES GERAIS</h2>
+          <p class="legal-text">
+            10.1. Caso qualquer cláusula destes Termos seja considerada inválida, as demais continuarão em vigor.
+          </p>
+          <p class="legal-text">
+            10.2. O foro para resolução de quaisquer disputas é o da comarca de Recife - PE.
+          </p>
+        </section>
+
+        <section class="legal-section">
+          <h2 class="legal-section-title">CONTATO</h2>
+          <p class="legal-text">
+            Para dúvidas ou suporte, entre em contato pelo e-mail: 
+            <a href="mailto:Ajuda@ticketpe.com.br" class="legal-link">Ajuda@ticketpe.com.br</a>
           </p>
         </section>
       </div>
@@ -137,7 +161,7 @@ import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 const router = useRouter()
 
 // Data da última atualização (formato brasileiro)
-const lastUpdated = ref('15 de janeiro de 2025')
+const lastUpdated = ref('11/02/2025')
 
 // Breadcrumbs
 const breadcrumbItems = ref([
@@ -175,9 +199,10 @@ onUnmounted(() => {
 .back-button-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  margin-top: 24px;
   width: fit-content;
   transition: opacity 0.2s ease;
   color: white;
@@ -191,24 +216,33 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: white;
   transition: background-color 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .back-button-container:hover .back-icon {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .back-arrow-icon {
-  color: white;
+  color: #35c7ee !important;
+}
+
+.back-arrow-icon .q-icon {
+  color: #35c7ee !important;
+}
+
+.back-icon .q-icon {
+  color: #35c7ee !important;
 }
 
 .back-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 500;
   color: white;
 }
@@ -237,7 +271,7 @@ onUnmounted(() => {
 
 /* Conteúdo legal */
 .legal-content {
-  background-color: white;
+  background-color: #455066;
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -246,10 +280,11 @@ onUnmounted(() => {
 .last-updated {
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  color: #6b7280;
+  color: #FAFDFF;
   font-style: italic;
   margin-bottom: 32px;
   text-align: right;
+  opacity: 0.8;
 }
 
 .legal-section {
@@ -264,7 +299,7 @@ onUnmounted(() => {
   font-family: 'Poppins', sans-serif;
   font-size: 24px;
   font-weight: 700;
-  color: #1f2937;
+  color: #FAFDFF;
   margin-bottom: 16px;
 }
 
@@ -272,7 +307,7 @@ onUnmounted(() => {
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: #374151;
+  color: #FAFDFF;
   line-height: 1.7;
   margin-bottom: 16px;
 }
@@ -284,7 +319,7 @@ onUnmounted(() => {
 .legal-list {
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
-  color: #374151;
+  color: #FAFDFF;
   line-height: 1.7;
   margin-left: 24px;
   margin-bottom: 16px;
