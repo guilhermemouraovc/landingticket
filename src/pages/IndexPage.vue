@@ -15,6 +15,7 @@
           infinite
           swipeable
           autoplay
+          :autoplay-interval="autoplayInterval"
           :height="$q.screen.lt.sm ? 'auto' : '440px'"
           control-color="transparent"
           navigation-position="bottom"
@@ -49,12 +50,25 @@
 
                     <div class="q-mt-md q-gutter-sm">
                       <div class="row items-center event-meta">
-                        <q-icon name="event" class="q-mr-sm event-meta__icon" color="purple-7" aria-hidden="true" />
+                        <q-icon
+                          name="event"
+                          class="q-mr-sm event-meta__icon"
+                          color="purple-7"
+                          aria-hidden="true"
+                        />
                         <span>{{ ev.date }}</span>
                       </div>
                       <div class="row items-center event-meta">
-                        <q-icon name="place" class="q-mr-sm event-meta__icon" color="purple-7" aria-hidden="true" />
-                        <span>{{ ev.location }}</span>
+                        <q-icon
+                          name="place"
+                          class="q-mr-sm event-meta__icon"
+                          color="purple-7"
+                          aria-hidden="true"
+                        />
+                        <span class="event-location-desktop">{{ ev.location }}</span>
+                        <span class="event-location-mobile">{{
+                          ev.cityState || ev.location || 'Local a definir'
+                        }}</span>
                       </div>
                     </div>
 
@@ -87,7 +101,7 @@
     </section>
 
     <!-- CATEGORIAS -->
-    <section class="categories" aria-label="Categorias de eventos">
+    <section class="categories categories--hide-mobile" aria-label="Categorias de eventos">
       <div class="categories-wrap">
         <div class="cat-grid">
           <q-btn
@@ -124,6 +138,7 @@
       <!-- Eventos filtrados por categoria -->
       <template v-else-if="selectedCategory">
         <EventSectionCarousel
+          :section-id="getSectionIdByLabel(selectedCategory)"
           :title="`Eventos de ${selectedCategory}`"
           :items="filteredEvents"
           :default-image="DEFAULT_IMAGE"
@@ -133,6 +148,7 @@
       <!-- Carrosséis normais -->
       <template v-else>
         <EventSectionCarousel
+          section-id="reveillon"
           title="Réveillon"
           :items="reveillonEvents"
           see-all-label="Ver Tudo"
@@ -141,6 +157,7 @@
         />
 
         <EventSectionCarousel
+          section-id="carnaval"
           title="Carnaval"
           :items="carnavalEvents"
           see-all-label="Ver Tudo"
@@ -149,6 +166,7 @@
         />
 
         <EventSectionCarousel
+          section-id="festivais"
           title="Festivais"
           :items="saoJoaoEvents"
           see-all-label="Ver Tudo"
@@ -157,6 +175,7 @@
         />
 
         <EventSectionCarousel
+          section-id="programacao-completa"
           title="Programação completa"
           :items="allEvents"
           see-all-label="Ver Tudo"
@@ -221,7 +240,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
@@ -254,6 +273,7 @@ const reveillonEvents = ref([])
 const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
 const allEvents = ref([])
+const autoplayInterval = ref(3000) // em milissegundos
 
 // Estados de loading
 const loadingFeatured = ref(true)
@@ -270,6 +290,63 @@ const categories = ref([])
 function getTagNameByLabel(label) {
   const c = categories.value.find((x) => x.label === label)
   return c?.tagName || null
+}
+
+// Helper para converter label de categoria em ID de seção
+function getSectionIdByLabel(label) {
+  // Mapeamento fixo dos carrosséis principais
+  const fixedMap = {
+    Réveillon: 'reveillon',
+    Reveillon: 'reveillon',
+    REVEILLONS: 'reveillon',
+    Carnaval: 'carnaval',
+    CARNAVAL: 'carnaval',
+    Carnavais: 'carnaval',
+    Festivais: 'festivais',
+    FESTIVAISS: 'festivais',
+    'Programação completa': 'programacao-completa',
+    'Programação Completa': 'programacao-completa',
+  }
+
+  // Se já está mapeado, retorna
+  if (fixedMap[label]) {
+    return fixedMap[label]
+  }
+
+  // Caso contrário, converte o label para slug
+  // Remove acentos e caracteres especiais, converte para minúsculas
+  return label
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+    .trim()
+    .replace(/\s+/g, '-') // Espaços viram hífens
+}
+
+// Função para fazer scroll suave até uma seção
+async function scrollToSection(sectionId) {
+  if (!sectionId) return
+
+  // Aguarda o próximo ciclo de atualização do Vue para garantir que o DOM foi atualizado
+  await nextTick()
+
+  // Aguarda um pouco mais para garantir que os elementos foram renderizados
+  setTimeout(() => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const offset = 120 // Offset para não colar no topo (header fixo)
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      })
+    } else {
+      console.warn(`⚠️ Seção com ID "${sectionId}" não encontrada`)
+    }
+  }, 150)
 }
 
 // Escuta eventos do header
@@ -394,6 +471,9 @@ async function loadAllEvents() {
   }
 }
 
+// IDs das seções fixas que já existem como carrosséis
+const fixedSectionIds = ['reveillon', 'carnaval', 'festivais', 'programacao-completa']
+
 // Filtro por categoria
 function toggleCategory(categoryLabel) {
   if (selectedCategory.value === categoryLabel) {
@@ -401,9 +481,21 @@ function toggleCategory(categoryLabel) {
     selectedCategory.value = null
     filteredEvents.value = []
   } else {
-    // Seleciona nova categoria e filtra eventos
-    selectedCategory.value = categoryLabel
-    filterEventsByCategory(categoryLabel)
+    const sectionId = getSectionIdByLabel(categoryLabel)
+
+    // Se é uma categoria fixa (já tem carrossel), apenas faz scroll até o carrossel
+    if (fixedSectionIds.includes(sectionId)) {
+      scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
+    } else {
+      // Para outras categorias, seleciona e filtra eventos
+      selectedCategory.value = categoryLabel
+
+      // Faz scroll até o carrossel correspondente após filtrar
+      filterEventsByCategory(categoryLabel).then(async () => {
+        // Aguarda o DOM atualizar com os eventos filtrados antes de fazer scroll
+        await scrollToSection(sectionId)
+      })
+    }
   }
 }
 
@@ -417,7 +509,7 @@ async function filterEventsByCategory(categoryLabel) {
     if (!tagName) {
       console.warn('⚠️ Categoria não mapeada:', categoryLabel)
       filteredEvents.value = []
-      return
+      return Promise.resolve()
     }
 
     // Usar Supabase com tagName dinâmico
@@ -429,6 +521,9 @@ async function filterEventsByCategory(categoryLabel) {
   } finally {
     loadingCarousels.value = false
   }
+
+  // Retorna promise para permitir aguardar o carregamento
+  return Promise.resolve()
 }
 </script>
 
@@ -444,6 +539,7 @@ async function filterEventsByCategory(categoryLabel) {
 @media (max-width: 599px) {
   .event-groups {
     padding: 0 16px;
+    margin-bottom: 0;
   }
 }
 
@@ -456,7 +552,6 @@ async function filterEventsByCategory(categoryLabel) {
 /* fundo */
 .bg-landing {
   background-color: #2a3447;
-  min-height: 100vh;
 }
 
 /* ================= CARROSSEL ================= */
@@ -590,10 +685,19 @@ async function filterEventsByCategory(categoryLabel) {
 /* Mobile: padding ajustado e layout vertical com altura mínima fixa */
 @media (max-width: 599px) {
   .panel-inner {
-    padding: 24px 20px;
-    gap: 16px;
+    padding: 8px 20px 24px 20px; /* Reduzido padding-top de 12px para 8px */
+    gap: 6px; /* Reduzido gap de 12px para 6px */
     justify-content: flex-start;
     min-height: 210px;
+  }
+
+  /* Reduz espaçamento entre título e elementos abaixo */
+  .panel-inner .event-title {
+    margin-bottom: -3px !important;
+  }
+
+  .panel-inner .q-mt-md {
+    margin-top: -5px !important;
   }
 }
 .featured-description {
@@ -651,31 +755,41 @@ async function filterEventsByCategory(categoryLabel) {
   outline-offset: 2px;
 }
 
-/* Mobile: bolinhas conforme protótipo com borda mais grossa */
+/* Mobile: bolinhas minimalistas e próximas */
 @media (max-width: 599px) {
   .pagination-dots {
-    gap: 16px;
+    gap: 12px;
     margin-top: 24px;
     padding: 0;
-    height: 14px;
+    /* Remover height: 8px; que estava causando o problema */
+    align-items: center; /* Centralizar verticalmente */
   }
 
   .pagination-dot {
-    width: 14px;
-    height: 14px;
-    border-width: 2.5px;
-    border-color: rgba(255, 255, 255, 0.35);
+    width: 12px;
+    height: 12px;
+    min-width: 8px; /* Garantir largura mínima */
+    min-height: 8px; /* Garantir altura mínima */
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: transparent;
+    border-radius: 50%; /* Forçar círculo perfeito */
+    box-sizing: border-box; /* Bordas dentro do tamanho */
+    flex-shrink: 0; /* Não comprimir */
+    padding: 0; /* Resetar padding padrão do botão */
+    line-height: 1; /* Resetar line-height */
+    vertical-align: middle; /* Alinhamento vertical */
   }
 
   .pagination-dot--active {
     background-color: white;
     border-color: white;
-    transform: scale(1);
+    transform: none;
   }
 
   .pagination-dot:hover {
-    transform: scale(1);
-    border-color: rgba(255, 255, 255, 0.5);
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
@@ -691,6 +805,11 @@ async function filterEventsByCategory(categoryLabel) {
   .categories {
     margin-top: 32px;
     padding: 40px 0;
+  }
+
+  /* Esconde a seção de categorias no mobile */
+  .categories--hide-mobile {
+    display: none !important;
   }
 }
 .categories-wrap {
@@ -864,6 +983,7 @@ async function filterEventsByCategory(categoryLabel) {
     -webkit-box-orient: vertical;
     overflow: hidden;
     min-height: 62px;
+    margin-bottom: 0 !important; /* Removido espaçamento abaixo do título */
   }
 }
 
@@ -891,6 +1011,26 @@ async function filterEventsByCategory(categoryLabel) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* Mostra apenas cidade-estado no mobile - SEMPRE */
+  .event-location-desktop {
+    display: none !important;
+  }
+
+  .event-location-mobile {
+    display: block !important;
+  }
+}
+
+/* Desktop: mostra localização completa */
+@media (min-width: 600px) {
+  .event-location-desktop {
+    display: block !important;
+  }
+
+  .event-location-mobile {
+    display: none !important;
   }
 }
 
@@ -1053,6 +1193,11 @@ a.footer-link:hover {
 
   .social-icons {
     justify-content: center;
+  }
+
+  .footer {
+    margin-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 32px);
   }
 }
 

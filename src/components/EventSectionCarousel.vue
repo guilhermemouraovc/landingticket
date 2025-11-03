@@ -1,5 +1,5 @@
 ﻿<template>
-  <section class="event-section">
+  <section :id="sectionId" class="event-section">
     <!-- Cabecalho da secao com titulo, CTA e navegacao -->
     <div class="section-header">
       <div class="section-info">
@@ -48,7 +48,10 @@
       class="cards-viewport"
       ref="viewport"
       @scroll="updateScrollState"
-      :class="{ 'fade-right': showRightFade }"
+      :class="{ 
+        'fade-right': showRightFade,
+        'fade-left': showLeftFade
+      }"
     >
       <div class="cards-row">
         <EventCard
@@ -80,6 +83,7 @@ const props = defineProps({
   seeAllLabel: { type: String, default: 'Ver Tudo' },
   seeAllLink: { type: [String, Object], default: null },
   defaultImage: { type: String, default: 'https://via.placeholder.com/400x200?text=Evento' },
+  sectionId: { type: String, default: null },
 })
 
 const viewport = ref(null)
@@ -87,6 +91,7 @@ const scrollStep = 344
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 const showRightFade = ref(true)
+const showLeftFade = ref(false)
 const FADE_SHOW_AT = 24
 const FADE_HIDE_AT = 40
 
@@ -99,10 +104,19 @@ function updateScrollState() {
   canScrollLeft.value = el.scrollLeft > 0
   canScrollRight.value = el.scrollLeft < maxScrollLeft
   hasScrolled.value = el.scrollLeft > 0
+  
+  // Controla fade direito
   if (showRightFade.value) {
     if (el.scrollLeft >= FADE_HIDE_AT) showRightFade.value = false
   } else {
     if (el.scrollLeft <= FADE_SHOW_AT) showRightFade.value = true
+  }
+  
+  // Controla fade esquerdo (aparece quando há scroll para a esquerda)
+  if (el.scrollLeft > FADE_HIDE_AT) {
+    showLeftFade.value = true
+  } else {
+    showLeftFade.value = false
   }
 }
 
@@ -224,6 +238,22 @@ onMounted(() => {
   mask-repeat: no-repeat;
 }
 
+.cards-viewport.fade-left {
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade));
+  mask-repeat: no-repeat;
+}
+
+.cards-viewport.fade-left.fade-right {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    transparent 100%
+  );
+  mask-repeat: no-repeat;
+}
+
 .cards-row {
   --peek: calc(var(--card-width) * 2.62);
   display: flex;
@@ -259,15 +289,11 @@ onMounted(() => {
   }
 
   .cards-viewport {
-    --fade: 0px; /* remove fade */
+    --fade: 24px; /* fade no mobile */
     scroll-padding-right: 0;
     margin: 0; /* sem margin */
     padding-left: 0; /* sem padding esquerdo */
     padding-right: 0; /* sem padding direito */
-  }
-
-  .cards-viewport.fade-right {
-    mask-image: none; /* remove máscara de fade */
   }
 
   .cards-row {

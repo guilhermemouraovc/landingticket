@@ -742,7 +742,8 @@ function getEventTags(eventData) {
 
   .event-hero-wrap {
     border-radius: 16px;
-    margin: 0 -16px 16px -16px;
+    margin: 0 0 16px 0;
+    width: 100%;
   }
 
   .event-card {
@@ -757,11 +758,6 @@ function getEventTags(eventData) {
     background: #2a3447;
   }
 
-  .event-hero-wrap {
-    width: 100%;
-    margin: 0;
-  }
-
   .event-hero {
     width: 100%;
     height: auto;
@@ -772,6 +768,10 @@ function getEventTags(eventData) {
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 24px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .event-heading .text-h4 {
@@ -907,6 +907,17 @@ function getEventTags(eventData) {
     margin-bottom: 24px;
     margin-left: 0;
     margin-right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .buy-btn .q-btn__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
   }
 
   .event-section {

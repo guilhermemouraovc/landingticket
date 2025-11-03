@@ -354,6 +354,10 @@ onMounted(() => {
     padding: 40px 0;
   }
 
+  .related-events-container {
+    padding: 0 16px;
+  }
+
   .header-container {
     margin-bottom: 20px;
   }
@@ -363,7 +367,7 @@ onMounted(() => {
   }
 
   .navigation-arrows {
-    gap: 8px;
+    display: none; /* Esconde as setinhas no mobile */
   }
 
   .nav-button {
@@ -379,6 +383,14 @@ onMounted(() => {
 
   .carousel-wrapper {
     height: 350px;
+    margin-left: -16px; /* Permite que os cards estourem um pouco à esquerda */
+    margin-right: -16px;
+    padding-left: 16px; /* Mantém o primeiro card alinhado */
+    padding-right: 16px; /* Espaço no final para indicar scroll */
+  }
+
+  .carousel-track {
+    gap: 16px; /* Reduzido de 40px para 16px no mobile */
   }
 
   .carousel-item {
