@@ -179,25 +179,25 @@ const event = ref(null)
 
 // Carrega evento inicial e reage a mudanças de rota
 onMounted(() => {
-  loadEvent(route.params.id)
+  loadEvent(route.params.slug)
 })
 
 watch(
-  () => route.params.id,
-  (id, previous) => {
-    if (id && id !== previous) {
-      loadEvent(id)
+  () => route.params.slug,
+  (slug, previous) => {
+    if (slug && slug !== previous) {
+      loadEvent(slug)
     }
   },
 )
 
 // Fluxo principal de obtenção de dados
-async function loadEvent(idParam) {
+async function loadEvent(slugParam) {
   error.value = ''
   event.value = null
 
   try {
-    const eventData = await fetchEventById(idParam)
+    const eventData = await fetchEventById(slugParam)
 
     if (!eventData) {
       error.value = 'Evento não encontrado.'
@@ -206,6 +206,11 @@ async function loadEvent(idParam) {
 
     event.value = eventData
     console.log('image:', event.value.image)
+    
+    // Atualiza a URL se ainda estiver usando ID (redireciona para slug)
+    if (eventData.slug && route.params.slug !== eventData.slug) {
+      router.replace({ name: 'event-detail', params: { slug: eventData.slug } })
+    }
   } catch (err) {
     console.error('Falha ao carregar evento', err)
     error.value = apiError.value || 'Não foi possível carregar os detalhes do evento.'
@@ -880,7 +885,7 @@ function getEventTags(eventData) {
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
-    margin-top: 180px;
+    margin-top: 24px;
     margin-bottom: 24px;
     margin-left: 0;
     margin-right: 0;

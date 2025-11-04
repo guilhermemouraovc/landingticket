@@ -15,6 +15,7 @@
     "postinstall": "quasar prepare"
   },
   "dependencies": {
+    "@phosphor-icons/vue": "^2.2.1",
     "@quasar/extras": "^1.16.4",
     "@supabase/supabase-js": "^2.75.0",
     "axios": "^1.12.2",

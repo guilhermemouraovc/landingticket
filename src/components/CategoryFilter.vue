@@ -17,7 +17,6 @@
             ? {}
             : { backgroundColor: '#e5e7eb', color: '#374151' }
         "
-        :icon="category.icon"
         class="category-chip"
         :aria-label="`${category.name}. ${selectedCategories.includes(category.id) ? 'Selecionado' : 'Não selecionado'}`"
         :aria-pressed="selectedCategories.includes(category.id)"
@@ -27,7 +26,24 @@
         @keydown.enter="toggleCategory(category.id)"
         @keydown.space.prevent="toggleCategory(category.id)"
       >
-        {{ category.name }}
+        <template #default>
+          <span class="category-chip-content">
+            <PhosphorIcon 
+              v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
+              :name="category.icon.name" 
+              :size="16" 
+              weight="fill"
+              color="currentColor" 
+              class="category-chip-icon"
+            />
+            <q-icon 
+              v-else-if="typeof category.icon === 'string'" 
+              :name="category.icon" 
+              class="category-chip-icon"
+            />
+            <span class="category-chip-label">{{ category.name }}</span>
+          </span>
+        </template>
       </q-chip>
     </div>
 
@@ -50,6 +66,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import PhosphorIcon from 'components/PhosphorIcon.vue'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 
 // Composable para carregar tags dinâmicas
@@ -132,6 +149,26 @@ function clearCategories() {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.category-chip-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category-chip-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.category-chip :deep(.phosphor-icon svg) {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .category-chip {

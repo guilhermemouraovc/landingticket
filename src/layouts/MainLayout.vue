@@ -142,11 +142,28 @@
                 class="category-btn category-btn--active"
                 color="white"
                 text-color="white"
-                :icon="category.icon"
-                :label="category.label"
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategory(category.label)"
-              />
+              >
+                <template #default>
+                  <span class="category-btn-content">
+                    <PhosphorIcon 
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
+                      :name="category.icon.name" 
+                      :size="20" 
+                      weight="fill"
+                      color="white" 
+                      class="category-btn-icon"
+                    />
+                    <q-icon 
+                      v-else-if="typeof category.icon === 'string'" 
+                      :name="category.icon" 
+                      class="category-btn-icon"
+                    />
+                    <span class="category-btn-label">{{ category.label }}</span>
+                  </span>
+                </template>
+              </q-btn>
               <q-btn
                 flat
                 round
@@ -170,11 +187,28 @@
                 :class="{ 'category-btn--active': selectedCategory === category.label }"
                 color="white"
                 text-color="white"
-                :icon="category.icon"
-                :label="category.label"
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategory(category.label)"
-              />
+              >
+                <template #default>
+                  <span class="category-btn-content">
+                    <PhosphorIcon 
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
+                      :name="category.icon.name" 
+                      :size="20" 
+                      weight="fill"
+                      color="white" 
+                      class="category-btn-icon"
+                    />
+                    <q-icon 
+                      v-else-if="typeof category.icon === 'string'" 
+                      :name="category.icon" 
+                      class="category-btn-icon"
+                    />
+                    <span class="category-btn-label">{{ category.label }}</span>
+                  </span>
+                </template>
+              </q-btn>
               <!-- Botão para expandir categorias (só aparece se houver mais de 9 e não estiver expandido) -->
               <q-btn
                 v-if="!showAllCategories && categories.length > 9"
@@ -253,11 +287,28 @@
                 no-caps
                 class="category-btn-mobile"
                 :class="{ 'category-btn-mobile--active': selectedCategory === category.label }"
-                :icon="category.icon"
-                :label="category.label"
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategoryMobile(category.label)"
-              />
+              >
+                <template #default>
+                  <span class="category-btn-mobile-content">
+                    <PhosphorIcon 
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
+                      :name="category.icon.name" 
+                      :size="20" 
+                      weight="fill"
+                      color="white" 
+                      class="category-btn-mobile-icon"
+                    />
+                    <q-icon 
+                      v-else-if="typeof category.icon === 'string'" 
+                      :name="category.icon" 
+                      class="category-btn-mobile-icon"
+                    />
+                    <span class="category-btn-mobile-label">{{ category.label }}</span>
+                  </span>
+                </template>
+              </q-btn>
             </div>
           </template>
 
@@ -325,6 +376,7 @@
 import { ref, watch, provide, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
+import PhosphorIcon from 'src/components/PhosphorIcon.vue'
 import { useQuasar } from 'quasar'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 
@@ -710,6 +762,7 @@ function applyFilters() {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  justify-content: center;
 }
 
 .category-btn {
@@ -744,6 +797,46 @@ function applyFilters() {
 .category-btn .q-icon {
   margin-right: 8px;
   font-size: 20px;
+}
+
+/* Estilos para o conteúdo dos botões com ícones */
+.category-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-btn-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* Estilos para ícones Phosphor dentro dos botões */
+.category-btn :deep(.phosphor-icon svg) {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  color: white;
+}
+
+.category-btn-mobile-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-btn-mobile-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+.category-btn-mobile :deep(.phosphor-icon svg) {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  color: white;
 }
 
 .add-category-btn {

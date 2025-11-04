@@ -27,27 +27,49 @@ export function useSupabaseTags() {
   // Mapeia para os botões/Chips mantendo o visual atual
   function mapToCategoryButtons(tags) {
     const iconMap = {
-      carnaval: 'celebration',
-      carnavais: 'celebration',
-      reveillon: 'auto_awesome',
-      reveillons: 'auto_awesome',
+      carnaval: { type: 'phosphor', name: 'confetti' },
+      carnavais: { type: 'phosphor', name: 'confetti' },
+      reveillon: { type: 'phosphor', name: 'cheers' },
+      reveillons: { type: 'phosphor', name: 'cheers' },
       festivais: 'park',
       festivaiss: 'park',
-      open: 'nightlife',
-      'open-bar': 'nightlife',
-      saojoao: 'holiday_village',
-      'sao-joao': 'holiday_village',
-      'semana-santa': 'holiday_village',
+      open: { type: 'phosphor', name: 'beer-stein' }, // OPEN BAR usa slug 'open'
+      'open-bar': { type: 'phosphor', name: 'beer-stein' },
+      openfood: { type: 'phosphor', name: 'hamburger' }, // Open Food usa slug 'openfood'
+      'open-food': { type: 'phosphor', name: 'hamburger' },
+      saojoao: { type: 'phosphor', name: 'campfire' },
+      'sao-joao': { type: 'phosphor', name: 'campfire' },
+      'semana-santa': { type: 'phosphor', name: 'star' },
+      vaquejadas: { type: 'phosphor', name: 'cow' },
+      balada: { type: 'phosphor', name: 'speaker-hifi' },
+      rap: { type: 'phosphor', name: 'microphone-stage' },
+      trap: { type: 'phosphor', name: 'microphone-stage' },
+      mpb: { type: 'phosphor', name: 'guitar' },
+      eletronica: { type: 'phosphor', name: 'disc' },
+      samba: { type: 'phosphor', name: 'music-notes' },
+      forro: { type: 'phosphor', name: 'piano-keys' },
+      forró: { type: 'phosphor', name: 'piano-keys' },
+      sertanejo: { type: 'phosphor', name: 'cowboy-hat' },
       boate: 'nightlife',
       calourada: 'school',
     }
-    return tags.map(t => ({
-      id: t.slug || t.id,
-      label: t.name,  // Usa o nome diretamente do Supabase, sem transformação
-      icon: iconMap[(t.slug || '').toLowerCase()] || 'sell',
-      tagName: t.name,
-      slug: t.slug,
-    }))
+    
+    return tags.map(t => {
+      const slug = (t.slug || '').toLowerCase()
+      const iconConfig = iconMap[slug] || 'sell'
+      
+      // Se for um objeto com type: 'phosphor', retorna o objeto
+      // Se for string, retorna como antes para compatibilidade
+      const icon = typeof iconConfig === 'object' ? iconConfig : iconConfig
+      
+      return {
+        id: String(t.slug || t.id), // Garante que id seja sempre string
+        label: t.name,  // Usa o nome diretamente do Supabase, sem transformação
+        icon: icon,
+        tagName: t.name,
+        slug: t.slug,
+      }
+    })
   }
 
   function mapToCategoryChips(tags) {

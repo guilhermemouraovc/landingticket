@@ -114,11 +114,28 @@
             :class="{ 'cat-btn--active': selectedCategory === c.label }"
             color="white"
             text-color="white"
-            :icon="c.icon"
-            :label="c.label"
             :aria-label="`Filtrar eventos de ${c.label}`"
             @click="toggleCategory(c.label)"
-          />
+          >
+            <template #default>
+              <span class="cat-btn-content">
+                <PhosphorIcon 
+                  v-if="typeof c.icon === 'object' && c.icon.type === 'phosphor'" 
+                  :name="c.icon.name" 
+                  :size="20" 
+                  weight="fill"
+                  color="white" 
+                  class="cat-btn-icon"
+                />
+                <q-icon 
+                  v-else-if="typeof c.icon === 'string'" 
+                  :name="c.icon" 
+                  class="cat-btn-icon"
+                />
+                <span class="cat-btn-label">{{ c.label }}</span>
+              </span>
+            </template>
+          </q-btn>
           <!-- Botão para expandir categorias -->
           <q-btn
             v-if="!showAllCategories && categories.length > 9"
@@ -269,6 +286,7 @@ import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
+import PhosphorIcon from 'components/PhosphorIcon.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 import { DEFAULT_IMAGES } from 'src/constants/config'
@@ -438,7 +456,6 @@ onMounted(async () => {
   try {
     const tags = await fetchTags()
     categories.value = mapToCategoryButtons(tags)
-    console.log('✅ Tags carregadas:', categories.value.length)
   } catch (e) {
     console.error('❌ Erro ao carregar tags:', e)
     categories.value = []
@@ -921,12 +938,12 @@ async function filterEventsByCategory(categoryLabel) {
 }
 .cat-grid {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
   max-width: 1280px;
-  margin: 0;
+  margin: 0 auto;
 }
 
 /* Mobile: grid 2 colunas conforme protótipo */
@@ -963,7 +980,7 @@ async function filterEventsByCategory(categoryLabel) {
 @media (min-width: 600px) and (max-width: 1023px) {
   .cat-grid {
     gap: 12px;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .cat-btn {
@@ -1003,6 +1020,27 @@ async function filterEventsByCategory(categoryLabel) {
 .cat-btn .q-icon {
   margin-right: 8px;
   font-size: 20px;
+}
+
+/* Estilos para o conteúdo dos botões com ícones */
+.cat-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-btn-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* Estilos para ícones Phosphor dentro dos botões */
+.cat-btn :deep(.phosphor-icon svg) {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  color: white;
 }
 
 /* Estado ativo da categoria */

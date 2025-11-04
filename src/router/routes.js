@@ -5,7 +5,7 @@
     children: [
       { path: '', component: () => import('pages/IndexPage.vue') },
       {
-        path: 'event/:id',
+        path: 'event/:slug',
         name: 'event-detail',
         component: () => import('pages/EventDetailPage.vue'),
       },

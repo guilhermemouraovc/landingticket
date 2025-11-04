@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb, toEventDetailFromSb } from 'src/utils/supabaseEventMapper'
+import { generateSlug } from 'src/utils/stringUtils'
 
 export function useSupabaseEvents() {
   const loading = ref(false)
@@ -67,17 +68,39 @@ export function useSupabaseEvents() {
     }
   }
 
-  async function fetchEventById(id) {
+  async function fetchEventById(idOrSlug) {
     loading.value = true
     error.value = null
     try {
-      const { data, error: e } = await supabase
-        .from('view_event_detail')
-        .select('*')
-        .eq('id', id)
-        .single()
-      if (e) throw e
-      return toEventDetailFromSb(data)
+      // Verifica se é um UUID (formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)
+      
+      if (isUUID) {
+        // Se for UUID, busca por ID (compatibilidade com URLs antigas)
+        const { data, error: e } = await supabase
+          .from('view_event_detail')
+          .select('*')
+          .eq('id', idOrSlug)
+          .single()
+        if (e) throw e
+        return toEventDetailFromSb(data)
+      } else {
+        // Se for slug, busca por título normalizado
+        const { data: allEvents, error: e1 } = await supabase
+          .from('view_event_detail')
+          .select('*')
+        
+        if (e1) throw e1
+        
+        // Gera slug de todos os eventos e compara
+        const event = allEvents.find(e => generateSlug(e.title) === idOrSlug)
+        
+        if (!event) {
+          throw new Error('Evento não encontrado')
+        }
+        
+        return toEventDetailFromSb(event)
+      }
     } catch (err) {
       console.error('Erro ao buscar evento:', err)
       error.value = 'Evento não encontrado'

@@ -1,3 +1,5 @@
+import { generateSlug } from './stringUtils'
+
 /**
  * Formata data no estilo "14 FEV > 17 FEV"
  */
@@ -99,15 +101,18 @@ export function toEventCardFromSb(row) {
     hasImageUrl: !!row.image_url,
   })
 
+  const slug = generateSlug(row.title)
+
   return {
     id: row.id,
+    slug, // Adiciona o slug
     title: row.title,
     description: row.description,
     date: formatDateRange(row.start_date, row.end_date),
     location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
     cityState: formatCityStateSimple(row.city, row.state), // city - state apenas
     image: row.image_url || '/logo.svg',
-    link: { name: 'event-detail', params: { id: row.id } },
+    link: { name: 'event-detail', params: { slug } }, // Usa slug ao invés de id
     // Informações de preço
     ...priceInfo,
   }
@@ -195,9 +200,11 @@ export function toEventDetailFromSb(row) {
   const dateBadge = buildDateBadge(parsedDate)
   const image = resolveImage(row)
   const priceInfo = formatPriceInfo(row)
+  const slug = generateSlug(row.title)
 
   return {
     id: row.id,
+    slug, // Adiciona o slug
     title: row.title,
     highlight: row.highlight,
     description: row.description || 'Sem descrição disponível no momento.',
