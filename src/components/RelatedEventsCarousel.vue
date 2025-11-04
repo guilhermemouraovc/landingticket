@@ -32,7 +32,15 @@
       </div>
 
       <div v-else class="carousel-container">
-        <div class="carousel-wrapper" ref="carouselRef" @scroll="updateScrollState">
+        <div
+          class="carousel-wrapper"
+          ref="carouselRef"
+          @scroll="updateScrollState"
+          :class="{
+            'fade-right': showRightFade,
+            'fade-left': showLeftFade,
+          }"
+        >
           <div class="carousel-track">
             <EventCard
               v-for="event in events"
@@ -51,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
@@ -74,6 +82,10 @@ const loading = ref(true)
 const carouselRef = ref(null)
 const isAtStart = ref(true)
 const isAtEnd = ref(false)
+const showRightFade = ref(true)
+const showLeftFade = ref(false)
+const FADE_SHOW_AT = 24
+const FADE_HIDE_AT = 40
 
 /**
  * Mapeia variações de categoria para tag padrão
@@ -91,9 +103,9 @@ function getCategoryTag(tags) {
     'OPEN BAR': 'REVEILLONS', // Tags adicionais que podem estar relacionadas
     CARNAVAL: 'CARNAVAL',
     CARNAVAIS: 'CARNAVAL',
-    FESTIVAIS: 'FESTIVAISS',
-    FESTIVAISS: 'FESTIVAISS',
-    FESTIVAL: 'FESTIVAISS',
+    FESTIVAIS: 'FESTIVAIS',
+    FESTIVAISS: 'FESTIVAIS', // Compatibilidade com código antigo
+    FESTIVAL: 'FESTIVAIS',
   }
 
   const mappedTag = categoryMap[tag] || 'REVEILLONS' // Default para REVEILLONS ao invés de retornar a tag desconhecida
@@ -201,24 +213,44 @@ function scrollRight() {
 }
 
 function updateScrollState() {
-  if (carouselRef.value) {
-    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.value
-    isAtStart.value = scrollLeft <= 0
-    isAtEnd.value = scrollLeft + clientWidth >= scrollWidth - 1
+  if (!carouselRef.value) return
+
+  const el = carouselRef.value
+  const { scrollLeft, scrollWidth, clientWidth } = el
+
+  isAtStart.value = scrollLeft <= 0
+  isAtEnd.value = scrollLeft + clientWidth >= scrollWidth - 1
+
+  // Controla fade direito
+  if (showRightFade.value) {
+    if (scrollLeft >= FADE_HIDE_AT) showRightFade.value = false
+  } else {
+    if (scrollLeft <= FADE_SHOW_AT) showRightFade.value = true
+  }
+
+  // Controla fade esquerdo (aparece quando há scroll para a esquerda)
+  if (scrollLeft > FADE_HIDE_AT) {
+    showLeftFade.value = true
+  } else {
+    showLeftFade.value = false
   }
 }
 
 // Reage a mudanças nas props
 watch(
   () => [props.currentEventId, props.eventTags],
-  () => {
-    loadRelatedEvents()
+  async () => {
+    await loadRelatedEvents()
+    await nextTick()
+    updateScrollState()
   },
   { deep: true },
 )
 
-onMounted(() => {
-  loadRelatedEvents()
+onMounted(async () => {
+  await loadRelatedEvents()
+  await nextTick()
+  updateScrollState()
 })
 </script>
 
@@ -299,10 +331,36 @@ onMounted(() => {
   scrollbar-width: none; /* Esconde scrollbar no Firefox */
   padding-top: 10px;
   padding-bottom: 20px; /* Espaço para hover não cortar */
+  --fade: 28px; /* largura do fade */
+  scroll-padding-right: 200px;
 }
 
 .carousel-wrapper::-webkit-scrollbar {
   display: none; /* Esconde scrollbar no Chrome/Safari */
+}
+
+/* Efeito de fade direito */
+.carousel-wrapper.fade-right {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent 100%);
+  mask-repeat: no-repeat;
+}
+
+/* Efeito de fade esquerdo */
+.carousel-wrapper.fade-left {
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--fade));
+  mask-repeat: no-repeat;
+}
+
+/* Efeito de fade em ambos os lados */
+.carousel-wrapper.fade-left.fade-right {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    transparent 100%
+  );
+  mask-repeat: no-repeat;
 }
 
 .carousel-track {
@@ -385,12 +443,23 @@ onMounted(() => {
     height: 350px;
     margin-left: -16px; /* Permite que os cards estourem um pouco à esquerda */
     margin-right: -16px;
-    padding-left: 16px; /* Mantém o primeiro card alinhado */
-    padding-right: 16px; /* Espaço no final para indicar scroll */
+    padding-left: 0; /* Mantém o primeiro card alinhado */
+    padding-right: 0; /* Espaço no final para indicar scroll */
+    --fade: 24px; /* fade no mobile */
+    scroll-padding-right: 0;
+  }
+
+  /* Remove o fade no mobile */
+  .carousel-wrapper.fade-right,
+  .carousel-wrapper.fade-left,
+  .carousel-wrapper.fade-left.fade-right {
+    mask-image: none;
   }
 
   .carousel-track {
     gap: 16px; /* Reduzido de 40px para 16px no mobile */
+    padding-left: 16px; /* primeiro card alinhado */
+    padding-right: 16px; /* espaço do último card até a borda */
   }
 
   .carousel-item {

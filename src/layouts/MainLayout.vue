@@ -158,10 +158,10 @@
                 @click="expandCategories"
               />
             </template>
-            <!-- Caso contrário, mostra todas -->
+            <!-- Caso contrário, mostra categorias limitadas ou todas -->
             <template v-else>
               <q-btn
-                v-for="category in categories"
+                v-for="category in visibleCategories"
                 :key="category.label"
                 outline
                 square-rounded
@@ -175,14 +175,17 @@
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategory(category.label)"
               />
+              <!-- Botão para expandir categorias (só aparece se houver mais de 9 e não estiver expandido) -->
               <q-btn
+                v-if="!showAllCategories && categories.length > 9"
                 flat
                 round
                 dense
                 icon="add"
                 class="add-category-btn"
                 color="white"
-                aria-label="Adicionar mais categorias"
+                aria-label="Mostrar mais categorias"
+                @click="expandCategories"
               />
             </template>
           </div>
@@ -344,6 +347,14 @@ const showAllCategories = ref(false) // Controla se mostra todas ou apenas a sel
 
 // Categorias disponíveis (carregadas dinamicamente)
 const categories = ref([])
+
+// Computed para retornar apenas as primeiras 9 categorias ou todas
+const visibleCategories = computed(() => {
+  if (showAllCategories.value) {
+    return categories.value
+  }
+  return categories.value.slice(0, 9)
+})
 
 // Detectar se estamos na página de detalhes do evento
 const isEventDetailPage = computed(() => {

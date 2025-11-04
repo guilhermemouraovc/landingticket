@@ -2,12 +2,7 @@
   <q-page class="event-page">
     <div class="event-container">
       <div class="event-toolbar">
-        <div class="back-button-container" @click="goBack">
-          <div class="back-icon">
-            <q-icon name="arrow_back" size="24px" class="back-arrow-icon" />
-          </div>
-          <span class="back-text">Voltar</span>
-        </div>
+        <BackButton :use-history="true" />
       </div>
 
       <!-- Breadcrumbs -->
@@ -61,9 +56,6 @@
             <div class="event-heading row items-center justify-between q-mb-lg">
               <div>
                 <div class="text-h4 text-weight-bold text-white event-title">{{ event.title }}</div>
-                <div v-if="event.highlight" class="event-highlight text-body2">
-                  {{ event.highlight }}
-                </div>
               </div>
 
               <!-- Botão de share desktop -->
@@ -167,6 +159,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
+import BackButton from 'src/components/BackButton.vue'
 import { useQuasar } from 'quasar'
 const openingWhatsapp = ref(false)
 
@@ -291,14 +284,6 @@ function shareEvent() {
   }
 }
 
-function goBack() {
-  if (typeof window !== 'undefined' && window.history.length > 1) {
-    router.back()
-  } else {
-    router.push('/')
-  }
-}
-
 function goHome() {
   router.push('/')
 }
@@ -331,8 +316,8 @@ function getEventTags(eventData) {
     title.includes('joão') ||
     title.includes('festival')
   ) {
-    console.log('🎪 Tag inferida: FESTIVAISS')
-    return ['FESTIVAISS'] // Tag correta do Supabase
+    console.log('🎪 Tag inferida: FESTIVAIS')
+    return ['FESTIVAIS'] // Tag correta do Supabase
   }
 
   // Padrão: Réveillon
@@ -384,46 +369,6 @@ function getEventTags(eventData) {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 24px;
-}
-
-.back-button-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.back-button-container:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.back-icon {
-  width: 56px;
-  height: 56px;
-  background-color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.back-text {
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  font-family:
-    'Poppins',
-    system-ui,
-    -apple-system,
-    sans-serif;
-}
-
-.toolbar-back {
-  border-radius: 999px;
 }
 
 .event-error {
@@ -525,6 +470,7 @@ function getEventTags(eventData) {
   display: grid;
   gap: 24px;
   margin-top: 20px;
+  margin-bottom: 40px;
 }
 
 /* Remover a indentação dos meta-items */
@@ -645,7 +591,7 @@ function getEventTags(eventData) {
   font-weight: 500;
   color: #d1d5db;
   line-height: 0.5;
-  margin-top: 24.66px; /* Distância exata conforme protótipo */
+  margin-top: 70px; /* Distância exata conforme protótipo */
 }
 
 .buy-btn {
@@ -724,20 +670,6 @@ function getEventTags(eventData) {
 
   .event-toolbar {
     margin-bottom: 16px;
-  }
-
-  .back-button-container {
-    gap: 8px;
-    padding: 4px;
-  }
-
-  .back-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .back-text {
-    font-size: 14px;
   }
 
   .event-hero-wrap {
@@ -903,7 +835,7 @@ function getEventTags(eventData) {
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
-    margin-top: 24px;
+    margin-top: 180px;
     margin-bottom: 24px;
     margin-left: 0;
     margin-right: 0;
@@ -942,12 +874,6 @@ function getEventTags(eventData) {
   outline-offset: 2px;
 }
 
-.toolbar-back:focus-visible {
-  outline: 2px solid #35c7ee;
-  outline-offset: 4px;
-  border-radius: 999px;
-}
-
 .event-share:focus-visible {
   outline: 2px solid #35c7ee;
   outline-offset: 3px;
@@ -956,29 +882,5 @@ function getEventTags(eventData) {
 .buy-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
-}
-
-.back-button-container:focus-visible {
-  outline: 2px solid #35c7ee;
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-
-.back-arrow-icon {
-  color: #35c7ee !important;
-}
-
-.back-arrow-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-/* Garantir que a cor seja aplicada */
-.back-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon svg {
-  width: 24px;
-  height: 24px;
 }
 </style>

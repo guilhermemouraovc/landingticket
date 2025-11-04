@@ -48,9 +48,9 @@
       class="cards-viewport"
       ref="viewport"
       @scroll="updateScrollState"
-      :class="{ 
+      :class="{
         'fade-right': showRightFade,
-        'fade-left': showLeftFade
+        'fade-left': showLeftFade,
       }"
     >
       <div class="cards-row">
@@ -104,14 +104,14 @@ function updateScrollState() {
   canScrollLeft.value = el.scrollLeft > 0
   canScrollRight.value = el.scrollLeft < maxScrollLeft
   hasScrolled.value = el.scrollLeft > 0
-  
+
   // Controla fade direito
   if (showRightFade.value) {
     if (el.scrollLeft >= FADE_HIDE_AT) showRightFade.value = false
   } else {
     if (el.scrollLeft <= FADE_SHOW_AT) showRightFade.value = true
   }
-  
+
   // Controla fade esquerdo (aparece quando há scroll para a esquerda)
   if (el.scrollLeft > FADE_HIDE_AT) {
     showLeftFade.value = true
@@ -142,7 +142,7 @@ onMounted(() => {
 
 <style scoped>
 .event-section {
-  margin-top: 56px;
+  margin-top: 24px;
 }
 
 .section-header {
@@ -265,7 +265,7 @@ onMounted(() => {
 /* Mobile */
 @media (max-width: 599px) {
   .event-section {
-    margin-top: 40px;
+    margin-top: 20px;
   }
 
   .section-header {

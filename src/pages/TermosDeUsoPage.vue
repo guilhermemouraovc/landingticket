@@ -2,20 +2,7 @@
   <q-page class="bg-landing">
     <div class="legal-page-wrap">
       <!-- Header com título -->
-      <div class="page-header">
-        <div class="back-button-container" @click="goBack">
-          <div class="back-icon">
-            <q-icon name="arrow_back" size="32px" class="back-arrow-icon" />
-          </div>
-          <span class="back-text">Voltar</span>
-        </div>
-
-        <!-- Título centralizado -->
-        <div class="page-title">Termos de Uso</div>
-
-        <!-- Linha divisória -->
-        <div class="title-divider"></div>
-      </div>
+      <PageHeader title="Termos de Uso" use-gradient />
 
       <!-- Breadcrumbs -->
       <BreadcrumbNav :crumbs="breadcrumbItems" />
@@ -155,10 +142,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
-
-const router = useRouter()
+import PageHeader from 'src/components/PageHeader.vue'
 
 // Data da última atualização (formato brasileiro)
 const lastUpdated = ref('11/02/2025')
@@ -168,11 +153,6 @@ const breadcrumbItems = ref([
   { label: 'Início', to: '/' },
   { label: 'Termos de Uso', to: null },
 ])
-
-// Função para voltar
-function goBack() {
-  router.back()
-}
 
 // Define o título da página
 onMounted(() => {
@@ -191,81 +171,24 @@ onUnmounted(() => {
   padding-bottom: 80px;
 }
 
-/* Header */
-.page-header {
+/* Header agora é componente */
+.legal-page-wrap :deep(.page-header) {
   margin-bottom: 24px;
 }
 
-.back-button-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+.legal-page-wrap :deep(.page-header .back-button-container) {
   margin-bottom: 32px;
   margin-top: 24px;
-  width: fit-content;
-  transition: opacity 0.2s ease;
-  color: white;
 }
 
-.back-button-container:hover {
-  opacity: 0.8;
-}
-
-.back-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: white;
-  transition: background-color 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.back-button-container:hover .back-icon {
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-.back-arrow-icon {
-  color: #35c7ee !important;
-}
-
-.back-arrow-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-icon .q-icon {
-  color: #35c7ee !important;
-}
-
-.back-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 24px;
-  font-weight: 500;
-  color: white;
-}
-
-.page-title {
+.legal-page-wrap :deep(.page-title) {
   font-family: 'Poppins', sans-serif;
   font-size: 36px;
   font-weight: 700;
-  color: white;
-  text-align: center;
   margin-bottom: 16px;
 }
 
-.title-divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 20%,
-    rgba(255, 255, 255, 0.3) 80%,
-    transparent 100%
-  );
+.legal-page-wrap :deep(.title-divider) {
   margin-bottom: 32px;
 }
 

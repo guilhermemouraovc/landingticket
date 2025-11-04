@@ -1,12 +1,7 @@
 <template>
   <section class="banner-card-section">
     <div class="banner-card-wrap">
-      <q-card
-        class="banner-card"
-        flat
-        :class="{ clickable: clickable || ctaLink }"
-        @click="handleClick"
-      >
+      <q-card class="banner-card" flat>
         <q-img
           :src="bannerImage"
           v-bind="bannerRatio ? { ratio: bannerRatio } : {}"
@@ -39,11 +34,9 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { computed } from 'vue'
 
-const router = useRouter()
 const $q = useQuasar()
 
 const props = defineProps({
@@ -93,35 +86,13 @@ const bannerRatio = computed(() => {
   // No mobile, não usar ratio fixo para que a imagem use seu tamanho natural
   return $q.screen.lt.sm ? undefined : 1920 / 200
 })
-
-const emit = defineEmits(['click'])
-
-const handleClick = () => {
-  // Se tem um link definido, navega para ele
-  if (props.ctaLink && props.ctaLink !== '#' && props.ctaLink !== '') {
-    if (typeof props.ctaLink === 'string') {
-      // Se for URL externa, abre em nova aba
-      if (props.ctaLink.startsWith('http')) {
-        window.open(props.ctaLink, '_blank')
-      } else {
-        // Se for rota interna, usa o router
-        router.push(props.ctaLink)
-      }
-    } else {
-      // Se for objeto de rota, usa diretamente
-      router.push(props.ctaLink)
-    }
-  } else if (props.clickable) {
-    // Se for apenas clicável sem link, emite o evento
-    emit('click')
-  }
-}
 </script>
 
 <style scoped>
 .banner-card-section {
   background-color: #2a3447;
-  padding: 40px 0;
+  padding: 20px 0;
+  overflow: hidden; /* Previne overflow horizontal */
 }
 
 .banner-card-wrap {
@@ -130,29 +101,39 @@ const handleClick = () => {
   margin: 0 auto;
   padding: 0 80px;
   box-sizing: border-box;
+  background-color: #2a3447; /* Garante que o wrap também tenha o background correto */
 }
 
 .banner-card {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  width: 100%; /* Garante que o card não ultrapasse o container */
+  max-width: 100%; /* Previne overflow */
+  background-color: #2a3447 !important; /* Remove o background branco padrão do q-card */
+  cursor: default; /* Indica que não é clicável */
 }
 
-.banner-card.clickable {
-  cursor: pointer;
-}
-
-.banner-card.clickable:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
+/* Banner não é mais clicável - estilos de hover removidos */
 
 .banner-img {
   width: 100%;
+  max-width: 100%; /* Previne que a imagem ultrapasse */
   min-height: 200px;
+  display: block; /* Remove espaços inline */
+}
+
+.banner-img :deep(.q-img__container) {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.banner-img :deep(img) {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover; /* Ajusta a imagem mantendo proporção */
+  display: block;
 }
 
 .banner-overlay {
@@ -207,20 +188,38 @@ const handleClick = () => {
 /* Mobile */
 @media (max-width: 599px) {
   .banner-card-section {
-    padding: 20px 0;
+    padding: 10px 0;
+    overflow: hidden; /* Previne overflow no mobile */
   }
 
   .banner-card-wrap {
     padding: 0 16px;
+    max-width: 100%; /* Garante que não ultrapasse a viewport */
+  }
+
+  .banner-card {
+    max-width: 100%; /* Garante que o card não ultrapasse */
   }
 
   .banner-img {
     min-height: auto;
     height: auto;
+    max-width: 100%;
+    width: 100%;
   }
 
   .banner-img :deep(.q-img__container) {
     height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .banner-img :deep(img) {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain; /* No mobile, usa contain para mostrar a imagem inteira */
+    display: block;
   }
 
   .banner-overlay {
@@ -237,14 +236,19 @@ const handleClick = () => {
 
   .banner-content {
     width: 100%;
+    max-width: 100%;
   }
 
   .banner-title {
     font-size: 22px;
+    word-wrap: break-word; /* Quebra palavras longas */
+    overflow-wrap: break-word;
   }
 
   .banner-subtitle {
     font-size: 13px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .banner-cta {
@@ -256,8 +260,30 @@ const handleClick = () => {
 
 /* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
+  .banner-card-section {
+    overflow: hidden; /* Previne overflow no tablet */
+  }
+
   .banner-card-wrap {
     padding: 0 40px;
+    max-width: 100%;
+  }
+
+  .banner-card {
+    max-width: 100%;
+  }
+
+  .banner-img {
+    max-width: 100%;
+  }
+
+  .banner-img :deep(.q-img__container) {
+    max-width: 100% !important;
+  }
+
+  .banner-img :deep(img) {
+    max-width: 100%;
+    object-fit: cover;
   }
 
   .banner-overlay {
@@ -266,17 +292,41 @@ const handleClick = () => {
 
   .banner-title {
     font-size: 28px;
+    word-wrap: break-word;
   }
 
   .banner-subtitle {
     font-size: 15px;
+    word-wrap: break-word;
   }
 }
 
 /* Desktop médio */
 @media (min-width: 1024px) and (max-width: 1439px) {
+  .banner-card-section {
+    overflow: hidden; /* Previne overflow no desktop médio */
+  }
+
   .banner-card-wrap {
     padding: 0 40px;
+    max-width: 100%;
+  }
+
+  .banner-card {
+    max-width: 100%;
+  }
+
+  .banner-img {
+    max-width: 100%;
+  }
+
+  .banner-img :deep(.q-img__container) {
+    max-width: 100% !important;
+  }
+
+  .banner-img :deep(img) {
+    max-width: 100%;
+    object-fit: cover;
   }
 
   .banner-overlay {
@@ -285,10 +335,27 @@ const handleClick = () => {
 
   .banner-title {
     font-size: 32px;
+    word-wrap: break-word;
   }
 
   .banner-subtitle {
     font-size: 16px;
+    word-wrap: break-word;
+  }
+}
+
+/* Desktop grande - ajuste para telas muito largas */
+@media (min-width: 1440px) {
+  .banner-card-section {
+    overflow: hidden;
+  }
+
+  .banner-card-wrap {
+    max-width: 1760px; /* Mantém o max-width original mas com proteção */
+  }
+
+  .banner-img :deep(img) {
+    object-fit: cover;
   }
 }
 </style>

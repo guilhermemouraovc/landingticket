@@ -105,7 +105,7 @@
       <div class="categories-wrap">
         <div class="cat-grid">
           <q-btn
-            v-for="c in categories"
+            v-for="c in visibleCategories"
             :key="c.label"
             outline
             square-rounded
@@ -118,6 +118,18 @@
             :label="c.label"
             :aria-label="`Filtrar eventos de ${c.label}`"
             @click="toggleCategory(c.label)"
+          />
+          <!-- Botão para expandir categorias -->
+          <q-btn
+            v-if="!showAllCategories && categories.length > 9"
+            flat
+            round
+            dense
+            icon="add"
+            class="add-category-btn"
+            color="white"
+            aria-label="Mostrar mais categorias"
+            @click="toggleShowAllCategories"
           />
         </div>
       </div>
@@ -240,7 +252,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
@@ -286,8 +298,24 @@ const filteredEvents = ref([])
 // categorias dinâmicas do Supabase
 const categories = ref([])
 
+// Estado para controlar se mostra todas as categorias ou apenas 9
+const showAllCategories = ref(false)
+
 // Flag para evitar loop de eventos
 const isInternalCategoryChange = ref(false)
+
+// Computed para retornar apenas as primeiras 9 categorias ou todas
+const visibleCategories = computed(() => {
+  if (showAllCategories.value) {
+    return categories.value
+  }
+  return categories.value.slice(0, 9)
+})
+
+// Função para alternar a exibição de todas as categorias
+function toggleShowAllCategories() {
+  showAllCategories.value = !showAllCategories.value
+}
 
 // Helper para obter tagName a partir do label
 function getTagNameByLabel(label) {
@@ -306,7 +334,8 @@ function getSectionIdByLabel(label) {
     CARNAVAL: 'carnaval',
     Carnavais: 'carnaval',
     Festivais: 'festivais',
-    FESTIVAISS: 'festivais',
+    FESTIVAIS: 'festivais',
+    FESTIVAISS: 'festivais', // Compatibilidade com código antigo
     'Programação completa': 'programacao-completa',
     'Programação Completa': 'programacao-completa',
   }
@@ -478,9 +507,9 @@ async function loadFestivais() {
   try {
     console.log('🔍 Carregando eventos de Festivais...')
 
-    // Busca eventos do Supabase usando a tag correta 'FESTIVAISS'
-    let events = await fetchEventsByTagSupabase('FESTIVAISS', { limit: 100 })
-    console.log('📊 Eventos encontrados com "FESTIVAISS":', events.length)
+    // Busca eventos do Supabase usando a tag correta 'FESTIVAIS'
+    let events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
+    console.log('📊 Eventos encontrados com "FESTIVAIS":', events.length)
 
     saoJoaoEvents.value = events
     console.log('✅ Total de eventos de Festivais carregados:', events.length)
@@ -880,12 +909,12 @@ async function filterEventsByCategory(categoryLabel) {
 }
 .cat-grid {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* Mobile: grid 2 colunas conforme protótipo */
@@ -922,7 +951,7 @@ async function filterEventsByCategory(categoryLabel) {
 @media (min-width: 600px) and (max-width: 1023px) {
   .cat-grid {
     gap: 12px;
-    justify-content: space-around;
+    justify-content: flex-start;
   }
 
   .cat-btn {
@@ -973,6 +1002,28 @@ async function filterEventsByCategory(categoryLabel) {
 
 .cat-btn--active .q-btn__content {
   color: white !important;
+}
+
+/* Botão para expandir categorias */
+.add-category-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.add-category-btn:hover {
+  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
+  border-color: #35c7ee !important;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .add-category-btn {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* ================= HERO - TIPOGRAFIA E CORES ================= */
