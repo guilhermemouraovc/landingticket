@@ -1,10 +1,15 @@
 <template>
-  <component :is="iconComponent" :size="size" :weight="weight" :color="color" />
+  <component
+    :is="iconComponent"
+    :size="size"
+    :weight="weight"
+    :color="color"
+    v-if="iconComponent"
+  />
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import * as PhosphorIcons from '@phosphor-icons/vue'
 
 const props = defineProps({
   name: {
@@ -26,12 +31,51 @@ const props = defineProps({
   },
 })
 
-const iconComponent = computed(() => {
-  const iconName = `Ph${props.name
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('')}`
+// Importação estática apenas dos ícones usados (reduz drasticamente o bundle)
+import {
+  PhConfetti,
+  PhCheers,
+  PhBeerStein,
+  PhHamburger,
+  PhCampfire,
+  PhStar,
+  PhCow,
+  PhSpeakerHifi,
+  PhMicrophoneStage,
+  PhGuitar,
+  PhDisc,
+  PhMusicNotes,
+  PhPianoKeys,
+  PhCowboyHat,
+} from '@phosphor-icons/vue'
 
-  return PhosphorIcons[iconName] || null
+// Mapeamento de ícones Phosphor usados no projeto
+const iconMap = {
+  confetti: PhConfetti,
+  cheers: PhCheers,
+  'beer-stein': PhBeerStein,
+  hamburger: PhHamburger,
+  campfire: PhCampfire,
+  star: PhStar,
+  cow: PhCow,
+  'speaker-hifi': PhSpeakerHifi,
+  'microphone-stage': PhMicrophoneStage,
+  guitar: PhGuitar,
+  disc: PhDisc,
+  'music-notes': PhMusicNotes,
+  'piano-keys': PhPianoKeys,
+  'cowboy-hat': PhCowboyHat,
+}
+
+const iconComponent = computed(() => {
+  const Icon = iconMap[props.name]
+  if (!Icon) {
+    if (import.meta.env.DEV) {
+      console.warn(`Ícone Phosphor não encontrado: ${props.name}`)
+    }
+    return null
+  }
+
+  return Icon
 })
 </script>

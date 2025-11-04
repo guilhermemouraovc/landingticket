@@ -45,15 +45,55 @@ export default defineConfig((/* ctx */) => {
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
       // publicPath: '/',
-      // analyze: true,
+      // analyze: true, // Descomente para analisar bundle size
       // env: {},
       // rawDefine: {}
       // ignorePublicFolder: true,
-      // minify: false,
+      minify: true, // Minificação habilitada para produção (padrão: true no Quasar)
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf (viteConf) {
+        // Otimizações de build para produção
+        viteConf.build.chunkSizeWarningLimit = 1000 // Aumenta limite para 1MB
+        
+        // Minificação otimizada
+        viteConf.build.minify = 'esbuild' // Mais rápido que terser, similar qualidade
+        
+        // Code splitting otimizado para melhor performance e cache
+        viteConf.build.rollupOptions = {
+          ...viteConf.build.rollupOptions,
+          output: {
+            ...viteConf.build.rollupOptions?.output,
+            manualChunks: (id) => {
+              // Separa vendor chunks para melhor cache
+              if (id.includes('node_modules')) {
+                // Supabase em chunk separado
+                if (id.includes('@supabase')) {
+                  return 'supabase'
+                }
+                // Phosphor Icons em chunk separado (será muito menor agora)
+                if (id.includes('@phosphor-icons')) {
+                  return 'phosphor-icons'
+                }
+                // Vue e Quasar em chunks separados
+                if (id.includes('vue') || id.includes('vue-router')) {
+                  return 'vue-vendor'
+                }
+                if (id.includes('quasar')) {
+                  return 'quasar-vendor'
+                }
+                // Outros vendors
+                return 'vendor'
+              }
+            },
+          },
+        }
+        
+        // Otimizações adicionais para Vercel/produção
+        viteConf.build.cssCodeSplit = true // CSS code splitting
+        viteConf.build.sourcemap = false // Desabilita sourcemaps em produção (reduz tamanho)
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [

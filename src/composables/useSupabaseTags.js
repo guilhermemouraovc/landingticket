@@ -16,7 +16,9 @@ export function useSupabaseTags() {
       if (e) throw e
       return data || []
     } catch (err) {
-      console.error('Erro ao carregar tags:', err)
+      if (import.meta.env.DEV) {
+        console.error('Erro ao carregar tags:', err)
+      }
       error.value = 'Falha ao carregar tags'
       return []
     } finally {
@@ -53,18 +55,18 @@ export function useSupabaseTags() {
       boate: 'nightlife',
       calourada: 'school',
     }
-    
-    return tags.map(t => {
+
+    return tags.map((t) => {
       const slug = (t.slug || '').toLowerCase()
       const iconConfig = iconMap[slug] || 'sell'
-      
+
       // Se for um objeto com type: 'phosphor', retorna o objeto
       // Se for string, retorna como antes para compatibilidade
       const icon = typeof iconConfig === 'object' ? iconConfig : iconConfig
-      
+
       return {
         id: String(t.slug || t.id), // Garante que id seja sempre string
-        label: t.name,  // Usa o nome diretamente do Supabase, sem transformação
+        label: t.name, // Usa o nome diretamente do Supabase, sem transformação
         icon: icon,
         tagName: t.name,
         slug: t.slug,
@@ -87,4 +89,3 @@ export function useSupabaseTags() {
 
   return { loading, error, fetchTags, mapToCategoryButtons, mapToCategoryChips }
 }
-

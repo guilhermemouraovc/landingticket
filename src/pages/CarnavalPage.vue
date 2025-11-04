@@ -72,25 +72,22 @@ function goToEvent(card) {
 async function loadCarnavalEvents() {
   loading.value = true
   try {
-    console.log('🔍 Carregando eventos de Carnaval...')
-
     // Tenta diferentes variações da tag
     let events = await fetchEventsByTag('CARNAVAL', { limit: 100 })
 
     if (!events.length) {
-      console.log('🔄 Tentando com "carnavais" (slug)...')
       events = await fetchEventsByTag('carnavais', { limit: 100 })
     }
 
     if (!events.length) {
-      console.log('🔄 Tentando com "CARNAVAIS" (plural)...')
       events = await fetchEventsByTag('CARNAVAIS', { limit: 100 })
     }
 
     items.value = events
-    console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (e) {
-    console.error('❌ Falha ao carregar eventos de Carnaval', e)
+    if (import.meta.env.DEV) {
+      console.error('❌ Falha ao carregar eventos de Carnaval', e)
+    }
     items.value = []
   } finally {
     loading.value = false

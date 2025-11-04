@@ -95,16 +95,13 @@ function goToEvent(card) {
 async function loadFestivaisEvents() {
   loading.value = true
   try {
-    console.log('🔍 Carregando eventos de Festivais...')
-
     // Busca eventos do Supabase usando a tag correta 'FESTIVAIS'
-    let events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
-    console.log('📊 Eventos encontrados com "FESTIVAIS":', events.length)
-
+    const events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
     items.value = events
-    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (e) {
-    console.error('❌ Falha ao carregar eventos de Festivais', e)
+    if (import.meta.env.DEV) {
+      console.error('❌ Falha ao carregar eventos de Festivais', e)
+    }
     items.value = []
   } finally {
     loading.value = false

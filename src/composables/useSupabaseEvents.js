@@ -19,7 +19,9 @@ export function useSupabaseEvents() {
       if (e) throw e
       return (data || []).map(toEventCardFromSb)
     } catch (err) {
-      console.error('Erro ao buscar eventos:', err)
+      if (import.meta.env.DEV) {
+        console.error('Erro ao buscar eventos:', err)
+      }
       error.value = 'Falha ao carregar eventos'
       throw err
     } finally {
@@ -31,20 +33,14 @@ export function useSupabaseEvents() {
     loading.value = true
     error.value = null
     try {
-      console.log('🔍 Buscando eventos com tag:', tagName)
-
       const { data: tagRows, error: e1 } = await supabase
         .from('view_events_by_tag')
         .select('event_id')
         .eq('tag_name', tagName)
         .limit(1000) // Aumentar limite da view também
 
-      console.log('📊 Resultado view_events_by_tag:', { tagRows, error: e1 })
-
       if (e1) throw e1
       const ids = (tagRows || []).map((r) => r.event_id)
-
-      console.log('🎯 IDs encontrados:', ids.length, 'eventos')
 
       if (!ids.length) return []
 
@@ -55,12 +51,12 @@ export function useSupabaseEvents() {
         .order('start_date', { ascending: true })
         .limit(limit)
 
-      console.log('📊 Eventos carregados:', data?.length)
-
       if (e2) throw e2
       return (data || []).map(toEventCardFromSb)
     } catch (err) {
-      console.error('❌ Erro ao filtrar eventos:', err)
+      if (import.meta.env.DEV) {
+        console.error('❌ Erro ao filtrar eventos:', err)
+      }
       error.value = 'Falha ao filtrar eventos'
       throw err
     } finally {
@@ -73,8 +69,10 @@ export function useSupabaseEvents() {
     error.value = null
     try {
       // Verifica se é um UUID (formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)
-      
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        idOrSlug,
+      )
+
       if (isUUID) {
         // Se for UUID, busca por ID (compatibilidade com URLs antigas)
         const { data, error: e } = await supabase
@@ -86,23 +84,23 @@ export function useSupabaseEvents() {
         return toEventDetailFromSb(data)
       } else {
         // Se for slug, busca por título normalizado
-        const { data: allEvents, error: e1 } = await supabase
-          .from('view_event_detail')
-          .select('*')
-        
+        const { data: allEvents, error: e1 } = await supabase.from('view_event_detail').select('*')
+
         if (e1) throw e1
-        
+
         // Gera slug de todos os eventos e compara
-        const event = allEvents.find(e => generateSlug(e.title) === idOrSlug)
-        
+        const event = allEvents.find((e) => generateSlug(e.title) === idOrSlug)
+
         if (!event) {
           throw new Error('Evento não encontrado')
         }
-        
+
         return toEventDetailFromSb(event)
       }
     } catch (err) {
-      console.error('Erro ao buscar evento:', err)
+      if (import.meta.env.DEV) {
+        console.error('Erro ao buscar evento:', err)
+      }
       error.value = 'Evento não encontrado'
       throw err
     } finally {
@@ -123,7 +121,9 @@ export function useSupabaseEvents() {
       if (e) throw e
       return (data || []).map(toEventCardFromSb)
     } catch (err) {
-      console.error('Erro ao buscar eventos em destaque:', err)
+      if (import.meta.env.DEV) {
+        console.error('Erro ao buscar eventos em destaque:', err)
+      }
       error.value = 'Falha ao carregar eventos em destaque'
       throw err
     } finally {
@@ -131,6 +131,7 @@ export function useSupabaseEvents() {
     }
   }
 
+  // Wrapper para compatibilidade - mantido para não quebrar código existente
   async function fetchAllEvents(limit = 200) {
     return fetchEvents({ limit })
   }

@@ -1,0 +1,9 @@
+# robots.txt para LandingTicket
+# Permite indexação de todos os conteúdos
+
+User-agent: *
+Allow: /
+
+# Sitemap (adicione quando criar)
+# Sitemap: https://seudominio.com/sitemap.xml
+

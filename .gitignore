@@ -31,7 +31,9 @@ yarn-error.log*
 
 # local .env files
 .env
-.env.local*
+.env.local
+.env.*
+!.env.example
 
 # Cursor AI files
 .cursorindexingignore

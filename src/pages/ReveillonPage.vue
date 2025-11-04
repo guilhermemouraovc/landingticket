@@ -72,25 +72,22 @@ function goToEvent(card) {
 async function loadReveillonEvents() {
   loading.value = true
   try {
-    console.log('🔍 Carregando eventos de Réveillon...')
-
     // Usar a tag correta 'REVEILLONS' conforme o banco de dados
     let events = await fetchEventsByTag('REVEILLONS', { limit: 100 })
 
     if (!events.length) {
-      console.log('🔄 Tentando com "reveillon" (minúsculo)...')
       events = await fetchEventsByTag('reveillon', { limit: 100 })
     }
 
     if (!events.length) {
-      console.log('🔄 Tentando com "REVEILLON" (singular)...')
       events = await fetchEventsByTag('REVEILLON', { limit: 100 })
     }
 
     items.value = events
-    console.log('✅ Eventos de Réveillon carregados:', events.length)
   } catch (e) {
-    console.error('❌ Falha ao carregar eventos de Réveillon', e)
+    if (import.meta.env.DEV) {
+      console.error('❌ Falha ao carregar eventos de Réveillon', e)
+    }
     items.value = []
   } finally {
     loading.value = false

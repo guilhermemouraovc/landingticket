@@ -109,7 +109,6 @@ function getCategoryTag(tags) {
   }
 
   const mappedTag = categoryMap[tag] || 'REVEILLONS' // Default para REVEILLONS ao invés de retornar a tag desconhecida
-  console.log(`🗺️ Mapeando "${tag}" → "${mappedTag}"`)
   return mappedTag
 }
 
@@ -118,19 +117,13 @@ async function loadRelatedEvents() {
   loading.value = true
 
   try {
-    console.log('🔍 Carregando eventos relacionados...')
-    console.log('📋 Tags recebidas:', props.eventTags)
-    console.log('🆔 Evento atual:', props.currentEventId)
-
     if (!props.currentEventId) {
-      console.warn('⚠️ ID do evento atual não fornecido')
       events.value = []
       return
     }
 
     // Determina a categoria/tag para buscar
     const categoryTag = getCategoryTag(props.eventTags)
-    console.log('🏷️ Tag normalizada:', categoryTag)
 
     // Busca eventos pela tag usando view_events_by_tag
     const { data: tagRows, error: tagError } = await supabase
@@ -140,22 +133,17 @@ async function loadRelatedEvents() {
       .limit(50)
 
     if (tagError) {
-      console.error('❌ Erro ao buscar tags:', tagError)
-      console.error('Detalhes do erro:', tagError)
+      if (import.meta.env.DEV) {
+        console.error('❌ Erro ao buscar tags:', tagError)
+      }
       throw tagError
     }
-
-    console.log('📦 Dados brutos retornados:', tagRows)
 
     const eventIds = (tagRows || [])
       .map((row) => row.event_id)
       .filter((id) => id !== props.currentEventId) // Exclui evento atual
 
-    console.log('🎯 IDs de eventos encontrados:', eventIds.length)
-    console.log('🔢 IDs:', eventIds)
-
     if (eventIds.length === 0) {
-      console.log('ℹ️ Nenhum evento relacionado encontrado')
       events.value = []
       return
     }
@@ -169,16 +157,18 @@ async function loadRelatedEvents() {
       .limit(12)
 
     if (eventsError) {
-      console.error('❌ Erro ao buscar eventos:', eventsError)
+      if (import.meta.env.DEV) {
+        console.error('❌ Erro ao buscar eventos:', eventsError)
+      }
       throw eventsError
     }
 
     // Mapeia os eventos para o formato da UI
     events.value = (eventsData || []).map(toEventCardFromSb).slice(0, 6) // Limita a 6 eventos no carrossel
-
-    console.log('✅ Eventos relacionados carregados:', events.value.length)
   } catch (error) {
-    console.error('❌ Erro ao carregar eventos relacionados:', error)
+    if (import.meta.env.DEV) {
+      console.error('❌ Erro ao carregar eventos relacionados:', error)
+    }
     events.value = []
   } finally {
     loading.value = false

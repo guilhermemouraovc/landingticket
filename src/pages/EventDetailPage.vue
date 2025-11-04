@@ -205,14 +205,15 @@ async function loadEvent(slugParam) {
     }
 
     event.value = eventData
-    console.log('image:', event.value.image)
-    
+
     // Atualiza a URL se ainda estiver usando ID (redireciona para slug)
     if (eventData.slug && route.params.slug !== eventData.slug) {
       router.replace({ name: 'event-detail', params: { slug: eventData.slug } })
     }
   } catch (err) {
-    console.error('Falha ao carregar evento', err)
+    if (import.meta.env.DEV) {
+      console.error('Falha ao carregar evento', err)
+    }
     error.value = apiError.value || 'Não foi possível carregar os detalhes do evento.'
   }
 }
@@ -340,24 +341,18 @@ function goHome() {
 
 // Função para extrair tags do evento
 function getEventTags(eventData) {
-  console.log('🏷️ Extraindo tags do evento:', eventData)
-
   // Tenta extrair tags de diferentes estruturas possíveis
   if (eventData.tags && Array.isArray(eventData.tags) && eventData.tags.length > 0) {
-    console.log('✅ Tags encontradas no evento:', eventData.tags)
     return eventData.tags
   }
 
   // Se não há tags específicas, tenta inferir pela categoria baseada no título
   const title = (eventData.title || '').toLowerCase()
-  console.log('📝 Inferindo tag pelo título:', title)
 
   if (title.includes('réveillon') || title.includes('reveillon') || title.includes('amoré')) {
-    console.log('🎆 Tag inferida: REVEILLONS')
     return ['REVEILLONS'] // Tag correta do Supabase
   }
   if (title.includes('carnaval') || title.includes('carvalheira')) {
-    console.log('🎭 Tag inferida: CARNAVAL')
     return ['CARNAVAL'] // Tag correta do Supabase
   }
   if (
@@ -366,12 +361,10 @@ function getEventTags(eventData) {
     title.includes('joão') ||
     title.includes('festival')
   ) {
-    console.log('🎪 Tag inferida: FESTIVAIS')
     return ['FESTIVAIS'] // Tag correta do Supabase
   }
 
   // Padrão: Réveillon
-  console.log('⚠️ Nenhuma tag específica encontrada, usando padrão: REVEILLONS')
   return ['REVEILLONS']
 }
 </script>
@@ -770,7 +763,7 @@ function getEventTags(eventData) {
     position: absolute;
     top: 16px;
     right: 16px;
-    background: white !important;
+    background: #f5f5f5 !important;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -780,11 +773,13 @@ function getEventTags(eventData) {
     align-items: center;
     justify-content: center;
     z-index: 10;
+    outline: 2px solid #35c7ee;
+    outline-offset: 0;
   }
 
   .event-share--mobile .share-icon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
   }
 
   .event-meta {
