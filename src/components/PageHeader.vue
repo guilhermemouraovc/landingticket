@@ -73,10 +73,19 @@ defineProps({
   .page-header {
     padding: 20px 0;
     gap: 12px;
+    align-items: center;
+    position: relative;
+  }
+
+  .page-header :deep(.back-button-container) {
+    align-self: flex-start;
+    margin-left: 0;
   }
 
   .page-title {
     font-size: 28px;
+    width: 100%;
+    text-align: center;
   }
 }
 </style>

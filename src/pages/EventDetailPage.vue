@@ -243,7 +243,8 @@ function shareEvent() {
     url: shareUrl,
   }
 
-  if (navigator?.share) {
+  // Verifica se a Web Share API está disponível (funciona no Safari mobile iOS 12.2+)
+  if (navigator.share && typeof navigator.share === 'function') {
     navigator
       .share(shareData)
       .then(() => {
@@ -256,30 +257,74 @@ function shareEvent() {
         })
       })
       .catch((error) => {
-        if (error.name !== 'AbortError') {
-          $q.notify({
-            type: 'warning',
-            message: 'Não foi possível compartilhar',
-            position: 'top',
-            timeout: 2000,
-          })
+        // AbortError significa que o usuário cancelou - não mostra erro
+        if (error.name !== 'AbortError' && error.name !== 'NotAllowedError') {
+          // Se falhar, tenta copiar para clipboard como fallback
+          copyToClipboard(shareUrl)
         }
       })
-  } else if (navigator?.clipboard?.writeText) {
-    navigator.clipboard.writeText(shareUrl).then(() => {
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    // Fallback: copia para clipboard
+    copyToClipboard(shareUrl)
+  } else {
+    // Fallback final: método legado para navegadores mais antigos
+    copyToClipboardLegacy(shareUrl)
+  }
+}
+
+// Função auxiliar para copiar para clipboard
+function copyToClipboard(text) {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
       $q.notify({
-        type: 'negative',
-        message: 'Erro ao copiar link',
+        type: 'positive',
+        message: 'Link copiado para a área de transferência!',
         position: 'top',
         timeout: 2000,
+        icon: 'content_copy',
       })
     })
-  } else {
+    .catch(() => {
+      // Se falhar, tenta método legado
+      copyToClipboardLegacy(text)
+    })
+}
+
+// Método legado para navegadores sem Clipboard API
+function copyToClipboardLegacy(text) {
+  try {
+    // Cria um elemento temporário para copiar
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    textArea.style.position = 'fixed'
+    textArea.style.left = '-999999px'
+    textArea.style.top = '-999999px'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+
+    const successful = document.execCommand('copy')
+    document.body.removeChild(textArea)
+
+    if (successful) {
+      $q.notify({
+        type: 'positive',
+        message: 'Link copiado para a área de transferência!',
+        position: 'top',
+        timeout: 2000,
+        icon: 'content_copy',
+      })
+    } else {
+      throw new Error('Falha ao copiar')
+    }
+  } catch {
     $q.notify({
-      type: 'info',
-      message: 'Compartilhamento não disponível neste navegador',
+      type: 'warning',
+      message: 'Não foi possível copiar o link. Tente manualmente.',
       position: 'top',
       timeout: 3000,
+      icon: 'warning',
     })
   }
 }

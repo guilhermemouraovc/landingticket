@@ -42,10 +42,10 @@ export function useSupabaseTags() {
       calourada: 'school',
     }
     return tags.map(t => ({
-      id: t.slug || t.id,               // usado pelo CategoryFilter
-      label: toTitleCase(t.name),       // usado nos botões grandes
+      id: t.slug || t.id,
+      label: t.name,  // Usa o nome diretamente do Supabase, sem transformação
       icon: iconMap[(t.slug || '').toLowerCase()] || 'sell',
-      tagName: t.name,                  // exatamente como salvo no banco (ex.: REVEILLONS)
+      tagName: t.name,
       slug: t.slug,
     }))
   }
@@ -61,12 +61,6 @@ export function useSupabaseTags() {
       tagName: b.tagName,
       slug: b.slug,
     }))
-  }
-
-  function toTitleCase(str) {
-    return (str || '')
-      .toLowerCase()
-      .replace(/\b\p{L}/gu, ch => ch.toUpperCase())
   }
 
   return { loading, error, fetchTags, mapToCategoryButtons, mapToCategoryChips }

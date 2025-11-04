@@ -214,10 +214,22 @@
             <a href="#" class="social-link" aria-label="WhatsApp">
               <img src="/whatsapp.svg" alt="WhatsApp" class="social-icon" />
             </a>
-            <a href="#" class="social-link" aria-label="Instagram">
+            <a
+              href="https://www.instagram.com/ticketpe"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="Instagram"
+            >
               <img src="/insta.svg" alt="Instagram" class="social-icon" />
             </a>
-            <a href="#" class="social-link" aria-label="TikTok">
+            <a
+              href="https://www.tiktok.com/@ticketpe"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="TikTok"
+            >
               <img src="/tiktok.svg" alt="TikTok" class="social-icon" />
             </a>
           </div>
