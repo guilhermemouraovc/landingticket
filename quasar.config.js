@@ -54,45 +54,19 @@ export default defineConfig((/* ctx */) => {
       // distDir
 
       extendViteConf (viteConf) {
-        // Otimizações de build para produção
+        // Otimizações básicas de build para produção
         viteConf.build.chunkSizeWarningLimit = 1000 // Aumenta limite para 1MB
         
-        // Minificação otimizada
-        viteConf.build.minify = 'esbuild' // Mais rápido que terser, similar qualidade
-        
-        // Code splitting otimizado para melhor performance e cache
-        viteConf.build.rollupOptions = {
-          ...viteConf.build.rollupOptions,
-          output: {
-            ...viteConf.build.rollupOptions?.output,
-            manualChunks: (id) => {
-              // Separa vendor chunks para melhor cache
-              if (id.includes('node_modules')) {
-                // Supabase em chunk separado
-                if (id.includes('@supabase')) {
-                  return 'supabase'
-                }
-                // Phosphor Icons em chunk separado (será muito menor agora)
-                if (id.includes('@phosphor-icons')) {
-                  return 'phosphor-icons'
-                }
-                // Vue e Quasar em chunks separados
-                if (id.includes('vue') || id.includes('vue-router')) {
-                  return 'vue-vendor'
-                }
-                if (id.includes('quasar')) {
-                  return 'quasar-vendor'
-                }
-                // Outros vendors
-                return 'vendor'
-              }
-            },
-          },
-        }
+        // Minificação: usar 'terser' ao invés de 'esbuild' para melhor compatibilidade
+        // esbuild pode causar problemas com algumas dependências
+        viteConf.build.minify = 'terser'
         
         // Otimizações adicionais para Vercel/produção
         viteConf.build.cssCodeSplit = true // CSS code splitting
         viteConf.build.sourcemap = false // Desabilita sourcemaps em produção (reduz tamanho)
+        
+        // NÃO usar manualChunks customizado - deixar Vite gerenciar automaticamente
+        // O Vite já faz code splitting inteligente que respeita dependências
       },
       // viteVuePluginOptions: {},
 
