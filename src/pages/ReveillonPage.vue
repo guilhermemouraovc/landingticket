@@ -42,6 +42,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { useCategories } from 'src/composables/useCategories'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import EventCard from 'src/components/EventCard.vue'
@@ -55,13 +56,19 @@ const loading = ref(true)
 // Composable para gerenciar eventos do Supabase
 const { fetchEventsByTag } = useSupabaseEvents()
 
+// Composable para gerenciar categorias (com cache)
+const { categories, loadCategories } = useCategories()
+
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
   { label: 'Início', to: '/', icon: 'home' },
   { label: 'Réveillon', to: null },
 ])
 
-onMounted(loadReveillonEvents)
+onMounted(async () => {
+  await loadCategories()
+  await loadReveillonEvents()
+})
 
 function goToEvent(card) {
   if (card?.link) {
@@ -72,15 +79,36 @@ function goToEvent(card) {
 async function loadReveillonEvents() {
   loading.value = true
   try {
-    // Usar a tag correta 'REVEILLONS' conforme o banco de dados
-    let events = await fetchEventsByTag('REVEILLONS', { limit: 100 })
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Reveillons' // Nome padrão atualizado
+    
+    if (categories.value) {
+      const reveillonCategory = categories.value.find(
+        (c) => 
+          c.label === 'Réveillon' || 
+          c.label === 'Reveillons' || 
+          c.label === 'REVEILLONS' ||
+          c.slug === 'reveillon' ||
+          c.slug === 'reveillons'
+      )
+      if (reveillonCategory?.tagName) {
+        tagName = reveillonCategory.tagName
+      }
+    }
+
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTag(tagName, { limit: 100 })
 
     if (!events.length) {
-      events = await fetchEventsByTag('reveillon', { limit: 100 })
+      events = await fetchEventsByTag('Reveillons', { limit: 100 })
     }
 
     if (!events.length) {
-      events = await fetchEventsByTag('REVEILLON', { limit: 100 })
+      events = await fetchEventsByTag('REVEILLONS', { limit: 100 })
+    }
+
+    if (!events.length) {
+      events = await fetchEventsByTag('reveillon', { limit: 100 })
     }
 
     items.value = events

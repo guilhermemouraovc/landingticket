@@ -315,7 +315,9 @@ function getSectionIdByLabel(label) {
   const fixedMap = {
     Réveillon: 'reveillon',
     Reveillon: 'reveillon',
+    Reveillons: 'reveillon', // Plural atualizado
     REVEILLONS: 'reveillon',
+    REVEILLON: 'reveillon',
     Carnaval: 'carnaval',
     CARNAVAL: 'carnaval',
     Carnavais: 'carnaval',
@@ -482,9 +484,39 @@ async function loadReveillon() {
   try {
     console.log('🔍 Carregando eventos de Réveillon...')
 
-    // Usar o mesmo método que na ReveillonPage e outras categorias
-    reveillonEvents.value = await fetchEventsByTagSupabase('REVEILLONS', { limit: 100 })
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Reveillons' // Nome padrão atualizado
+    
+    if (categories.value) {
+      const reveillonCategory = categories.value.find(
+        (c) => 
+          c.label === 'Réveillon' || 
+          c.label === 'Reveillons' || 
+          c.label === 'REVEILLONS' ||
+          c.slug === 'reveillon' ||
+          c.slug === 'reveillons'
+      )
+      if (reveillonCategory?.tagName) {
+        tagName = reveillonCategory.tagName
+      }
+    }
 
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('Reveillons', { limit: 100 })
+    }
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('REVEILLONS', { limit: 100 })
+    }
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('reveillon', { limit: 100 })
+    }
+
+    reveillonEvents.value = events
     console.log('✅ Eventos de Réveillon carregados:', reveillonEvents.value.length)
   } catch (err) {
     console.error('❌ Falha ao carregar reveillon', err)
@@ -496,12 +528,35 @@ async function loadCarnaval() {
   try {
     console.log('🔍 Carregando eventos de Carnaval...')
 
-    // Primeiro tenta buscar do Supabase usando a tag 'CARNAVAL' ou 'carnavais'
-    let events = await fetchEventsByTagSupabase('CARNAVAL', { limit: 100 })
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Carnaval' // Nome padrão atualizado
+    
+    if (categories.value) {
+      const carnavalCategory = categories.value.find(
+        (c) => 
+          c.label === 'Carnaval' || 
+          c.label === 'CARNAVAL' || 
+          c.label === 'Carnavais' ||
+          c.slug === 'carnaval' ||
+          c.slug === 'carnavais'
+      )
+      if (carnavalCategory?.tagName) {
+        tagName = carnavalCategory.tagName
+      }
+    }
 
-    // Se não encontrou eventos com 'CARNAVAL', tenta 'carnavais' (slug)
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    
     if (!events.length) {
-      console.log('🔄 Tentando com slug "carnavais"...')
+      events = await fetchEventsByTagSupabase('Carnaval', { limit: 100 })
+    }
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('CARNAVAL', { limit: 100 })
+    }
+    
+    if (!events.length) {
       events = await fetchEventsByTagSupabase('carnavais', { limit: 100 })
     }
 
@@ -517,9 +572,31 @@ async function loadFestivais() {
   try {
     console.log('🔍 Carregando eventos de Festivais...')
 
-    // Busca eventos do Supabase usando a tag correta 'FESTIVAIS'
-    let events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
-    console.log('📊 Eventos encontrados com "FESTIVAIS":', events.length)
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Festivais' // Nome padrão atualizado
+    
+    if (categories.value) {
+      const festivaisCategory = categories.value.find(
+        (c) => 
+          c.label === 'Festivais' || 
+          c.label === 'FESTIVAIS' ||
+          c.slug === 'festivais'
+      )
+      if (festivaisCategory?.tagName) {
+        tagName = festivaisCategory.tagName
+      }
+    }
+
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('Festivais', { limit: 100 })
+    }
+    
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
+    }
 
     saoJoaoEvents.value = events
     console.log('✅ Total de eventos de Festivais carregados:', events.length)

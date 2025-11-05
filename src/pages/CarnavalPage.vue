@@ -42,6 +42,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { useCategories } from 'src/composables/useCategories'
 import SkeletonLoader from 'src/components/SkeletonLoader.vue'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import EventCard from 'src/components/EventCard.vue'
@@ -55,13 +56,19 @@ const loading = ref(true)
 // Composable para gerenciar eventos do Supabase
 const { fetchEventsByTag } = useSupabaseEvents()
 
+// Composable para gerenciar categorias (com cache)
+const { categories, loadCategories } = useCategories()
+
 // Breadcrumbs
 const breadcrumbItems = computed(() => [
   { label: 'Início', to: '/', icon: 'home' },
   { label: 'Carnaval', to: null },
 ])
 
-onMounted(loadCarnavalEvents)
+onMounted(async () => {
+  await loadCategories()
+  await loadCarnavalEvents()
+})
 
 function goToEvent(card) {
   if (card?.link) {
@@ -72,15 +79,36 @@ function goToEvent(card) {
 async function loadCarnavalEvents() {
   loading.value = true
   try {
-    // Tenta diferentes variações da tag
-    let events = await fetchEventsByTag('CARNAVAL', { limit: 100 })
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Carnaval' // Nome padrão atualizado
+    
+    if (categories.value) {
+      const carnavalCategory = categories.value.find(
+        (c) => 
+          c.label === 'Carnaval' || 
+          c.label === 'CARNAVAL' || 
+          c.label === 'Carnavais' ||
+          c.slug === 'carnaval' ||
+          c.slug === 'carnavais'
+      )
+      if (carnavalCategory?.tagName) {
+        tagName = carnavalCategory.tagName
+      }
+    }
+
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTag(tagName, { limit: 100 })
 
     if (!events.length) {
-      events = await fetchEventsByTag('carnavais', { limit: 100 })
+      events = await fetchEventsByTag('Carnaval', { limit: 100 })
     }
 
     if (!events.length) {
-      events = await fetchEventsByTag('CARNAVAIS', { limit: 100 })
+      events = await fetchEventsByTag('CARNAVAL', { limit: 100 })
+    }
+
+    if (!events.length) {
+      events = await fetchEventsByTag('carnavais', { limit: 100 })
     }
 
     items.value = events
