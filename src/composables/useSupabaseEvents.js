@@ -136,6 +136,33 @@ export function useSupabaseEvents() {
     return fetchEvents({ limit })
   }
 
+  async function fetchUpcomingEvents({ limit = 100 } = {}) {
+    loading.value = true
+    error.value = null
+    try {
+      // Busca eventos com data de início >= hoje, ordenados por data crescente
+      const today = new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+      
+      const { data, error: e } = await supabase
+        .from('view_event_cards')
+        .select('*')
+        .gte('start_date', today) // start_date >= hoje
+        .order('start_date', { ascending: true })
+        .limit(limit)
+      
+      if (e) throw e
+      return (data || []).map(toEventCardFromSb)
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error('Erro ao buscar eventos próximos:', err)
+      }
+      error.value = 'Falha ao carregar eventos próximos'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
@@ -144,5 +171,6 @@ export function useSupabaseEvents() {
     fetchEventById,
     fetchFeaturedEvents,
     fetchAllEvents,
+    fetchUpcomingEvents,
   }
 }

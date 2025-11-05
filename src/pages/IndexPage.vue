@@ -119,17 +119,17 @@
           >
             <template #default>
               <span class="cat-btn-content">
-                <PhosphorIcon 
-                  v-if="typeof c.icon === 'object' && c.icon.type === 'phosphor'" 
-                  :name="c.icon.name" 
-                  :size="20" 
+                <PhosphorIcon
+                  v-if="typeof c.icon === 'object' && c.icon.type === 'phosphor'"
+                  :name="c.icon.name"
+                  :size="20"
                   weight="fill"
-                  color="white" 
+                  color="white"
                   class="cat-btn-icon"
                 />
-                <q-icon 
-                  v-else-if="typeof c.icon === 'string'" 
-                  :name="c.icon" 
+                <q-icon
+                  v-else-if="typeof c.icon === 'string'"
+                  :name="c.icon"
                   class="cat-btn-icon"
                 />
                 <span class="cat-btn-label">{{ c.label }}</span>
@@ -161,7 +161,7 @@
     <section class="event-groups">
       <!-- Skeletons para carrosséis -->
       <template v-if="loadingCarousels">
-        <SkeletonLoader variant="carousel" :carousel-count="4" />
+        <SkeletonLoader variant="carousel" :carousel-count="5" />
       </template>
 
       <!-- Eventos filtrados por categoria -->
@@ -176,6 +176,15 @@
 
       <!-- Carrosséis normais -->
       <template v-else>
+        <EventSectionCarousel
+          section-id="eventos-a-seguir"
+          title="Eventos à seguir"
+          :items="upcomingEvents"
+          see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'programacao-completa' }"
+          :default-image="DEFAULT_IMAGE"
+        />
+
         <EventSectionCarousel
           section-id="reveillon"
           title="Réveillon"
@@ -213,70 +222,6 @@
         />
       </template>
     </section>
-
-    <!-- FOOTER -->
-    <footer class="footer" role="contentinfo">
-      <div class="footer-wrap">
-        <div class="footer-top row items-center justify-between q-mb-lg">
-          <router-link to="/" class="footer-logo-container">
-            <img
-              src="/logo.svg"
-              alt="TicketPE - Eventos em Pernambuco"
-              style="width: 220px"
-              loading="lazy"
-            />
-          </router-link>
-
-          <div class="social-icons row q-gutter-md">
-            <a href="#" class="social-link" aria-label="WhatsApp">
-              <img src="/whatsapp.svg" alt="WhatsApp" class="social-icon" />
-            </a>
-            <a
-              href="https://www.instagram.com/ticketpe"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-link"
-              aria-label="Instagram"
-            >
-              <img src="/insta.svg" alt="Instagram" class="social-icon" />
-            </a>
-            <a
-              href="https://www.tiktok.com/@ticketpe"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="social-link"
-              aria-label="TikTok"
-            >
-              <img src="/tiktok.svg" alt="TikTok" class="social-icon" />
-            </a>
-          </div>
-        </div>
-
-        <q-separator dark />
-
-        <div class="footer-links row justify-between q-mt-lg">
-          <div class="footer-column">
-            <div class="footer-title">Links Úteis</div>
-            <div class="footer-link">Programação Completa</div>
-          </div>
-
-          <div class="footer-column">
-            <div class="footer-title">Contato</div>
-            <div class="footer-link">ajuda@ticketpe.com.br</div>
-          </div>
-
-          <div class="footer-column">
-            <div class="footer-title">Suporte</div>
-            <router-link to="/termos-de-uso" class="footer-link">Termos de Uso</router-link>
-            <div class="footer-link">Política de Privacidade</div>
-          </div>
-        </div>
-
-        <q-separator dark class="q-mt-lg" />
-
-        <div class="footer-copyright">© 2025 ticketpe. Todos os direitos reservados.</div>
-      </div>
-    </footer>
   </q-page>
 </template>
 
@@ -301,6 +246,7 @@ const {
   fetchEvents: fetchEventsSupabase,
   fetchEventsByTag: fetchEventsByTagSupabase,
   fetchAllEvents: fetchAllEventsSupabase,
+  fetchUpcomingEvents: fetchUpcomingEventsSupabase,
 } = useSupabaseEvents()
 
 // Composable para gerenciar tags (categorias dinâmicas)
@@ -311,6 +257,7 @@ const activeSlide = ref(null)
 const featured = ref([])
 
 // seções adicionais
+const upcomingEvents = ref([])
 const reveillonEvents = ref([])
 const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
@@ -469,7 +416,13 @@ onMounted(async () => {
   loadingFeatured.value = false
 
   // Carrega carrosséis em paralelo
-  await Promise.all([loadReveillon(), loadCarnaval(), loadFestivais(), loadAllEvents()])
+  await Promise.all([
+    loadUpcomingEvents(),
+    loadReveillon(),
+    loadCarnaval(),
+    loadFestivais(),
+    loadAllEvents(),
+  ])
   loadingCarousels.value = false
 })
 
@@ -494,6 +447,20 @@ async function loadFeatured() {
   } catch (err) {
     console.error('Falha ao carregar eventos em destaque', err)
     featured.value = []
+  }
+}
+
+async function loadUpcomingEvents() {
+  try {
+    console.log('🔍 Carregando eventos próximos...')
+
+    // Busca eventos com data >= hoje, ordenados por data crescente
+    upcomingEvents.value = await fetchUpcomingEventsSupabase({ limit: 100 })
+
+    console.log('✅ Eventos próximos carregados:', upcomingEvents.value.length)
+  } catch (err) {
+    console.error('❌ Falha ao carregar eventos próximos', err)
+    upcomingEvents.value = []
   }
 }
 
@@ -641,7 +608,7 @@ async function filterEventsByCategory(categoryLabel) {
 @media (max-width: 599px) {
   .event-groups {
     padding: 0 16px;
-    margin-bottom: 0;
+    margin-bottom: 80px;
   }
 }
 
@@ -1188,197 +1155,11 @@ async function filterEventsByCategory(categoryLabel) {
   color: #d907f2 !important;
 }
 
-/* ================= FOOTER ================= */
-.footer {
-  background-color: #1a202c;
-  padding: 32px 0;
-  color: white;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-}
-
-.footer-wrap {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 80px;
-}
-
-@media (min-width: 1600px) {
-  .footer-wrap {
-    max-width: 1600px;
-  }
-}
-
-@media (min-width: 1920px) {
-  .footer-wrap {
-    max-width: 1800px;
-    padding: 0 80px;
-  }
-}
-
-.footer-logo-container {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.footer-logo-container:hover {
-  opacity: 0.9;
-}
-
-.social-icons {
-  display: flex;
-  gap: 8px;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: transform 0.3s ease;
-}
-
-.social-link:hover {
-  transform: translateY(-2px);
-}
-
-.social-icon {
-  width: 55.8px;
-  height: 55.8px;
-}
-
-.footer-links {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-}
-
-.footer-column {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.footer-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  color: white;
-  margin-bottom: 8px;
-}
-
-.footer-link {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  color: #d1d5db;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  text-decoration: none;
-  display: block;
-}
-
-.footer-link:hover {
-  color: #35c7ee;
-}
-
-a.footer-link {
-  text-decoration: none;
-}
-
-a.footer-link:hover {
-  text-decoration: none;
-}
-
-.footer-copyright {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  color: #d1d5db;
-  text-align: left;
-  margin-top: 16px;
-}
-
-/* Telas grandes */
-@media (min-width: 1200px) {
-  .footer-links {
-    gap: 60px;
-  }
-}
-
-@media (min-width: 1600px) {
-  .footer-links {
-    gap: 80px;
-  }
-}
-
-/* Mobile */
-@media (max-width: 599px) {
-  .footer-wrap {
-    padding: 0 16px;
-  }
-
-  .footer-links {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .footer-top {
-    flex-direction: column;
-    gap: 24px;
-    text-align: center;
-  }
-
-  .social-icons {
-    justify-content: center;
-  }
-
-  .footer {
-    margin-bottom: 0;
-    padding-bottom: env(safe-area-inset-bottom, 32px);
-  }
-}
-
-/* Tablet */
-@media (min-width: 600px) and (max-width: 768px) {
-  .footer-wrap {
-    padding: 0 40px;
-  }
-
-  .footer-links {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .footer-top {
-    flex-direction: column;
-    gap: 24px;
-    text-align: center;
-  }
-
-  .social-icons {
-    justify-content: center;
-  }
-}
-
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
 .q-btn:focus-visible,
 .q-carousel__control button:focus-visible {
   outline: 2px solid #35c7ee;
   outline-offset: 2px;
-}
-
-.social-icon:focus-visible {
-  outline: 2px solid #35c7ee;
-  outline-offset: 2px;
-  border-radius: 50%;
 }
 
 .cat-btn:focus-visible {
