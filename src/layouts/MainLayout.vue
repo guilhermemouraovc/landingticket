@@ -30,20 +30,7 @@
               @keydown.enter="toggleCategories"
               @keydown.space="toggleCategories"
             >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 33"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="filter-icon"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 11.0078H9.125C9.3453 11.8683 9.8457 12.6309 10.5473 13.1755C11.2489 13.7201 12.1118 14.0157 13 14.0157C13.8882 14.0157 14.7511 13.7201 15.4527 13.1755C16.1543 12.6309 16.6547 11.8683 16.875 11.0078H27C27.2652 11.0078 27.5196 10.9025 27.7071 10.715C27.8946 10.5274 28 10.2731 28 10.0078C28 9.74263 27.8946 9.48827 27.7071 9.30074C27.5196 9.1132 27.2652 9.00784 27 9.00784H16.875C16.6547 8.14743 16.1543 7.38481 15.4527 6.8402C14.7511 6.2956 13.8882 6 13 6C12.1118 6 11.2489 6.2956 10.5473 6.8402C9.8457 7.38481 9.3453 8.14743 9.125 9.00784H5C4.73478 9.00784 4.48043 9.1132 4.29289 9.30074C4.10536 9.48827 4 9.74263 4 10.0078C4 10.2731 4.10536 10.5274 4.29289 10.715C4.48043 10.9025 4.73478 11.0078 5 11.0078ZM13 8.00784C13.3956 8.00784 13.7822 8.12514 14.1111 8.3449C14.44 8.56467 14.6964 8.87702 14.8478 9.24248C14.9991 9.60793 15.0387 10.0101 14.9616 10.398C14.8844 10.786 14.6939 11.1424 14.4142 11.4221C14.1345 11.7018 13.7781 11.8922 13.3902 11.9694C13.0022 12.0466 12.6001 12.007 12.2346 11.8556C11.8692 11.7042 11.5568 11.4479 11.3371 11.119C11.1173 10.7901 11 10.4034 11 10.0078C11 9.47741 11.2107 8.9687 11.5858 8.59363C11.9609 8.21856 12.4696 8.00784 13 8.00784ZM27 21.0078H24.875C24.6547 20.1474 24.1543 19.3848 23.4527 18.8402C22.7511 18.2956 21.8882 18 21 18C20.1118 18 19.2489 18.2956 18.5473 18.8402C17.8457 19.3848 17.3453 20.1474 17.125 21.0078H5C4.73478 21.0078 4.48043 21.1132 4.29289 21.3007C4.10536 21.4883 4 21.7426 4 22.0078C4 22.2731 4.10536 22.5274 4.29289 22.715C4.48043 22.9025 4.73478 23.0078 5 23.0078H17.125C17.3453 23.8683 17.8457 24.6309 18.5473 25.1755C19.2489 25.7201 20.1118 26.0157 21 26.0157C21.8882 26.0157 22.7511 25.7201 23.4527 25.1755C24.1543 24.6309 24.6547 23.8683 24.875 23.0078H27C27.2652 23.0078 27.5196 22.9025 27.7071 22.715C27.8946 22.5274 28 22.2731 28 22.0078C28 21.7426 27.8946 21.4883 27.7071 21.3007C27.5196 21.1132 27.2652 21.0078 27 21.0078ZM21 24.0078C20.6044 24.0078 20.2178 23.8905 19.8889 23.6708C19.56 23.451 19.3036 23.1387 19.1522 22.7732C19.0009 22.4078 18.9613 22.0056 19.0384 21.6177C19.1156 21.2297 19.3061 20.8733 19.5858 20.5936C19.8655 20.3139 20.2219 20.1234 20.6098 20.0463C20.9978 19.9691 21.3999 20.0087 21.7654 20.1601C22.1308 20.3115 22.4432 20.5678 22.6629 20.8967C22.8827 21.2256 23 21.6123 23 22.0078C23 22.5383 22.7893 23.047 22.4142 23.4221C22.0391 23.7971 21.5304 24.0078 21 24.0078Z"
-                  fill="white"
-                />
-              </svg>
+              <FilterIcon size="32" fill="white" />
               <span class="filter-text">Filtros</span>
             </div>
             <q-input
@@ -69,7 +56,10 @@
             <div
               v-if="!isEventDetailPage"
               class="filter-container-mobile"
-              :class="{ 'filter-container-mobile--active': filterDrawer }"
+              :class="{
+                'filter-container-mobile--active': filterDrawer,
+                'filter-container-mobile--has-selection': selectedCategories.length > 0,
+              }"
               @click="openFilterDrawer"
               aria-label="Abrir filtros de eventos"
               role="button"
@@ -77,20 +67,7 @@
               @keydown.enter="openFilterDrawer"
               @keydown.space="openFilterDrawer"
             >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 33"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="filter-icon"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 11.0078H9.125C9.3453 11.8683 9.8457 12.6309 10.5473 13.1755C11.2489 13.7201 12.1118 14.0157 13 14.0157C13.8882 14.0157 14.7511 13.7201 15.4527 13.1755C16.1543 12.6309 16.6547 11.8683 16.875 11.0078H27C27.2652 11.0078 27.5196 10.9025 27.7071 10.715C27.8946 10.5274 28 10.2731 28 10.0078C28 9.74263 27.8946 9.48827 27.7071 9.30074C27.5196 9.1132 27.2652 9.00784 27 9.00784H16.875C16.6547 8.14743 16.1543 7.38481 15.4527 6.8402C14.7511 6.2956 13.8882 6 13 6C12.1118 6 11.2489 6.2956 10.5473 6.8402C9.8457 7.38481 9.3453 8.14743 9.125 9.00784H5C4.73478 9.00784 4.48043 9.1132 4.29289 9.30074C4.10536 9.48827 4 9.74263 4 10.0078C4 10.2731 4.10536 10.5274 4.29289 10.715C4.48043 10.9025 4.73478 11.0078 5 11.0078ZM13 8.00784C13.3956 8.00784 13.7822 8.12514 14.1111 8.3449C14.44 8.56467 14.6964 8.87702 14.8478 9.24248C14.9991 9.60793 15.0387 10.0101 14.9616 10.398C14.8844 10.786 14.6939 11.1424 14.4142 11.4221C14.1345 11.7018 13.7781 11.8922 13.3902 11.9694C13.0022 12.0466 12.6001 12.007 12.2346 11.8556C11.8692 11.7042 11.5568 11.4479 11.3371 11.119C11.1173 10.7901 11 10.4034 11 10.0078C11 9.47741 11.2107 8.9687 11.5858 8.59363C11.9609 8.21856 12.4696 8.00784 13 8.00784ZM27 21.0078H24.875C24.6547 20.1474 24.1543 19.3848 23.4527 18.8402C22.7511 18.2956 21.8882 18 21 18C20.1118 18 19.2489 18.2956 18.5473 18.8402C17.8457 19.3848 17.3453 20.1474 17.125 21.0078H5C4.73478 21.0078 4.48043 21.1132 4.29289 21.3007C4.10536 21.4883 4 21.7426 4 22.0078C4 22.2731 4.10536 22.5274 4.29289 22.715C4.48043 22.9025 4.73478 23.0078 5 23.0078H17.125C17.3453 23.8683 17.8457 24.6309 18.5473 25.1755C19.2489 25.7201 20.1118 26.0157 21 26.0157C21.8882 26.0157 22.7511 25.7201 23.4527 25.1755C24.1543 24.6309 24.6547 23.8683 24.875 23.0078H27C27.2652 23.0078 27.5196 22.9025 27.7071 22.715C27.8946 22.5274 28 22.2731 28 22.0078C28 21.7426 27.8946 21.4883 27.7071 21.3007C27.5196 21.1132 27.2652 21.0078 27 21.0078ZM21 24.0078C20.6044 24.0078 20.2178 23.8905 19.8889 23.6708C19.56 23.451 19.3036 23.1387 19.1522 22.7732C19.0009 22.4078 18.9613 22.0056 19.0384 21.6177C19.1156 21.2297 19.3061 20.8733 19.5858 20.5936C19.8655 20.3139 20.2219 20.1234 20.6098 20.0463C20.9978 19.9691 21.3999 20.0087 21.7654 20.1601C22.1308 20.3115 22.4432 20.5678 22.6629 20.8967C22.8827 21.2256 23 21.6123 23 22.0078C23 22.5383 22.7893 23.047 22.4142 23.4221C22.0391 23.7971 21.5304 24.0078 21 24.0078Z"
-                  fill="white"
-                />
-              </svg>
+              <FilterIcon size="32" fill="white" />
             </div>
 
             <!-- Botão de Pesquisa Mobile -->
@@ -132,7 +109,7 @@
         <div class="categories-content">
           <div class="categories-grid">
             <!-- Se tem categorias selecionadas e não está expandido, mostra apenas as selecionadas -->
-            <template v-if="selectedCategories.length > 0 && !showAllCategories">
+            <template v-if="selectedCategories.length > 0 && !showAllCategories && categories">
               <q-btn
                 v-for="category in categories.filter((c) => selectedCategories.includes(c.label))"
                 :key="category.label"
@@ -147,18 +124,11 @@
               >
                 <template #default>
                   <span class="category-btn-content">
-                    <PhosphorIcon
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
-                      :name="category.icon.name"
+                    <CategoryIcon
+                      :icon="category.icon"
                       :size="20"
-                      weight="fill"
                       color="white"
-                      class="category-btn-icon"
-                    />
-                    <q-icon
-                      v-else-if="typeof category.icon === 'string'"
-                      :name="category.icon"
-                      class="category-btn-icon"
+                      icon-class="category-btn-icon"
                     />
                     <span class="category-btn-label">{{ category.label }}</span>
                   </span>
@@ -192,18 +162,11 @@
               >
                 <template #default>
                   <span class="category-btn-content">
-                    <PhosphorIcon
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
-                      :name="category.icon.name"
+                    <CategoryIcon
+                      :icon="category.icon"
                       :size="20"
-                      weight="fill"
                       color="white"
-                      class="category-btn-icon"
-                    />
-                    <q-icon
-                      v-else-if="typeof category.icon === 'string'"
-                      :name="category.icon"
-                      class="category-btn-icon"
+                      icon-class="category-btn-icon"
                     />
                     <span class="category-btn-label">{{ category.label }}</span>
                   </span>
@@ -211,7 +174,7 @@
               </q-btn>
               <!-- Botão para expandir categorias (só aparece se houver mais de 9 e não estiver expandido) -->
               <q-btn
-                v-if="!showAllCategories && categories.length > 9"
+                v-if="!showAllCategories && categories && categories.length > 9"
                 flat
                 round
                 dense
@@ -238,29 +201,44 @@
 
     <!-- DRAWER DE FILTROS -->
     <q-drawer
-      v-model="filterDrawer"
+      :model-value="filterDrawer"
+      @update:model-value="handleDrawerUpdate"
       side="right"
       overlay
-      :width="$q.screen.lt.sm ? '100%' : 400"
+      :width="$q.screen.lt.sm ? undefined : 400"
+      :behavior="$q.screen.lt.sm ? 'mobile' : 'default'"
       class="filter-drawer"
       :transition-duration="$q.screen.lt.sm ? 350 : 200"
       :transition-show="'slide-left'"
       :transition-hide="'slide-right'"
+      :no-swipe-backdrop="$q.screen.lt.sm"
     >
       <div
         class="filter-drawer-content"
         :class="{ 'filter-drawer-content--hidden': !filterDrawerContentVisible }"
       >
         <!-- Cabeçalho -->
-        <div class="filter-drawer-header">
+        <div
+          class="filter-drawer-header"
+          :class="{ 'filter-drawer-header--has-selection': selectedCategories.length > 0 }"
+        >
           <div class="filter-drawer-title">
             <q-icon
               name="tune"
               size="28px"
-              :color="$q.screen.lt.sm ? 'white' : 'primary'"
+              :color="
+                $q.screen.lt.sm ? (selectedCategories.length > 0 ? '#35c7ee' : 'white') : 'primary'
+              "
               aria-hidden="true"
             />
-            <span :class="{ 'text-white': $q.screen.lt.sm }">Filtros</span>
+            <span
+              :class="{
+                'text-white': $q.screen.lt.sm && selectedCategories.length === 0,
+                'filter-drawer-title--has-selection': selectedCategories.length > 0,
+              }"
+            >
+              Filtros
+            </span>
           </div>
           <q-btn
             flat
@@ -269,7 +247,8 @@
             icon="close"
             :color="$q.screen.lt.sm ? 'white' : 'dark'"
             aria-label="Fechar filtros"
-            @click="filterDrawer = false"
+            :disable="isDrawerTransitioning"
+            @click="closeFilterDrawer"
           />
         </div>
 
@@ -281,7 +260,7 @@
           <template v-if="$q.screen.lt.sm">
             <div class="category-list-mobile">
               <q-btn
-                v-for="category in categories"
+                v-for="category in categories || []"
                 :key="category.label"
                 unelevated
                 no-caps
@@ -294,18 +273,11 @@
               >
                 <template #default>
                   <span class="category-btn-mobile-content">
-                    <PhosphorIcon
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
-                      :name="category.icon.name"
+                    <CategoryIcon
+                      :icon="category.icon"
                       :size="20"
-                      weight="fill"
                       color="white"
-                      class="category-btn-mobile-icon"
-                    />
-                    <q-icon
-                      v-else-if="typeof category.icon === 'string'"
-                      :name="category.icon"
-                      class="category-btn-mobile-icon"
+                      icon-class="category-btn-mobile-icon"
                     />
                     <span class="category-btn-mobile-label">{{ category.label }}</span>
                   </span>
@@ -439,12 +411,13 @@
 </template>
 
 <script setup>
-import { ref, watch, provide, onMounted, computed } from 'vue'
+import { ref, watch, provide, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import CategoryFilter from 'src/components/CategoryFilter.vue'
-import PhosphorIcon from 'src/components/PhosphorIcon.vue'
+import CategoryIcon from 'src/components/CategoryIcon.vue'
+import FilterIcon from 'src/components/FilterIcon.vue'
 import { useQuasar } from 'quasar'
-import { useSupabaseTags } from 'src/composables/useSupabaseTags'
+import { useCategories } from 'src/composables/useCategories'
 
 const router = useRouter()
 const route = useRoute()
@@ -454,20 +427,20 @@ const filterDrawer = ref(false)
 const filterDrawerContentVisible = ref(true)
 const showSearchMobile = ref(false)
 const $q = useQuasar()
+const isDrawerTransitioning = ref(false) // Flag para prevenir múltiplos cliques durante transição
+const savedScrollPosition = ref(0) // Preserva a posição de scroll quando o drawer abre
 
-// Composable para carregar tags dinâmicas
-const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
+// Composable para carregar categorias (com cache)
+const { categories, loadCategories } = useCategories()
 
 // Estado das categorias expansíveis
 const showCategories = ref(false)
 const selectedCategories = ref([]) // Array de labels de categorias selecionadas
 const showAllCategories = ref(false) // Controla se mostra todas ou apenas as selecionadas
 
-// Categorias disponíveis (carregadas dinamicamente)
-const categories = ref([])
-
 // Computed para retornar apenas as primeiras 9 categorias ou todas
 const visibleCategories = computed(() => {
+  if (!categories.value) return []
   if (showAllCategories.value) {
     return categories.value
   }
@@ -492,13 +465,17 @@ let debounceTimer = null
 
 // Carrega categorias ao montar o componente
 onMounted(async () => {
-  try {
-    const tags = await fetchTags()
-    categories.value = mapToCategoryButtons(tags)
-    console.log('✅ Tags carregadas no header:', categories.value.length)
-  } catch (e) {
-    console.error('❌ Erro ao carregar tags no header:', e)
-    categories.value = []
+  await loadCategories()
+  console.log('✅ Categorias carregadas no header:', categories.value?.length || 0)
+})
+
+// Limpeza ao desmontar: restaura o body se o drawer estiver aberto
+onUnmounted(() => {
+  if (filterDrawer.value && $q.screen.lt.sm) {
+    document.body.style.overflow = ''
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.top = ''
   }
 })
 
@@ -536,6 +513,10 @@ function selectCategory(categoryLabel) {
 
 // Função para selecionar categoria no mobile (mantém o drawer aberto)
 function selectCategoryMobile(categoryLabel) {
+  // Previne cliques durante transição
+  if (isDrawerTransitioning.value) {
+    return
+  }
   selectCategory(categoryLabel)
   // O drawer permanece aberto para permitir múltiplas seleções
 }
@@ -549,16 +530,57 @@ function expandCategories() {
 provide('selectedCategories', selectedCategories)
 provide('selectCategory', selectCategory)
 
-// Watch para controlar visibilidade do conteúdo do drawer
+// Watch para controlar visibilidade do conteúdo do drawer e bloquear scroll do body
 watch(filterDrawer, (newValue) => {
   if (newValue) {
+    // Bloqueia scroll do body no mobile quando o drawer está aberto
+    if ($q.screen.lt.sm) {
+      // Preserva a posição de scroll atual antes de bloquear
+      savedScrollPosition.value = window.scrollY || window.pageYOffset || 0
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+      document.body.style.top = `-${savedScrollPosition.value}px`
+    }
+
+    // Reseta visibilidade e anima o conteúdo
+    filterDrawerContentVisible.value = false
+    isDrawerTransitioning.value = true
+
     // Quando abre, mostra o conteúdo com um pequeno delay para criar efeito em cascata
     setTimeout(() => {
       filterDrawerContentVisible.value = true
+      // Libera a flag após a animação de entrada
+      setTimeout(() => {
+        isDrawerTransitioning.value = false
+      }, 350)
     }, 50)
   } else {
     // Quando fecha, esconde o conteúdo rapidamente (antes do drawer)
+    isDrawerTransitioning.value = true
     filterDrawerContentVisible.value = false
+
+    // Restaura scroll do body no mobile quando o drawer fecha
+    if ($q.screen.lt.sm) {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.top = ''
+
+      // Restaura a posição de scroll após um pequeno delay para garantir que o DOM foi atualizado
+      setTimeout(() => {
+        window.scrollTo(0, savedScrollPosition.value)
+      }, 0)
+
+      // Libera a flag após a animação de saída
+      setTimeout(() => {
+        isDrawerTransitioning.value = false
+      }, 350)
+    } else {
+      setTimeout(() => {
+        isDrawerTransitioning.value = false
+      }, 200)
+    }
   }
 })
 
@@ -605,6 +627,11 @@ function clearAllFilters() {
 }
 
 function openFilterDrawer() {
+  // Previne múltiplos cliques rápidos durante transição
+  if (isDrawerTransitioning.value || filterDrawer.value) {
+    return
+  }
+
   showSearchMobile.value = false // Fecha a barra de pesquisa se estiver aberta
   // Reseta a visibilidade para criar o efeito de animação
   filterDrawerContentVisible.value = false
@@ -612,8 +639,29 @@ function openFilterDrawer() {
   // O watch vai fazer o conteúdo aparecer com delay para criar efeito em cascata
 }
 
+function closeFilterDrawer() {
+  // Previne múltiplos cliques rápidos durante transição
+  if (isDrawerTransitioning.value || !filterDrawer.value) {
+    return
+  }
+  filterDrawer.value = false
+}
+
+// Handler para atualizações do drawer (incluindo cliques no backdrop)
+function handleDrawerUpdate(newValue) {
+  // Se está tentando fechar durante transição, previne
+  if (!newValue && (isDrawerTransitioning.value || !filterDrawer.value)) {
+    // Mantém o valor atual se estiver em transição
+    return
+  }
+  // Permite a atualização normalmente (o watch vai cuidar do resto)
+  filterDrawer.value = newValue
+}
+
 function toggleSearchMobile() {
-  filterDrawer.value = false // Fecha o drawer de filtros se estiver aberto
+  if (filterDrawer.value) {
+    closeFilterDrawer()
+  }
   showSearchMobile.value = !showSearchMobile.value
 }
 
@@ -961,7 +1009,8 @@ function applyFilters() {
     background-color: rgba(255, 255, 255, 0.1);
   }
 
-  .filter-container-mobile--active .filter-icon path {
+  .filter-container-mobile--active .filter-icon path,
+  .filter-container-mobile--has-selection .filter-icon path {
     fill: #35c7ee;
   }
 
@@ -1057,14 +1106,25 @@ function applyFilters() {
 
   /* Animação customizada tipo gaveta para mobile */
   .filter-drawer :deep(.q-drawer__inner) {
+    width: 100% !important;
     transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
     will-change: transform;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
   }
 
   /* Animação do overlay */
   .filter-drawer :deep(.q-drawer__backdrop) {
     transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
     will-change: opacity;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Garante que o drawer não cause overflow horizontal */
+  .filter-drawer :deep(.q-drawer__container) {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 }
 
@@ -1072,6 +1132,8 @@ function applyFilters() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
   transition:
     opacity 0.2s ease-out,
     transform 0.2s ease-out;
@@ -1140,7 +1202,9 @@ function applyFilters() {
 .filter-drawer-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px;
+  -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
 }
 
 /* Mobile: ajuste do padding */
@@ -1156,6 +1220,17 @@ function applyFilters() {
   /* Separador mais visível no fundo escuro */
   .filter-drawer .q-separator {
     background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Quando há categorias selecionadas, ícone e texto ficam azuis */
+  .filter-drawer-header--has-selection .filter-drawer-title--has-selection {
+    color: #35c7ee !important;
+  }
+
+  /* Garante que apenas o ícone do título (tune) fique azul quando há categorias selecionadas */
+  /* O botão de fechar (X) permanece branco */
+  .filter-drawer-header--has-selection .filter-drawer-title .q-icon {
+    color: #35c7ee !important;
   }
 }
 

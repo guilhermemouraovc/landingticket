@@ -1,5 +1,6 @@
 // app global css in SCSS form
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+@import './mixins.scss';
 
 /* ==================== PREVENÇÃO DE SCROLL HORIZONTAL E FUNDO UNIFORME ==================== */
 html,

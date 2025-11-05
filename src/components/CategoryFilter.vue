@@ -28,18 +28,11 @@
       >
         <template #default>
           <span class="category-chip-content">
-            <PhosphorIcon 
-              v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
-              :name="category.icon.name" 
-              :size="16" 
-              weight="fill"
-              color="currentColor" 
-              class="category-chip-icon"
-            />
-            <q-icon 
-              v-else-if="typeof category.icon === 'string'" 
-              :name="category.icon" 
-              class="category-chip-icon"
+            <CategoryIcon
+              :icon="category.icon"
+              :size="16"
+              color="currentColor"
+              icon-class="category-chip-icon"
             />
             <span class="category-chip-label">{{ category.name }}</span>
           </span>
@@ -66,16 +59,18 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import PhosphorIcon from 'components/PhosphorIcon.vue'
+import CategoryIcon from 'components/CategoryIcon.vue'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
 
 // Composable para carregar tags dinâmicas
-const { fetchTags, mapToCategoryChips } = useSupabaseTags()
+const { mapToCategoryChips } = useSupabaseTags()
 const rawCategories = ref([])
 
 // Carrega categorias ao montar o componente
 onMounted(async () => {
   try {
+    // Como CategoryFilter usa chips, precisamos buscar do Supabase diretamente
+    const { fetchTags } = useSupabaseTags()
     const tags = await fetchTags()
     rawCategories.value = mapToCategoryChips(tags)
     console.log('✅ Tags carregadas no filtro:', rawCategories.value.length)

@@ -119,18 +119,11 @@
           >
             <template #default>
               <span class="cat-btn-content">
-                <PhosphorIcon
-                  v-if="typeof c.icon === 'object' && c.icon.type === 'phosphor'"
-                  :name="c.icon.name"
+                <CategoryIcon
+                  :icon="c.icon"
                   :size="20"
-                  weight="fill"
                   color="white"
-                  class="cat-btn-icon"
-                />
-                <q-icon
-                  v-else-if="typeof c.icon === 'string'"
-                  :name="c.icon"
-                  class="cat-btn-icon"
+                  icon-class="cat-btn-icon"
                 />
                 <span class="cat-btn-label">{{ c.label }}</span>
               </span>
@@ -138,7 +131,7 @@
           </q-btn>
           <!-- Botão para expandir categorias -->
           <q-btn
-            v-if="!showAllCategories && categories.length > 9"
+            v-if="!showAllCategories && categories && categories.length > 9"
             flat
             round
             dense
@@ -166,7 +159,21 @@
 
       <!-- Eventos filtrados por categoria -->
       <template v-else-if="selectedCategories.length > 0">
+        <!-- Mostra mensagem quando não há eventos -->
+        <template v-if="filteredEvents.length === 0">
+          <div class="empty-category-message">
+            <div class="sad-face">:(</div>
+            <div class="empty-category-title">
+              Ops! Nada de <span class="category-name">{{ selectedCategories[0] }}</span> por enquanto.
+            </div>
+            <div class="empty-category-subtitle">
+              Que tal explorar <a href="#" class="explore-link" @click.prevent="clearCategories">outra categoria</a>?
+            </div>
+          </div>
+        </template>
+        <!-- Mostra carrossel quando há eventos -->
         <EventSectionCarousel
+          v-else
           :section-id="getCombinedSectionId()"
           :title="getFilterTitle()"
           :items="filteredEvents"
@@ -231,9 +238,9 @@ import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
 import BannerCard from 'components/BannerCard.vue'
-import PhosphorIcon from 'components/PhosphorIcon.vue'
+import CategoryIcon from 'components/CategoryIcon.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
-import { useSupabaseTags } from 'src/composables/useSupabaseTags'
+import { useCategories } from 'src/composables/useCategories'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 const $q = useQuasar()
@@ -250,8 +257,8 @@ const {
   fetchUpcomingEvents: fetchUpcomingEventsSupabase,
 } = useSupabaseEvents()
 
-// Composable para gerenciar tags (categorias dinâmicas)
-const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
+// Composable para gerenciar categorias (com cache)
+const { categories, loadCategories } = useCategories()
 
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
@@ -273,8 +280,7 @@ const loadingCarousels = ref(true)
 const selectedCategories = ref([]) // Array de labels de categorias
 const filteredEvents = ref([])
 
-// categorias dinâmicas do Supabase
-const categories = ref([])
+// Categorias serão carregadas via composable useCategories
 
 // Estado para controlar se mostra todas as categorias ou apenas 9
 const showAllCategories = ref(false)
@@ -284,6 +290,7 @@ const isInternalCategoryChange = ref(false)
 
 // Computed para retornar apenas as primeiras 9 categorias ou todas
 const visibleCategories = computed(() => {
+  if (!categories.value) return []
   if (showAllCategories.value) {
     return categories.value
   }
@@ -297,6 +304,7 @@ function toggleShowAllCategories() {
 
 // Helper para obter tagName a partir do label
 function getTagNameByLabel(label) {
+  if (!categories.value) return null
   const c = categories.value.find((x) => x.label === label)
   return c?.tagName || null
 }
@@ -411,14 +419,8 @@ function isFixedCategory(categoryLabel) {
 
 // boot das seções
 onMounted(async () => {
-  // Carrega tags dinâmicas do Supabase
-  try {
-    const tags = await fetchTags()
-    categories.value = mapToCategoryButtons(tags)
-  } catch (e) {
-    console.error('❌ Erro ao carregar tags:', e)
-    categories.value = []
-  }
+  // Carrega categorias usando cache
+  await loadCategories()
 
   // Adiciona listener para eventos do header
   window.addEventListener('categorySelected', handleCategorySelected)
@@ -597,6 +599,33 @@ function getCombinedSectionId() {
     // Gera um ID baseado nas categorias selecionadas
     return selectedCategories.value.map((cat) => getSectionIdByLabel(cat)).join('-')
   }
+}
+
+// Função para limpar categorias selecionadas
+function clearCategories() {
+  selectedCategories.value = []
+  filteredEvents.value = []
+  
+  // Marca como mudança interna para evitar loop
+  isInternalCategoryChange.value = true
+  
+  // Emite evento para sincronizar com o header
+  setTimeout(() => {
+    window.dispatchEvent(
+      new CustomEvent('categorySelected', {
+        detail: {
+          category: null,
+          categories: [],
+        },
+      }),
+    )
+    
+    // Faz scroll suave até o topo do header
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }, 50)
 }
 
 async function filterEventsByCategories(categoryLabels) {
@@ -1203,5 +1232,81 @@ async function filterEventsByCategories(categoryLabels) {
 .cat-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
+}
+
+/* ==================== MENSAGEM DE CATEGORIA VAZIA ==================== */
+.empty-category-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  min-height: 300px;
+}
+
+.sad-face {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 6rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin-bottom: 24px;
+  line-height: 1;
+  user-select: none;
+}
+
+.empty-category-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.empty-category-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.category-name {
+  color: #35c7ee;
+  text-transform: capitalize;
+}
+
+.explore-link {
+  color: #35c7ee;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.explore-link:hover {
+  color: #008ec1;
+  text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .empty-category-message {
+    padding: 60px 16px;
+    min-height: 250px;
+  }
+
+  .sad-face {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+
+  .empty-category-title {
+    font-size: 1.25rem;
+  }
+
+  .empty-category-subtitle {
+    font-size: 0.9rem;
+  }
 }
 </style>
