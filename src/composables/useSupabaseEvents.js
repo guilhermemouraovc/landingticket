@@ -163,11 +163,80 @@ export function useSupabaseEvents() {
     }
   }
 
+  /**
+   * Busca eventos que têm TODAS as tags especificadas (AND lógico)
+   * @param {string[]} tagNames - Array de nomes de tags
+   * @param {Object} options - Opções de busca
+   * @param {number} options.limit - Limite de resultados
+   * @returns {Promise<Array>} Array de eventos que têm todas as tags
+   */
+  async function fetchEventsByMultipleTags(tagNames, { limit = 200 } = {}) {
+    loading.value = true
+    error.value = null
+    try {
+      // Se não há tags, retorna array vazio
+      if (!tagNames || tagNames.length === 0) {
+        return []
+      }
+
+      // Se há apenas uma tag, usa a função existente
+      if (tagNames.length === 1) {
+        return fetchEventsByTag(tagNames[0], { limit })
+      }
+
+      // Para múltiplas tags, busca IDs de eventos para cada tag
+      const eventIdsByTag = []
+      
+      for (const tagName of tagNames) {
+        const { data: tagRows, error: e1 } = await supabase
+          .from('view_events_by_tag')
+          .select('event_id')
+          .eq('tag_name', tagName)
+          .limit(1000)
+
+        if (e1) throw e1
+        const ids = (tagRows || []).map((r) => r.event_id)
+        eventIdsByTag.push(new Set(ids)) // Usa Set para busca mais rápida
+      }
+
+      // Encontra a interseção (eventos que têm TODAS as tags)
+      let intersection = eventIdsByTag[0]
+      
+      for (let i = 1; i < eventIdsByTag.length; i++) {
+        intersection = new Set([...intersection].filter(id => eventIdsByTag[i].has(id)))
+      }
+
+      const commonIds = Array.from(intersection)
+
+      if (!commonIds.length) return []
+
+      // Busca os eventos com os IDs comuns
+      const { data, error: e2 } = await supabase
+        .from('view_event_cards')
+        .select('*')
+        .in('id', commonIds)
+        .order('start_date', { ascending: true })
+        .limit(limit)
+
+      if (e2) throw e2
+      return (data || []).map(toEventCardFromSb)
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error('❌ Erro ao filtrar eventos por múltiplas tags:', err)
+      }
+      error.value = 'Falha ao filtrar eventos'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
     fetchEvents,
     fetchEventsByTag,
+    fetchEventsByMultipleTags,
     fetchEventById,
     fetchFeaturedEvents,
     fetchAllEvents,

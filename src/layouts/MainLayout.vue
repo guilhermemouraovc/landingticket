@@ -131,10 +131,10 @@
       <div class="categories-drawer" :class="{ 'categories-drawer--open': showCategories }">
         <div class="categories-content">
           <div class="categories-grid">
-            <!-- Se tem categoria selecionada e não está expandido, mostra apenas a selecionada -->
-            <template v-if="selectedCategory && !showAllCategories">
+            <!-- Se tem categorias selecionadas e não está expandido, mostra apenas as selecionadas -->
+            <template v-if="selectedCategories.length > 0 && !showAllCategories">
               <q-btn
-                v-for="category in categories.filter((c) => c.label === selectedCategory)"
+                v-for="category in categories.filter((c) => selectedCategories.includes(c.label))"
                 :key="category.label"
                 outline
                 square-rounded
@@ -184,7 +184,7 @@
                 square-rounded
                 no-caps
                 class="category-btn"
-                :class="{ 'category-btn--active': selectedCategory === category.label }"
+                :class="{ 'category-btn--active': selectedCategories.includes(category.label) }"
                 color="white"
                 text-color="white"
                 :aria-label="`Filtrar eventos de ${category.label}`"
@@ -286,7 +286,7 @@
                 unelevated
                 no-caps
                 class="category-btn-mobile"
-                :class="{ 'category-btn-mobile--active': selectedCategory === category.label }"
+                :class="{ 'category-btn-mobile--active': selectedCategories.includes(category.label) }"
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategoryMobile(category.label)"
               >
@@ -458,8 +458,8 @@ const { fetchTags, mapToCategoryButtons } = useSupabaseTags()
 
 // Estado das categorias expansíveis
 const showCategories = ref(false)
-const selectedCategory = ref(null)
-const showAllCategories = ref(false) // Controla se mostra todas ou apenas a selecionada
+const selectedCategories = ref([]) // Array de labels de categorias selecionadas
+const showAllCategories = ref(false) // Controla se mostra todas ou apenas as selecionadas
 
 // Categorias disponíveis (carregadas dinamicamente)
 const categories = ref([])
@@ -509,22 +509,25 @@ function toggleCategories() {
   }
 }
 
-// Função para selecionar uma categoria
+// Função para selecionar/deselecionar uma categoria (suporta múltiplas seleções)
 function selectCategory(categoryLabel) {
-  if (selectedCategory.value === categoryLabel) {
-    // Se já está selecionada, deseleciona
-    selectedCategory.value = null
-    showAllCategories.value = false
+  const currentIndex = selectedCategories.value.indexOf(categoryLabel)
+  
+  if (currentIndex > -1) {
+    // Se já está selecionada, remove
+    selectedCategories.value.splice(currentIndex, 1)
   } else {
-    // Seleciona nova categoria
-    selectedCategory.value = categoryLabel
-    showAllCategories.value = false
+    // Adiciona à lista de categorias selecionadas
+    selectedCategories.value.push(categoryLabel)
   }
 
   // Emite evento para a página atual
   window.dispatchEvent(
     new CustomEvent('categorySelected', {
-      detail: { category: selectedCategory.value },
+      detail: { 
+        category: selectedCategories.value.length === 1 ? selectedCategories.value[0] : null,
+        categories: selectedCategories.value 
+      },
     }),
   )
 }
@@ -542,7 +545,7 @@ function expandCategories() {
 }
 
 // Provide para comunicação com páginas filhas
-provide('selectedCategory', selectedCategory)
+provide('selectedCategories', selectedCategories)
 provide('selectCategory', selectCategory)
 
 // Watch para controlar visibilidade do conteúdo do drawer

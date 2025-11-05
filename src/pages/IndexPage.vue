@@ -111,7 +111,7 @@
             square-rounded
             no-caps
             class="cat-btn"
-            :class="{ 'cat-btn--active': selectedCategory === c.label }"
+            :class="{ 'cat-btn--active': selectedCategories.includes(c.label) }"
             color="white"
             text-color="white"
             :aria-label="`Filtrar eventos de ${c.label}`"
@@ -165,10 +165,10 @@
       </template>
 
       <!-- Eventos filtrados por categoria -->
-      <template v-else-if="selectedCategory">
+      <template v-else-if="selectedCategories.length > 0">
         <EventSectionCarousel
-          :section-id="getSectionIdByLabel(selectedCategory)"
-          :title="`Eventos de ${selectedCategory}`"
+          :section-id="getCombinedSectionId()"
+          :title="getFilterTitle()"
           :items="filteredEvents"
           :default-image="DEFAULT_IMAGE"
         />
@@ -245,6 +245,7 @@ const {
   fetchFeaturedEvents,
   fetchEvents: fetchEventsSupabase,
   fetchEventsByTag: fetchEventsByTagSupabase,
+  fetchEventsByMultipleTags: fetchEventsByMultipleTagsSupabase,
   fetchAllEvents: fetchAllEventsSupabase,
   fetchUpcomingEvents: fetchUpcomingEventsSupabase,
 } = useSupabaseEvents()
@@ -268,8 +269,8 @@ const autoplayInterval = ref(3000) // em milissegundos
 const loadingFeatured = ref(true)
 const loadingCarousels = ref(true)
 
-// Filtro por categoria (agora vem do header)
-const selectedCategory = ref(null)
+// Filtro por categoria (agora suporta múltiplas seleções)
+const selectedCategories = ref([]) // Array de labels de categorias
 const filteredEvents = ref([])
 
 // categorias dinâmicas do Supabase
@@ -378,23 +379,34 @@ function handleCategorySelected(event) {
   }
 
   const category = event.detail.category
-  selectedCategory.value = category
+  const categories = event.detail.categories || (category ? [category] : [])
 
-  if (category) {
-    const sectionId = getSectionIdByLabel(category)
+  selectedCategories.value = categories
 
-    // Se é uma categoria fixa, usa os eventos pré-carregados
-    if (fixedSectionIds.includes(sectionId)) {
-      filteredEvents.value = getEventsForFixedCategory(sectionId)
-      scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
+  if (categories.length > 0) {
+    // Se há múltiplas categorias, sempre filtra via API
+    if (categories.length > 1 || !isFixedCategory(categories[0])) {
+      filterEventsByCategories(categories)
     } else {
-      // Para categorias dinâmicas, filtra eventos
-      filterEventsByCategory(category)
+      // Se há apenas uma categoria e é fixa, usa eventos pré-carregados
+      const sectionId = getSectionIdByLabel(categories[0])
+      if (fixedSectionIds.includes(sectionId)) {
+        filteredEvents.value = getEventsForFixedCategory(sectionId)
+        scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
+      } else {
+        filterEventsByCategories(categories)
+      }
     }
   } else {
-    // Se categoria foi desmarcada, volta aos carrosséis normais
+    // Se categorias foram desmarcadas, volta aos carrosséis normais
     filteredEvents.value = []
   }
+}
+
+// Verifica se uma categoria é fixa (já tem carrossel)
+function isFixedCategory(categoryLabel) {
+  const sectionId = getSectionIdByLabel(categoryLabel)
+  return fixedSectionIds.includes(sectionId)
 }
 
 // boot das seções
@@ -528,64 +540,90 @@ async function loadAllEvents() {
 // IDs das seções fixas que já existem como carrosséis
 const fixedSectionIds = ['reveillon', 'carnaval', 'festivais', 'programacao-completa']
 
-// Filtro por categoria
+// Filtro por categoria (agora suporta múltiplas seleções)
 function toggleCategory(categoryLabel) {
   // Marca como mudança interna para evitar loop de eventos
   isInternalCategoryChange.value = true
 
-  if (selectedCategory.value === categoryLabel) {
-    // Se já está selecionada, deseleciona
-    selectedCategory.value = null
+  const currentIndex = selectedCategories.value.indexOf(categoryLabel)
+
+  if (currentIndex > -1) {
+    // Se já está selecionada, remove
+    selectedCategories.value.splice(currentIndex, 1)
+  } else {
+    // Adiciona à lista de categorias selecionadas
+    selectedCategories.value.push(categoryLabel)
+  }
+
+  // Se não há categorias selecionadas, limpa os eventos filtrados
+  if (selectedCategories.value.length === 0) {
     filteredEvents.value = []
   } else {
-    const sectionId = getSectionIdByLabel(categoryLabel)
-
-    // Seleciona a categoria (para todas, não apenas dinâmicas)
-    selectedCategory.value = categoryLabel
-
-    // Se é uma categoria fixa (já tem carrossel), usa os eventos pré-carregados
-    if (fixedSectionIds.includes(sectionId)) {
-      filteredEvents.value = getEventsForFixedCategory(sectionId)
-      scrollToSection(sectionId).catch((err) => console.error('Erro ao fazer scroll:', err))
-    } else {
-      // Para outras categorias, filtra eventos
-
-      // Faz scroll até o carrossel correspondente após filtrar
-      filterEventsByCategory(categoryLabel).then(async () => {
-        // Aguarda o DOM atualizar com os eventos filtrados antes de fazer scroll
-        await scrollToSection(sectionId)
-      })
-    }
+    // Filtra eventos pelas categorias selecionadas
+    filterEventsByCategories(selectedCategories.value)
   }
 
   // Emite evento para sincronizar com o header (após um pequeno delay para garantir que o DOM foi atualizado)
   setTimeout(() => {
     window.dispatchEvent(
       new CustomEvent('categorySelected', {
-        detail: { category: selectedCategory.value },
+        detail: {
+          category: selectedCategories.value.length === 1 ? selectedCategories.value[0] : null,
+          categories: selectedCategories.value,
+        },
       }),
     )
   }, 50)
 }
 
-async function filterEventsByCategory(categoryLabel) {
+// Função auxiliar para obter título do filtro
+function getFilterTitle() {
+  if (selectedCategories.value.length === 0) {
+    return 'Eventos'
+  } else if (selectedCategories.value.length === 1) {
+    return `Eventos de ${selectedCategories.value[0]}`
+  } else {
+    return `Eventos: ${selectedCategories.value.join(' + ')}`
+  }
+}
+
+// Função auxiliar para obter ID de seção combinado
+function getCombinedSectionId() {
+  if (selectedCategories.value.length === 0) {
+    return 'eventos-filtrados'
+  } else if (selectedCategories.value.length === 1) {
+    return getSectionIdByLabel(selectedCategories.value[0])
+  } else {
+    // Gera um ID baseado nas categorias selecionadas
+    return selectedCategories.value.map((cat) => getSectionIdByLabel(cat)).join('-')
+  }
+}
+
+async function filterEventsByCategories(categoryLabels) {
   loadingCarousels.value = true
   try {
-    console.log('🔍 Filtrando eventos por categoria:', categoryLabel)
+    console.log('🔍 Filtrando eventos por categorias:', categoryLabels)
 
-    // Usa mapeamento dinâmico das tags
-    const tagName = getTagNameByLabel(categoryLabel)
-    if (!tagName) {
-      console.warn('⚠️ Categoria não mapeada:', categoryLabel)
+    // Converte labels para tagNames
+    const tagNames = categoryLabels
+      .map((label) => getTagNameByLabel(label))
+      .filter((tagName) => tagName !== null)
+
+    if (tagNames.length === 0) {
+      console.warn('⚠️ Nenhuma categoria mapeada encontrada')
       filteredEvents.value = []
       return Promise.resolve()
     }
 
-    // Usar Supabase com tagName dinâmico
-    filteredEvents.value = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+    // Usa função para buscar eventos com múltiplas tags (AND lógico)
+    filteredEvents.value = await fetchEventsByMultipleTagsSupabase(tagNames, { limit: 100 })
     console.log('✅ Eventos filtrados:', filteredEvents.value.length)
+
+    // Faz scroll até a seção de eventos filtrados
+    const sectionId = getCombinedSectionId()
+    await scrollToSection(sectionId)
   } catch (err) {
-    console.error('❌ Falha ao filtrar eventos por categoria:', err)
+    console.error('❌ Falha ao filtrar eventos por categorias:', err)
     filteredEvents.value = []
   } finally {
     loadingCarousels.value = false
