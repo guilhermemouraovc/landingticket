@@ -38,8 +38,10 @@ body {
 @media (max-width: 599px) {
   html,
   body {
-    background-color: #2a3447 !important;
+    background-color: #1a202c !important;
     min-height: 100%;
+    overflow-x: hidden;
+    height: 100%;
   }
   
   .q-page {
@@ -53,14 +55,23 @@ body {
     margin-bottom: 0 !important;
     background-color: #2a3447 !important;
     min-height: auto !important;
+    flex: 1;
   }
   
   .q-layout {
     background-color: #2a3447 !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
   
   .main-container {
     background-color: transparent;
+  }
+  
+  /* Garante que o footer fique no final sem espaço extra */
+  .footer {
+    margin-top: auto;
   }
 }
 

@@ -147,17 +147,17 @@
               >
                 <template #default>
                   <span class="category-btn-content">
-                    <PhosphorIcon 
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
-                      :name="category.icon.name" 
-                      :size="20" 
+                    <PhosphorIcon
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
+                      :name="category.icon.name"
+                      :size="20"
                       weight="fill"
-                      color="white" 
+                      color="white"
                       class="category-btn-icon"
                     />
-                    <q-icon 
-                      v-else-if="typeof category.icon === 'string'" 
-                      :name="category.icon" 
+                    <q-icon
+                      v-else-if="typeof category.icon === 'string'"
+                      :name="category.icon"
                       class="category-btn-icon"
                     />
                     <span class="category-btn-label">{{ category.label }}</span>
@@ -192,17 +192,17 @@
               >
                 <template #default>
                   <span class="category-btn-content">
-                    <PhosphorIcon 
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
-                      :name="category.icon.name" 
-                      :size="20" 
+                    <PhosphorIcon
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
+                      :name="category.icon.name"
+                      :size="20"
                       weight="fill"
-                      color="white" 
+                      color="white"
                       class="category-btn-icon"
                     />
-                    <q-icon 
-                      v-else-if="typeof category.icon === 'string'" 
-                      :name="category.icon" 
+                    <q-icon
+                      v-else-if="typeof category.icon === 'string'"
+                      :name="category.icon"
                       class="category-btn-icon"
                     />
                     <span class="category-btn-label">{{ category.label }}</span>
@@ -286,23 +286,25 @@
                 unelevated
                 no-caps
                 class="category-btn-mobile"
-                :class="{ 'category-btn-mobile--active': selectedCategories.includes(category.label) }"
+                :class="{
+                  'category-btn-mobile--active': selectedCategories.includes(category.label),
+                }"
                 :aria-label="`Filtrar eventos de ${category.label}`"
                 @click="selectCategoryMobile(category.label)"
               >
                 <template #default>
                   <span class="category-btn-mobile-content">
-                    <PhosphorIcon 
-                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'" 
-                      :name="category.icon.name" 
-                      :size="20" 
+                    <PhosphorIcon
+                      v-if="typeof category.icon === 'object' && category.icon.type === 'phosphor'"
+                      :name="category.icon.name"
+                      :size="20"
                       weight="fill"
-                      color="white" 
+                      color="white"
                       class="category-btn-mobile-icon"
                     />
-                    <q-icon 
-                      v-else-if="typeof category.icon === 'string'" 
-                      :name="category.icon" 
+                    <q-icon
+                      v-else-if="typeof category.icon === 'string'"
+                      :name="category.icon"
                       class="category-btn-mobile-icon"
                     />
                     <span class="category-btn-mobile-label">{{ category.label }}</span>
@@ -512,7 +514,7 @@ function toggleCategories() {
 // Função para selecionar/deselecionar uma categoria (suporta múltiplas seleções)
 function selectCategory(categoryLabel) {
   const currentIndex = selectedCategories.value.indexOf(categoryLabel)
-  
+
   if (currentIndex > -1) {
     // Se já está selecionada, remove
     selectedCategories.value.splice(currentIndex, 1)
@@ -524,19 +526,18 @@ function selectCategory(categoryLabel) {
   // Emite evento para a página atual
   window.dispatchEvent(
     new CustomEvent('categorySelected', {
-      detail: { 
+      detail: {
         category: selectedCategories.value.length === 1 ? selectedCategories.value[0] : null,
-        categories: selectedCategories.value 
+        categories: selectedCategories.value,
       },
     }),
   )
 }
 
-// Função para selecionar categoria no mobile (fecha o drawer após seleção)
+// Função para selecionar categoria no mobile (mantém o drawer aberto)
 function selectCategoryMobile(categoryLabel) {
   selectCategory(categoryLabel)
-  // Fecha o drawer após selecionar
-  filterDrawer.value = false
+  // O drawer permanece aberto para permitir múltiplas seleções
 }
 
 // Função para expandir e mostrar todas as categorias
@@ -1494,7 +1495,9 @@ a.footer-link:hover {
 
   .footer {
     margin-bottom: 0;
-    padding-bottom: env(safe-area-inset-bottom, 32px);
+    padding-bottom: env(safe-area-inset-bottom, 48px);
+    min-height: auto;
+    position: relative;
   }
 }
 

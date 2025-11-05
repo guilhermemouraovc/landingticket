@@ -40,6 +40,28 @@ defineProps({
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  position: relative;
+}
+
+/* Desktop: Botão de voltar alinhado à esquerda */
+@media (min-width: 600px) {
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .page-header :deep(.back-button-container) {
+    align-self: flex-start;
+    margin-left: 0;
+  }
+
+  .page-title {
+    align-self: center;
+    width: 100%;
+  }
+
+  .title-divider {
+    align-self: center;
+  }
 }
 
 .page-title {
@@ -89,4 +111,3 @@ defineProps({
   }
 }
 </style>
-
