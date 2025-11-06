@@ -259,6 +259,19 @@
           <!-- Mobile: Categorias empilhadas -->
           <template v-if="$q.screen.lt.sm">
             <div class="category-list-mobile">
+              <!-- Texto "Limpar" acima da primeira categoria -->
+              <div
+                v-if="selectedCategories.length > 0"
+                class="clear-categories-wrapper"
+              >
+                <span
+                  class="clear-categories-text"
+                  @click="clearAllCategories"
+                  aria-label="Limpar todas as categorias"
+                >
+                  Limpar
+                </span>
+              </div>
               <q-btn
                 v-for="category in categories || []"
                 :key="category.label"
@@ -358,7 +371,13 @@
           </router-link>
 
           <div class="social-icons row q-gutter-md">
-            <a href="#" class="social-link" aria-label="WhatsApp">
+            <a
+              href="https://chat.whatsapp.com/HLtVXbX4PbO1RVW317mLlB?mode=wwt"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+              aria-label="WhatsApp"
+            >
               <img src="/whatsapp.svg" alt="WhatsApp" class="social-icon" />
             </a>
             <a
@@ -521,6 +540,23 @@ function selectCategoryMobile(categoryLabel) {
   }
   selectCategory(categoryLabel)
   // O drawer permanece aberto para permitir múltiplas seleções
+}
+
+// Função para limpar todas as categorias selecionadas (mobile)
+function clearAllCategories() {
+  if (isDrawerTransitioning.value) {
+    return
+  }
+  selectedCategories.value = []
+  // Emite evento para a página atual
+  window.dispatchEvent(
+    new CustomEvent('categorySelected', {
+      detail: {
+        category: null,
+        categories: [],
+      },
+    }),
+  )
 }
 
 // Função para expandir e mostrar todas as categorias
@@ -1300,28 +1336,29 @@ function applyFilters() {
   animation: slideInButton 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.category-btn-mobile:nth-child(1) {
+/* Delays de animação para os botões de categoria */
+.category-list-mobile .category-btn-mobile:nth-of-type(1) {
   animation-delay: 0.1s;
 }
-.category-btn-mobile:nth-child(2) {
+.category-list-mobile .category-btn-mobile:nth-of-type(2) {
   animation-delay: 0.15s;
 }
-.category-btn-mobile:nth-child(3) {
+.category-list-mobile .category-btn-mobile:nth-of-type(3) {
   animation-delay: 0.2s;
 }
-.category-btn-mobile:nth-child(4) {
+.category-list-mobile .category-btn-mobile:nth-of-type(4) {
   animation-delay: 0.25s;
 }
-.category-btn-mobile:nth-child(5) {
+.category-list-mobile .category-btn-mobile:nth-of-type(5) {
   animation-delay: 0.3s;
 }
-.category-btn-mobile:nth-child(6) {
+.category-list-mobile .category-btn-mobile:nth-of-type(6) {
   animation-delay: 0.35s;
 }
-.category-btn-mobile:nth-child(7) {
+.category-list-mobile .category-btn-mobile:nth-of-type(7) {
   animation-delay: 0.4s;
 }
-.category-btn-mobile:nth-child(8) {
+.category-list-mobile .category-btn-mobile:nth-of-type(8) {
   animation-delay: 0.45s;
 }
 
@@ -1353,6 +1390,32 @@ function applyFilters() {
 
 .category-btn-mobile--active .q-btn__content {
   color: white !important;
+}
+
+/* Container do texto "Limpar" acima da primeira categoria (mobile) */
+.clear-categories-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  padding: 0 4px;
+  opacity: 0;
+  animation: slideInButton 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.05s forwards;
+}
+
+/* Texto "Limpar" (mobile) */
+.clear-categories-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+.clear-categories-text:hover {
+  color: #35c7ee;
 }
 
 /* ==================== PREVENÇÃO DE SCROLL HORIZONTAL ==================== */
