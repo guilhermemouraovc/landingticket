@@ -119,12 +119,7 @@
           >
             <template #default>
               <span class="cat-btn-content">
-                <CategoryIcon
-                  :icon="c.icon"
-                  :size="20"
-                  color="white"
-                  icon-class="cat-btn-icon"
-                />
+                <CategoryIcon :icon="c.icon" :size="20" color="white" icon-class="cat-btn-icon" />
                 <span class="cat-btn-label">{{ c.label }}</span>
               </span>
             </template>
@@ -164,10 +159,12 @@
           <div class="empty-category-message">
             <div class="sad-face">:(</div>
             <div class="empty-category-title">
-              Ops! Nada de <span class="category-name">{{ selectedCategories[0] }}</span> por enquanto.
+              Ops! Nada de <span class="category-name">{{ selectedCategories[0] }}</span> por
+              enquanto.
             </div>
             <div class="empty-category-subtitle">
-              Que tal explorar <a href="#" class="explore-link" @click.prevent="clearCategories">outra categoria</a>?
+              Que tal explorar
+              <a href="#" class="explore-link" @click.prevent="clearCategories">outra categoria</a>?
             </div>
           </div>
         </template>
@@ -486,15 +483,15 @@ async function loadReveillon() {
 
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Reveillons' // Nome padrão atualizado
-    
+
     if (categories.value) {
       const reveillonCategory = categories.value.find(
-        (c) => 
-          c.label === 'Réveillon' || 
-          c.label === 'Reveillons' || 
+        (c) =>
+          c.label === 'Réveillon' ||
+          c.label === 'Reveillons' ||
           c.label === 'REVEILLONS' ||
           c.slug === 'reveillon' ||
-          c.slug === 'reveillons'
+          c.slug === 'reveillons',
       )
       if (reveillonCategory?.tagName) {
         tagName = reveillonCategory.tagName
@@ -503,15 +500,15 @@ async function loadReveillon() {
 
     // Tenta diferentes variações para compatibilidade
     let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('Reveillons', { limit: 100 })
     }
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('REVEILLONS', { limit: 100 })
     }
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('reveillon', { limit: 100 })
     }
@@ -530,15 +527,15 @@ async function loadCarnaval() {
 
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Carnaval' // Nome padrão atualizado
-    
+
     if (categories.value) {
       const carnavalCategory = categories.value.find(
-        (c) => 
-          c.label === 'Carnaval' || 
-          c.label === 'CARNAVAL' || 
+        (c) =>
+          c.label === 'Carnaval' ||
+          c.label === 'CARNAVAL' ||
           c.label === 'Carnavais' ||
           c.slug === 'carnaval' ||
-          c.slug === 'carnavais'
+          c.slug === 'carnavais',
       )
       if (carnavalCategory?.tagName) {
         tagName = carnavalCategory.tagName
@@ -547,15 +544,15 @@ async function loadCarnaval() {
 
     // Tenta diferentes variações para compatibilidade
     let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('Carnaval', { limit: 100 })
     }
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('CARNAVAL', { limit: 100 })
     }
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('carnavais', { limit: 100 })
     }
@@ -574,13 +571,10 @@ async function loadFestivais() {
 
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Festivais' // Nome padrão atualizado
-    
+
     if (categories.value) {
       const festivaisCategory = categories.value.find(
-        (c) => 
-          c.label === 'Festivais' || 
-          c.label === 'FESTIVAIS' ||
-          c.slug === 'festivais'
+        (c) => c.label === 'Festivais' || c.label === 'FESTIVAIS' || c.slug === 'festivais',
       )
       if (festivaisCategory?.tagName) {
         tagName = festivaisCategory.tagName
@@ -589,11 +583,11 @@ async function loadFestivais() {
 
     // Tenta diferentes variações para compatibilidade
     let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('Festivais', { limit: 100 })
     }
-    
+
     if (!events.length) {
       events = await fetchEventsByTagSupabase('FESTIVAIS', { limit: 100 })
     }
@@ -682,10 +676,10 @@ function getCombinedSectionId() {
 function clearCategories() {
   selectedCategories.value = []
   filteredEvents.value = []
-  
+
   // Marca como mudança interna para evitar loop
   isInternalCategoryChange.value = true
-  
+
   // Emite evento para sincronizar com o header
   setTimeout(() => {
     window.dispatchEvent(
@@ -696,7 +690,7 @@ function clearCategories() {
         },
       }),
     )
-    
+
     // Faz scroll suave até o topo do header
     window.scrollTo({
       top: 0,

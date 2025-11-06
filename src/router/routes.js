@@ -34,6 +34,11 @@
         name: 'termos-de-uso',
         component: () => import('pages/TermosDeUsoPage.vue'),
       },
+      {
+        path: 'politica-de-privacidade',
+        name: 'politica-de-privacidade',
+        component: () => import('pages/PoliticaPrivacidadePage.vue'),
+      },
     ],
   },
 

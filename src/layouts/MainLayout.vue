@@ -398,7 +398,9 @@
           <div class="footer-column">
             <div class="footer-title">Suporte</div>
             <router-link to="/termos-de-uso" class="footer-link">Termos de Uso</router-link>
-            <div class="footer-link">Política de Privacidade</div>
+            <router-link to="/politica-de-privacidade" class="footer-link"
+              >Política de Privacidade</router-link
+            >
           </div>
         </div>
 
