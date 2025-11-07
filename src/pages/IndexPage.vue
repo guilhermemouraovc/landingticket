@@ -900,7 +900,8 @@ async function filterEventsByCategories(categoryLabels) {
 
   /* Reduz espaçamento entre título e elementos abaixo */
   .panel-inner .event-title {
-    margin-bottom: -3px !important;
+    margin-top: 6px !important;
+    margin-bottom: -27px !important;
   }
 
   .panel-inner .q-mt-md {
