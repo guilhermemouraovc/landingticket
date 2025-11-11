@@ -132,12 +132,12 @@
 
             <div class="event-section q-mt-xl">
               <div class="section-title">Descrição do Evento</div>
-              <p class="section-text">{{ event.description }}</p>
+              <p class="section-text" v-html="event.description"></p>
             </div>
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
-              <div class="section-title">Informações Adicionais</div>
-              <p class="section-text">{{ event.additionalInfo }}</p>
+            <div class="section-title">Atrações</div>
+              <p class="section-text" v-html="event.additionalInfo"></p>
             </div>
           </div>
         </q-card>
@@ -674,6 +674,7 @@ function getEventTags(eventData) {
   color: #e5e7eb;
   font-size: 20px;
   line-height: 1.7;
+  white-space: pre-line;
 }
 
 @media (max-width: 1024px) {
@@ -910,6 +911,7 @@ function getEventTags(eventData) {
   .section-text {
     font-size: 14px;
     line-height: 1.6;
+    white-space: pre-line;
   }
 }
 
