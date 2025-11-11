@@ -130,14 +130,14 @@
               </template>
             </q-btn>
 
-            <div class="event-section q-mt-xl">
-              <div class="section-title">Descrição do Evento</div>
-              <p class="section-text" v-html="event.description"></p>
+            <div v-if="event.additionalInfo" class="event-section q-mt-md">
+              <div class="section-title">Atrações</div>
+              <p class="section-text" v-html="event.additionalInfo"></p>
             </div>
 
-            <div v-if="event.additionalInfo" class="event-section q-mt-md">
-            <div class="section-title">Atrações</div>
-              <p class="section-text" v-html="event.additionalInfo"></p>
+            <div class="event-section q-mt-md">
+              <div class="section-title">Descrição do Evento</div>
+              <p class="section-text" v-html="event.description"></p>
             </div>
           </div>
         </q-card>
@@ -648,7 +648,7 @@ function getEventTags(eventData) {
   margin-right: auto;
   display: block;
   margin-top: -200px; /* Bem próximo */
-  margin-bottom: 150px;
+  margin-bottom: 60px;
   background-color: #ffe100 !important;
   color: black !important;
 }
