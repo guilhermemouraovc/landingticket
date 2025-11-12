@@ -63,7 +63,6 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
-import { useCategories } from 'src/composables/useCategories'
 import EventCard from 'src/components/EventCard.vue'
 
 const props = defineProps({
@@ -88,63 +87,29 @@ const showLeftFade = ref(false)
 const FADE_SHOW_AT = 24
 const FADE_HIDE_AT = 40
 
-// Composable para gerenciar categorias (com cache)
-const { categories, loadCategories } = useCategories()
-
 /**
- * Mapeia variações de categoria para tag padrão usando categorias do banco
+ * Mapeia variações de categoria para tag padrão
  */
 function getCategoryTag(tags) {
-  if (!tags || tags.length === 0) {
-    // Se não há tags, busca Reveillons como padrão
-    if (categories.value) {
-      const reveillonCategory = categories.value.find(
-        (c) => 
-          c.label === 'Réveillon' || 
-          c.label === 'Reveillons' || 
-          c.label === 'REVEILLONS' ||
-          c.slug === 'reveillon' ||
-          c.slug === 'reveillons'
-      )
-      return reveillonCategory?.tagName || 'Reveillons'
-    }
-    return 'Reveillons'
-  }
+  if (!tags || tags.length === 0) return 'REVEILLONS'
 
-  const tag = tags[0]
+  const tag = tags[0].toUpperCase()
 
-  // Primeiro tenta buscar nas categorias carregadas do banco
-  if (categories.value) {
-    const category = categories.value.find(
-      (c) => 
-        c.tagName === tag ||
-        c.label === tag ||
-        c.slug === tag ||
-        c.tagName?.toUpperCase() === tag.toUpperCase() ||
-        c.label?.toUpperCase() === tag.toUpperCase() ||
-        c.slug?.toUpperCase() === tag.toUpperCase()
-    )
-    
-    if (category?.tagName) {
-      return category.tagName
-    }
-  }
-
-  // Fallback para mapeamento estático (compatibilidade)
-  const tagUpper = tag.toUpperCase()
+  // Mapeamento de categorias
   const categoryMap = {
-    REVEILLON: 'Reveillons',
-    REVEILLONS: 'Reveillons',
-    'ANO NOVO': 'Reveillons',
-    'OPEN BAR': 'Reveillons',
-    CARNAVAL: 'Carnaval',
-    CARNAVAIS: 'Carnaval',
-    FESTIVAIS: 'Festivais',
-    FESTIVAISS: 'Festivais',
-    FESTIVAL: 'Festivais',
+    REVEILLON: 'REVEILLONS',
+    REVEILLONS: 'REVEILLONS',
+    'ANO NOVO': 'REVEILLONS',
+    'OPEN BAR': 'REVEILLONS', // Tags adicionais que podem estar relacionadas
+    CARNAVAL: 'CARNAVAL',
+    CARNAVAIS: 'CARNAVAL',
+    FESTIVAIS: 'FESTIVAIS',
+    FESTIVAISS: 'FESTIVAIS', // Compatibilidade com código antigo
+    FESTIVAL: 'FESTIVAIS',
   }
 
-  return categoryMap[tagUpper] || 'Reveillons'
+  const mappedTag = categoryMap[tag] || 'REVEILLONS' // Default para REVEILLONS ao invés de retornar a tag desconhecida
+  return mappedTag
 }
 
 // Carrega eventos relacionados
@@ -157,45 +122,15 @@ async function loadRelatedEvents() {
       return
     }
 
-    // Garante que as categorias estão carregadas
-    if (!categories.value) {
-      await loadCategories()
-    }
-
     // Determina a categoria/tag para buscar
-    let categoryTag = getCategoryTag(props.eventTags)
+    const categoryTag = getCategoryTag(props.eventTags)
 
     // Busca eventos pela tag usando view_events_by_tag
-    let { data: tagRows, error: tagError } = await supabase
+    const { data: tagRows, error: tagError } = await supabase
       .from('view_events_by_tag')
       .select('event_id')
       .eq('tag_name', categoryTag)
       .limit(50)
-
-    // Se não encontrou, tenta variações
-    if ((!tagRows || tagRows.length === 0) && categoryTag) {
-      const variations = [
-        categoryTag.toUpperCase(),
-        categoryTag.toLowerCase(),
-        categoryTag.charAt(0).toUpperCase() + categoryTag.slice(1).toLowerCase(),
-      ]
-
-      for (const variation of variations) {
-        if (variation === categoryTag) continue
-        
-        const { data, error } = await supabase
-          .from('view_events_by_tag')
-          .select('event_id')
-          .eq('tag_name', variation)
-          .limit(50)
-
-        if (!error && data && data.length > 0) {
-          tagRows = data
-          tagError = null
-          break
-        }
-      }
-    }
 
     if (tagError) {
       if (import.meta.env.DEV) {
@@ -303,7 +238,6 @@ watch(
 )
 
 onMounted(async () => {
-  await loadCategories()
   await loadRelatedEvents()
   await nextTick()
   updateScrollState()

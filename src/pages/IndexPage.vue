@@ -25,7 +25,11 @@
         >
           <q-carousel-slide v-for="ev in featured" :key="ev.id" :name="ev.id" class="q-pa-none">
             <div class="featured-wrap">
-              <div class="featured-grid rounded-borders overflow-hidden shadow-2">
+              <div
+                class="featured-grid rounded-borders overflow-hidden shadow-2"
+                :class="{ 'featured-grid--clickable': $q.screen.lt.sm }"
+                @click="$q.screen.lt.sm ? $router.push(ev.link || '#') : null"
+              >
                 <!-- Imagem -->
                 <div class="featured-img">
                   <q-img
@@ -838,6 +842,11 @@ async function filterEventsByCategories(categoryLabels) {
     height: auto;
     min-height: 568px;
     border-radius: 24px;
+  }
+
+  .featured-grid--clickable {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
 }
 .featured-img {

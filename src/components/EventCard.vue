@@ -204,10 +204,13 @@ function handleClick() {
   cursor: pointer;
 }
 
-.event-card--clickable:hover,
-.event-card--clickable:focus-within {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
+/* Hover apenas em dispositivos não-touch (desktop) */
+@media (hover: hover) and (pointer: fine) {
+  .event-card--clickable:hover,
+  .event-card--clickable:focus-within {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
+  }
 }
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
