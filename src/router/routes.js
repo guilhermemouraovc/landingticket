@@ -39,6 +39,17 @@
         name: 'politica-de-privacidade',
         component: () => import('pages/PoliticaPrivacidadePage.vue'),
       },
+      // Rotas de influenciadoras
+      {
+        path: 'camila-carvalho',
+        name: 'camila-carvalho',
+        component: () => import('pages/CamilaCarvalhoPage.vue'),
+      },
+      {
+        path: 'julia-souto',
+        name: 'julia-souto',
+        component: () => import('pages/JuliaSoutoPage.vue'),
+      },
     ],
   },
 

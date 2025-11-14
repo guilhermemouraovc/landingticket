@@ -157,6 +157,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+import { useInfluencerTracking } from 'src/composables/useInfluencerTracking'
 import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import BackButton from 'src/components/BackButton.vue'
@@ -172,6 +173,9 @@ const router = useRouter()
 
 // Composable para gerenciar eventos do Supabase
 const { fetchEventById, loading, error: apiError } = useSupabaseEvents()
+
+// Composable para gerenciar tracking de influenciadoras
+const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone } = useInfluencerTracking()
 
 // Estado base da tela
 const error = ref('')
@@ -224,10 +228,19 @@ function openWhatsapp() {
 
   openingWhatsapp.value = true
 
-  const phone = event.value.whatsapp
-  const message = encodeURIComponent(event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE)
+  // Verifica se há tracking de influenciadora
+  let phone = event.value.whatsapp
+  let message = event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
+
+  if (hasInfluencer()) {
+    // Usa número fixo e mensagem personalizada para influenciadoras
+    phone = getInfluencerPhone()
+    message = getWhatsAppMessage(event.value.title) || message
+  }
+
+  const encodedMessage = encodeURIComponent(message)
   const base = phone ? 'https://wa.me/' + phone : 'https://wa.me/'
-  const url = `${base}?text=${message}`
+  const url = `${base}?text=${encodedMessage}`
 
   if (typeof window !== 'undefined') {
     window.open(url, '_blank')
