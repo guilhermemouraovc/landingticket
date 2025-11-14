@@ -25,24 +25,42 @@ export default defineRouter(function (/* { store, ssrContext } */) {
 
   const Router = createRouter({
     scrollBehavior(to, from, savedPosition) {
-      if (savedPosition) {
+      // Se estamos navegando para uma nova rota (não é um back/forward do browser),
+      // sempre vai para o topo
+      if (!savedPosition) {
+        // Se tem hash, scrolla para o elemento
+        if (to.hash) {
+          // Reset manual do scroll em ambos os elementos (fix para mobile)
+          if (typeof window !== 'undefined') {
+            setTimeout(() => {
+              document.body.scrollTop = 0
+              document.documentElement.scrollTop = 0
+            }, 0)
+          }
+          return {
+            el: to.hash,
+            behavior: 'smooth',
+            top: 80,
+          }
+        }
+        // Caso contrário, vai para o topo
+        // Reset manual do scroll em ambos os elementos (fix para mobile)
+        if (typeof window !== 'undefined') {
+          setTimeout(() => {
+            document.body.scrollTop = 0
+            document.documentElement.scrollTop = 0
+          }, 0)
+        }
         return {
-          ...savedPosition,
-          behavior: 'smooth',
+          left: 0,
+          top: 0,
+          behavior: 'instant', // Mudado de 'smooth' para 'instant' para melhor UX no mobile
         }
       }
 
-      if (to.hash) {
-        return {
-          el: to.hash,
-          behavior: 'smooth',
-          top: 80,
-        }
-      }
-
+      // Se é um back/forward do browser, restaura a posição salva
       return {
-        left: 0,
-        top: 0,
+        ...savedPosition,
         behavior: 'smooth',
       }
     },
