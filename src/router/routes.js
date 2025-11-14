@@ -50,6 +50,11 @@
         name: 'julia-souto',
         component: () => import('pages/JuliaSoutoPage.vue'),
       },
+      {
+        path: 'joao-clericuzzi',
+        name: 'joao-clericuzzi',
+        component: () => import('pages/JoaoClericuzziPage.vue'),
+      },
     ],
   },
 

@@ -7,6 +7,7 @@ const INFLUENCER_PHONE = '5581998471385'
 const INFLUENCER_NAMES = {
   'camila-carvalho': 'Camila Carvalho',
   'julia-souto': 'Julia Souto',
+  'joao-clericuzzi': 'João Clericuzzi',
 }
 
 export function useInfluencerTracking() {
