@@ -368,6 +368,9 @@ function goHome() {
 function getEventTags(eventData) {
   // Tenta extrair tags de diferentes estruturas possíveis
   if (eventData.tags && Array.isArray(eventData.tags) && eventData.tags.length > 0) {
+    if (import.meta.env.DEV) {
+      console.log('🏷️ Tags do evento:', eventData.tags)
+    }
     return eventData.tags
   }
 
@@ -375,9 +378,15 @@ function getEventTags(eventData) {
   const title = (eventData.title || '').toLowerCase()
 
   if (title.includes('réveillon') || title.includes('reveillon') || title.includes('amoré')) {
+    if (import.meta.env.DEV) {
+      console.log('🏷️ Tag inferida por título:', ['REVEILLONS'])
+    }
     return ['REVEILLONS'] // Tag correta do Supabase
   }
   if (title.includes('carnaval') || title.includes('carvalheira')) {
+    if (import.meta.env.DEV) {
+      console.log('🏷️ Tag inferida por título:', ['CARNAVAL'])
+    }
     return ['CARNAVAL'] // Tag correta do Supabase
   }
   if (
@@ -386,10 +395,16 @@ function getEventTags(eventData) {
     title.includes('joão') ||
     title.includes('festival')
   ) {
+    if (import.meta.env.DEV) {
+      console.log('🏷️ Tag inferida por título:', ['FESTIVAIS'])
+    }
     return ['FESTIVAIS'] // Tag correta do Supabase
   }
 
   // Padrão: Réveillon
+  if (import.meta.env.DEV) {
+    console.log('🏷️ Tag padrão:', ['REVEILLONS'])
+  }
   return ['REVEILLONS']
 }
 </script>
