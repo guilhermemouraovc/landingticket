@@ -175,7 +175,8 @@ const router = useRouter()
 const { fetchEventById, loading, error: apiError } = useSupabaseEvents()
 
 // Composable para gerenciar tracking de influenciadoras
-const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone } = useInfluencerTracking()
+const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } =
+  useInfluencerTracking()
 
 // Estado base da tela
 const error = ref('')
@@ -183,6 +184,17 @@ const event = ref(null)
 
 // Carrega evento inicial e reage a mudanças de rota
 onMounted(() => {
+  // Verifica se há parâmetro ref na URL (ex: ?ref=lauany)
+  const refParam = route.query.ref
+  if (refParam) {
+    saveInfluencer(refParam)
+    // Limpa o parâmetro da URL para deixar ela limpa
+    router.replace({
+      name: 'event-detail',
+      params: { slug: route.params.slug },
+    })
+  }
+
   loadEvent(route.params.slug)
 })
 
