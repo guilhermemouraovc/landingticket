@@ -65,6 +65,11 @@
         name: 'catalogo',
         component: () => import('pages/CatalogoPage.vue'),
       },
+      {
+        path: 'netinho-soares',
+        name: 'netinho-soares',
+        component: () => import('pages/NetinhoSoaresPage.vue'),
+      },
     ],
   },
 

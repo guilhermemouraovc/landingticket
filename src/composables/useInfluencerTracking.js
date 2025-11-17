@@ -10,6 +10,7 @@ const INFLUENCER_NAMES = {
   'joao-clericuzzi': 'João Clericuzzi',
   'lauany': 'Lauany',
   'catalogo': 'Rapha',
+  'netinho-soares': 'Netinho Soares',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -19,6 +20,7 @@ const INFLUENCER_GENDER = {
   'Julia Souto': 'pela',
   'Lauany': 'pela',
   'Rapha': 'pelo',
+  'Netinho Soares': 'pelo',
 }
 
 export function useInfluencerTracking() {
