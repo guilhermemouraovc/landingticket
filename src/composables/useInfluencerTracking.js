@@ -3,12 +3,20 @@ import { ref, onMounted } from 'vue'
 const INFLUENCER_STORAGE_KEY = 'landingticket_influencer'
 const INFLUENCER_PHONE = '5581998471385'
 
-// Mapeamento de slugs para nomes formatados
+// Mapeamento de slugs para nomes formatados e gênero
 const INFLUENCER_NAMES = {
   'camila-carvalho': 'Camila Carvalho',
   'julia-souto': 'Julia Souto',
   'joao-clericuzzi': 'João Clericuzzi',
   'lauany': 'Lauany',
+}
+
+// Mapeamento de gênero para usar o artigo correto
+const INFLUENCER_GENDER = {
+  'João Clericuzzi': 'pelo',
+  'Camila Carvalho': 'pela',
+  'Julia Souto': 'pela',
+  'Lauany': 'pela',
 }
 
 export function useInfluencerTracking() {
@@ -56,7 +64,8 @@ export function useInfluencerTracking() {
       return null
     }
 
-    return `Olá vim pela ${influencerName.value} e gostaria de finalizar a compra do ${eventTitle}`
+    const article = INFLUENCER_GENDER[influencerName.value] || 'pela'
+    return `Olá vim ${article} ${influencerName.value} e gostaria de finalizar a compra do ${eventTitle}`
   }
 
   // Retorna o número do WhatsApp para influenciadoras
