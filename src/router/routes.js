@@ -60,6 +60,11 @@
         name: 'lauany',
         component: () => import('pages/LauanyPage.vue'),
       },
+      {
+        path: 'catalogo',
+        name: 'catalogo',
+        component: () => import('pages/CatalogoPage.vue'),
+      },
     ],
   },
 

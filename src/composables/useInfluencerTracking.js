@@ -9,6 +9,7 @@ const INFLUENCER_NAMES = {
   'julia-souto': 'Julia Souto',
   'joao-clericuzzi': 'João Clericuzzi',
   'lauany': 'Lauany',
+  'catalogo': 'Rapha',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -17,6 +18,7 @@ const INFLUENCER_GENDER = {
   'Camila Carvalho': 'pela',
   'Julia Souto': 'pela',
   'Lauany': 'pela',
+  'Rapha': 'pelo',
 }
 
 export function useInfluencerTracking() {

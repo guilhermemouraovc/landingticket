@@ -111,7 +111,7 @@ export function toEventCardFromSb(row) {
     date: formatDateRange(row.start_date, row.end_date),
     location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
     cityState: formatCityStateSimple(row.city, row.state), // city - state apenas
-    image: row.image_url || '/logo.svg',
+    image: row.image_url || '/semfoto.png',
     link: { name: 'event-detail', params: { slug } }, // Usa slug ao invés de id
     // Informações de preço
     ...priceInfo,
@@ -177,7 +177,7 @@ function formatCityState(city, state) {
  */
 function resolveImage(row) {
   if (!row.images || !Array.isArray(row.images) || row.images.length === 0) {
-    return '/logo.svg'
+    return '/semfoto.png'
   }
 
   // Busca a imagem primária primeiro
@@ -192,7 +192,7 @@ function resolveImage(row) {
     return firstImage.url
   }
 
-  return '/logo.svg'
+  return '/semfoto.png'
 }
 
 export function toEventDetailFromSb(row) {
