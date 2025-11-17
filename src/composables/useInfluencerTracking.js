@@ -8,6 +8,7 @@ const INFLUENCER_NAMES = {
   'camila-carvalho': 'Camila Carvalho',
   'julia-souto': 'Julia Souto',
   'joao-clericuzzi': 'João Clericuzzi',
+  'lauany': 'Lauany',
 }
 
 export function useInfluencerTracking() {

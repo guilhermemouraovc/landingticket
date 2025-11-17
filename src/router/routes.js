@@ -55,6 +55,11 @@
         name: 'joao-clericuzzi',
         component: () => import('pages/JoaoClericuzziPage.vue'),
       },
+      {
+        path: 'lauany',
+        name: 'lauany',
+        component: () => import('pages/LauanyPage.vue'),
+      },
     ],
   },
 
