@@ -190,7 +190,7 @@ function handleClick() {
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  background: #ffffff;
+  background: transparent; /* Remove fundo branco */
   box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
   transition:
     transform 0.2s ease,
@@ -237,6 +237,23 @@ function handleClick() {
 .event-card__image {
   width: 100%;
   object-fit: cover;
+  border-radius: 24px 24px 0 0;
+  display: block;
+  flex-shrink: 0;
+
+  /* Força o q-img a respeitar o border-radius */
+  :deep(.q-img__container) {
+    border-radius: 24px 24px 0 0;
+  }
+
+  :deep(.q-img__image) {
+    border-radius: 24px 24px 0 0;
+  }
+
+  :deep(img) {
+    border-radius: 24px 24px 0 0;
+    display: block;
+  }
 }
 
 .event-card__body {
@@ -246,6 +263,8 @@ function handleClick() {
   flex-direction: column;
   gap: 12px;
   color: #1f2937;
+  background: #ffffff;
+  border-radius: 0 0 24px 24px;
 }
 
 .event-card__title {
