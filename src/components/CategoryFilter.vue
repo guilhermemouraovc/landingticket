@@ -11,13 +11,10 @@
         :key="category.id"
         clickable
         flat
-        :color="selectedCategories.includes(category.id) ? category.color : undefined"
-        :text-color="
-          selectedCategories.includes(category.id)
-            ? {}
-            : { backgroundColor: '#e5e7eb', color: '#374151' }
-        "
+        :color="selectedCategories.includes(category.id) ? category.color : 'grey-3'"
+        :text-color="selectedCategories.includes(category.id) ? 'white' : 'grey-8'"
         class="category-chip"
+        :class="{ 'category-chip--selected': selectedCategories.includes(category.id) }"
         :aria-label="`${category.name}. ${selectedCategories.includes(category.id) ? 'Selecionado' : 'Não selecionado'}`"
         :aria-pressed="selectedCategories.includes(category.id)"
         role="button"
@@ -236,6 +233,14 @@ function clearCategories() {
 .category-chip:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.category-chip--selected {
+  font-weight: 600;
+}
+
+.category-chip--selected :deep(.q-chip) {
+  font-weight: 600;
 }
 
 .filter-actions {

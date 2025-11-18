@@ -1,9 +1,20 @@
-# robots.txt para LandingTicket
-# Permite indexação de todos os conteúdos
+# robots.txt para Ticketpe
+# Permite indexação de todos os conteúdos relevantes
 
 User-agent: *
 Allow: /
 
-# Sitemap (adicione quando criar)
-# Sitemap: https://seudominio.com/sitemap.xml
+# Bloquear páginas de tracking de influenciadores (não relevantes para SEO)
+Disallow: /camila-carvalho
+Disallow: /julia-souto
+Disallow: /joao-clericuzzi
+Disallow: /lauany
+Disallow: /netinho-soares
+Disallow: /catalogo
+
+# Sitemap (será criado em breve)
+Sitemap: https://ticketpe.com.br/sitemap.xml
+
+# Crawl-delay para não sobrecarregar o servidor
+Crawl-delay: 1
 

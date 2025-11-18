@@ -29,9 +29,11 @@
       property="og:description"
       content="Descubra e reserve ingressos para os melhores eventos em Pernambuco. Shows, festas, teatro, esportes e muito mais. Sua experiência começa aqui no Ticketpe!"
     />
-    <meta property="og:image" content="https://ticketpe.com.br/logo.svg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image" content="https://ticketpe.com.br/icon-512.png" />
+    <meta property="og:image:alt" content="Logo Ticketpe" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:site_name" content="Ticketpe" />
     <meta property="og:locale" content="pt_BR" />
 
@@ -53,13 +55,82 @@
     <meta name="author" content="Ticketpe" />
     <meta name="robots" content="index, follow" />
 
+    <!-- Favicons - Múltiplos tamanhos para melhor indexação do Google -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Web App Manifest -->
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="apple-mobile-web-app-title" content="Ticketpe" />
     <meta name="application-name" content="Ticketpe" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Ticketpe",
+        "description": "Plataforma de venda de ingressos para eventos em Pernambuco",
+        "url": "https://ticketpe.com.br",
+        "logo": "https://ticketpe.com.br/icon-512.png",
+        "image": "https://ticketpe.com.br/icon-512.png",
+        "email": "ajuda@ticketpe.com.br",
+        "foundingDate": "2024",
+        "areaServed": {
+          "@type": "State",
+          "name": "Pernambuco",
+          "containedIn": {
+            "@type": "Country",
+            "name": "Brasil"
+          }
+        },
+        "sameAs": [
+          "https://www.instagram.com/ticketpe",
+          "https://www.tiktok.com/@ticketpe",
+          "https://chat.whatsapp.com/HLtVXbX4PbO1RVW317mLlB"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "email": "ajuda@ticketpe.com.br",
+          "availableLanguage": "Portuguese"
+        }
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ticketpe",
+        "url": "https://ticketpe.com.br",
+        "description": "Descubra e reserve ingressos para os melhores eventos em Pernambuco",
+        "inLanguage": "pt-BR",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Ticketpe",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://ticketpe.com.br/icon-512.png"
+          }
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ticketpe.com.br/programacao?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
   </head>
   <body>
     <!-- quasar:entry-point -->
