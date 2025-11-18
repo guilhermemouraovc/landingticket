@@ -96,7 +96,7 @@ export function toEventCardFromSb(row) {
   const slug = generateSlug(row.title)
 
   // Tenta usar image_url da view, se não existir, resolve do array images com context='card'
-  let cardImage = row.image_url || '/semfoto.png'
+  let cardImage = row.image_url || '/semfoto.webp'
   
   // Se há array de imagens, usa resolveImage com context 'card' para respeitar image_type
   if (row.images && Array.isArray(row.images) && row.images.length > 0) {
@@ -187,7 +187,7 @@ function formatCityState(city, state) {
  */
 function resolveImage(row, context = 'detail') {
   if (!row.images || !Array.isArray(row.images) || row.images.length === 0) {
-    return '/semfoto.png'
+    return '/semfoto.webp'
   }
 
   // Filtra imagens por contexto:
@@ -213,7 +213,7 @@ function resolveImage(row, context = 'detail') {
     return firstImage.url
   }
 
-  return '/semfoto.png'
+  return '/semfoto.webp'
 }
 
 export function toEventDetailFromSb(row) {

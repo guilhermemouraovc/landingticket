@@ -81,15 +81,15 @@ async function loadReveillonEvents() {
   try {
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Reveillons' // Nome padrão atualizado
-    
+
     if (categories.value) {
       const reveillonCategory = categories.value.find(
-        (c) => 
-          c.label === 'Réveillon' || 
-          c.label === 'Reveillons' || 
+        (c) =>
+          c.label === 'Réveillon' ||
+          c.label === 'Reveillons' ||
           c.label === 'REVEILLONS' ||
           c.slug === 'reveillon' ||
-          c.slug === 'reveillons'
+          c.slug === 'reveillons',
       )
       if (reveillonCategory?.tagName) {
         tagName = reveillonCategory.tagName
