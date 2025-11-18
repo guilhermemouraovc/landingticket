@@ -93,15 +93,22 @@ function formatCityStateSimple(city, state) {
 
 export function toEventCardFromSb(row) {
   const priceInfo = formatPriceInfo(row)
+  const slug = generateSlug(row.title)
 
-  console.log('🔍 Mapeando evento:', {
+  // Tenta usar image_url da view, se não existir, resolve do array images com context='card'
+  let cardImage = row.image_url || '/semfoto.png'
+  
+  // Se há array de imagens, usa resolveImage com context 'card' para respeitar image_type
+  if (row.images && Array.isArray(row.images) && row.images.length > 0) {
+    cardImage = resolveImage(row, 'card')
+  }
+
+  console.log('🔍 Mapeando evento para card:', {
     id: row.id,
     title: row.title,
-    image_url: row.image_url,
-    hasImageUrl: !!row.image_url,
+    cardImage,
+    hasImages: !!(row.images && row.images.length > 0),
   })
-
-  const slug = generateSlug(row.title)
 
   return {
     id: row.id,
@@ -111,7 +118,7 @@ export function toEventCardFromSb(row) {
     date: formatDateRange(row.start_date, row.end_date),
     location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
     cityState: formatCityStateSimple(row.city, row.state), // city - state apenas
-    image: row.image_url || '/semfoto.png',
+    image: cardImage,
     link: { name: 'event-detail', params: { slug } }, // Usa slug ao invés de id
     // Informações de preço
     ...priceInfo,
@@ -174,20 +181,34 @@ function formatCityState(city, state) {
 
 /**
  * Resolve a melhor imagem disponível para o evento
+ * @param {Object} row - Dados do evento do Supabase
+ * @param {string} context - Contexto de uso: 'card' (carrossel) ou 'detail' (página de detalhes)
+ * @returns {string} URL da imagem ou imagem padrão
  */
-function resolveImage(row) {
+function resolveImage(row, context = 'detail') {
   if (!row.images || !Array.isArray(row.images) || row.images.length === 0) {
     return '/semfoto.png'
   }
 
+  // Filtra imagens por contexto:
+  // - Se context='card': busca imagens com image_type='card' ou 'both' ou null (compatibilidade)
+  // - Se context='detail': busca imagens com image_type='detail' ou 'both' ou null (compatibilidade)
+  const contextImages = row.images.filter((img) => {
+    if (!img.image_type || img.image_type === 'both') return true
+    return img.image_type === context
+  })
+
+  // Se não há imagens do contexto específico, usa todas (fallback)
+  const imagesToSearch = contextImages.length > 0 ? contextImages : row.images
+
   // Busca a imagem primária primeiro
-  const primaryImage = row.images.find((img) => img.is_primary === true)
+  const primaryImage = imagesToSearch.find((img) => img.is_primary === true)
   if (primaryImage && primaryImage.url) {
     return primaryImage.url
   }
 
   // Se não há primária, pega a primeira disponível
-  const firstImage = row.images.find((img) => img.url)
+  const firstImage = imagesToSearch.find((img) => img.url)
   if (firstImage && firstImage.url) {
     return firstImage.url
   }
@@ -198,7 +219,8 @@ function resolveImage(row) {
 export function toEventDetailFromSb(row) {
   const parsedDate = parseDate(row.start_date)
   const dateBadge = buildDateBadge(parsedDate)
-  const image = resolveImage(row)
+  // Usa context='detail' para buscar imagem específica da página de detalhes
+  const image = resolveImage(row, 'detail')
   const priceInfo = formatPriceInfo(row)
   const slug = generateSlug(row.title)
 

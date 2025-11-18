@@ -156,6 +156,7 @@ Tabela que armazena imagens associadas aos eventos.
 | `alt_text`    | `text`                     | Texto alternativo para acessibilidade    | NULL                                     |
 | `is_primary`  | `boolean`                  | Indica se é a imagem principal do evento | DEFAULT `false`                          |
 | `order_index` | `integer`                  | Ordem de exibição das imagens            | DEFAULT `0`                              |
+| `image_type`  | `text`                     | Contexto de uso da imagem: 'card', 'detail', ou 'both' | NULL                          |
 | `created_at`  | `timestamp with time zone` | Data de criação do registro              | DEFAULT `now()`                          |
 
 #### Observações
@@ -165,6 +166,10 @@ Tabela que armazena imagens associadas aos eventos.
 - Se não houver imagem primária, a primeira imagem disponível é usada
 - O `order_index` permite ordenar as imagens
 - O `alt_text` é importante para acessibilidade (WCAG 2.1)
+- O `image_type` permite definir onde a imagem será exibida:
+  - `'card'`: Apenas nos cards de carrossel
+  - `'detail'`: Apenas na página de detalhes do evento
+  - `'both'` ou `NULL`: Em ambos os contextos (padrão para compatibilidade)
 
 #### Exemplo de Uso
 
@@ -184,6 +189,20 @@ ORDER BY is_primary DESC, order_index ASC;
 SELECT * FROM event_images
 WHERE event_id = 'uuid-do-evento'
 ORDER BY is_primary DESC, order_index ASC, created_at ASC
+LIMIT 1;
+
+-- Buscar imagem para usar em cards (carrossel)
+SELECT * FROM event_images
+WHERE event_id = 'uuid-do-evento'
+  AND (image_type = 'card' OR image_type = 'both' OR image_type IS NULL)
+  AND is_primary = true
+LIMIT 1;
+
+-- Buscar imagem para usar na página de detalhes
+SELECT * FROM event_images
+WHERE event_id = 'uuid-do-evento'
+  AND (image_type = 'detail' OR image_type = 'both' OR image_type IS NULL)
+  AND is_primary = true
 LIMIT 1;
 ```
 
@@ -241,6 +260,10 @@ View que facilita a busca de eventos por tag, retornando:
 - Sempre defina uma imagem primária (`is_primary = true`) quando possível
 - Use `alt_text` para melhorar acessibilidade
 - Ordene imagens usando `order_index`
+- Use `image_type` para definir contextos específicos:
+  - `'card'`: Imagem otimizada para visualização em cards/carrosséis (menor, mais larga)
+  - `'detail'`: Imagem otimizada para página de detalhes (maior resolução, mais alta)
+  - `'both'` ou `NULL`: Serve para ambos os contextos (recomendado para compatibilidade)
 
 ### Tags
 
