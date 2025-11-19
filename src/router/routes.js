@@ -70,6 +70,11 @@
         name: 'netinho-soares',
         component: () => import('pages/NetinhoSoaresPage.vue'),
       },
+      {
+        path: 'cadu-alencar',
+        name: 'cadu-alencar',
+        component: () => import('pages/CaduAlencarPage.vue'),
+      },
     ],
   },
 
