@@ -75,6 +75,21 @@
         name: 'cadu-alencar',
         component: () => import('pages/CaduAlencarPage.vue'),
       },
+      {
+        path: 'tallita-manta',
+        name: 'tallita-manta',
+        component: () => import('pages/TallitaMantaPage.vue'),
+      },
+      {
+        path: 'hypepe',
+        name: 'hypepe',
+        component: () => import('pages/HypepePage.vue'),
+      },
+      {
+        path: 'mariana-almeida',
+        name: 'mariana-almeida',
+        component: () => import('pages/MarianaAlmeidaPage.vue'),
+      },
     ],
   },
 

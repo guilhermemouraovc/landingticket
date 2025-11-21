@@ -12,6 +12,9 @@ const INFLUENCER_NAMES = {
   'catalogo': 'Rapha',
   'netinho-soares': 'Netinho Soares',
   'cadu-alencar': 'Cadu Alencar',
+  'tallita-manta': 'Tallita Manta',
+  'hypepe': 'Hype PE',
+  'mariana-almeida': 'Mariana Almeida',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -23,6 +26,9 @@ const INFLUENCER_GENDER = {
   'Rapha': 'pelo',
   'Netinho Soares': 'pelo',
   'Cadu Alencar': 'pelo',
+  'Tallita Manta': 'pela',
+  'Hype PE': 'pela',
+  'Mariana Almeida': 'pela',
 }
 
 export function useInfluencerTracking() {

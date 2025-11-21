@@ -12,6 +12,9 @@ Disallow: /lauany
 Disallow: /netinho-soares
 Disallow: /catalogo
 Disallow: /cadu-alencar
+Disallow: /tallita-manta
+Disallow: /hypepe
+Disallow: /mariana-almeida
 
 # Sitemap (será criado em breve)
 Sitemap: https://ticketpe.com.br/sitemap.xml
