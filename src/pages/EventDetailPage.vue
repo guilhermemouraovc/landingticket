@@ -1,8 +1,18 @@
 ﻿<template>
   <q-page class="event-page">
     <div class="event-container">
-      <div class="event-toolbar">
+      <!-- Toolbar ajustada para suportar botão de edição à direita -->
+      <div class="event-toolbar row justify-between items-center">
         <BackButton :use-history="true" />
+        
+        <q-btn
+          v-if="isAdmin"
+          color="primary"
+          icon="edit"
+          label="Editar Evento"
+          @click="openEditDialog"
+          class="q-ml-sm"
+        />
       </div>
 
       <!-- Breadcrumbs -->
@@ -150,6 +160,29 @@
         />
       </div>
     </div>
+
+    <!-- Dialog de Edição (Admin) -->
+    <q-dialog v-model="showEditDialog" maximized persistent>
+      <q-card>
+        <q-card-section class="row items-center q-pb-none bg-primary text-white">
+          <div class="text-h6">Editar Evento</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
+
+        <q-separator />
+
+        <q-card-section class="q-pt-md scroll" style="max-height: 80vh">
+          <EventForm
+            v-if="showEditDialog && eventToEdit"
+            :event="eventToEdit"
+            :tags="allTags"
+            @save="handleSave"
+            @cancel="showEditDialog = false"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -162,6 +195,13 @@ import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import BackButton from 'src/components/BackButton.vue'
 import { useQuasar } from 'quasar'
+
+// Admin imports
+import { useAuth } from 'src/composables/useAuth'
+import { useAdminEvents } from 'src/composables/useAdminEvents'
+import { useSupabaseTags } from 'src/composables/useSupabaseTags'
+import EventForm from 'src/components/EventForm.vue'
+
 const openingWhatsapp = ref(false)
 
 const $q = useQuasar()
@@ -174,6 +214,11 @@ const router = useRouter()
 // Composable para gerenciar eventos do Supabase
 const { fetchEventById, loading, error: apiError } = useSupabaseEvents()
 
+// Admin composables
+const { isAdmin, initSession } = useAuth()
+const { fetchEventById: fetchAdminEventById } = useAdminEvents() // Precisamos buscar a versão RAW do evento para o form
+const { fetchTags } = useSupabaseTags()
+
 // Composable para gerenciar tracking de influenciadoras
 const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } =
   useInfluencerTracking()
@@ -182,8 +227,13 @@ const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } 
 const error = ref('')
 const event = ref(null)
 
+// Admin state
+const showEditDialog = ref(false)
+const eventToEdit = ref(null)
+const allTags = ref([])
+
 // Carrega evento inicial e reage a mudanças de rota
-onMounted(() => {
+onMounted(async () => {
   // Verifica se há parâmetro ref na URL (ex: ?ref=lauany)
   const refParam = route.query.ref
   if (refParam) {
@@ -195,6 +245,9 @@ onMounted(() => {
     })
   }
 
+  // Inicializa sessão para verificar admin
+  await initSession()
+  
   loadEvent(route.params.slug)
 })
 
@@ -232,6 +285,37 @@ async function loadEvent(slugParam) {
     }
     error.value = apiError.value || 'Não foi possível carregar os detalhes do evento.'
   }
+}
+
+// Admin functions
+async function openEditDialog() {
+  if (!event.value) return
+  
+  try {
+    // Carrega tags se necessário
+    if (allTags.value.length === 0) {
+      allTags.value = await fetchTags()
+    }
+    
+    // Busca o evento raw (sem formatação) para edição
+    // Precisamos do ID real, que deve estar no objeto formatado 'event.value.id'
+    const rawEvent = await fetchAdminEventById(event.value.id)
+    eventToEdit.value = rawEvent
+    showEditDialog.value = true
+  } catch (err) {
+    console.error('Erro ao preparar edição:', err)
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao carregar dados para edição'
+    })
+  }
+}
+
+async function handleSave() {
+  showEditDialog.value = false
+  eventToEdit.value = null
+  // Recarrega o evento atual
+  await loadEvent(route.params.slug)
 }
 
 // Utilitários de ação
@@ -450,7 +534,7 @@ function getEventTags(eventData) {
 
 .event-toolbar {
   display: flex;
-  justify-content: flex-start;
+  /* justify-content: flex-start; -- Removido para usar classes do Quasar no template */
   margin-bottom: 24px;
 }
 

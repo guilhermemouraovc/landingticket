@@ -68,5 +68,33 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
+  // Navigation guard para proteger rotas admin
+  Router.beforeEach(async (to, from, next) => {
+    if (to.meta.requiresAuth) {
+      try {
+        // Importa dinamicamente para evitar problemas de SSR
+        const { useAuth } = await import('src/composables/useAuth')
+        const { checkAdminPermission, initSession } = useAuth()
+        
+        // Garante que a sessão está inicializada
+        await initSession()
+        
+        // Aguarda um pouco para garantir que o estado foi atualizado
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        const hasPermission = await checkAdminPermission()
+        if (!hasPermission) {
+          next('/login')
+          return
+        }
+      } catch (err) {
+        console.error('Erro ao verificar permissão:', err)
+        next('/login')
+        return
+      }
+    }
+    next()
+  })
+
   return Router
 })

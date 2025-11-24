@@ -92,7 +92,18 @@
       },
     ],
   },
-
+  // Rotas de autenticação e admin (sem layout principal)
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('pages/LoginPage.vue'),
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('pages/AdminPage.vue'),
+    meta: { requiresAuth: true },
+  },
   // Always leave this as last one,
   // but you can also remove it
   {

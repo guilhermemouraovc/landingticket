@@ -13,6 +13,50 @@
                 style="width: 220px"
                 class="q-mr-sm"
               />
+              <!-- Admin Login Button -->
+              <q-btn
+                v-if="!isAdmin"
+                flat
+                dense
+                round
+                size="sm"
+                color="grey-5"
+                icon="lock"
+                to="/login"
+                class="q-ml-sm lt-md"
+                aria-label="Admin Login"
+              >
+                <q-tooltip>Acesso Admin</q-tooltip>
+              </q-btn>
+              <q-btn
+                v-if="!isAdmin"
+                flat
+                dense
+                no-caps
+                size="sm"
+                color="grey-5"
+                icon="lock"
+                label="Login"
+                to="/login"
+                class="q-ml-sm gt-sm"
+                aria-label="Admin Login"
+              >
+                <q-tooltip>Acesso Admin</q-tooltip>
+              </q-btn>
+              <q-btn
+                v-if="isAdmin"
+                flat
+                dense
+                no-caps
+                size="sm"
+                color="positive"
+                icon="admin_panel_settings"
+                label="Admin"
+                to="/admin"
+                class="q-ml-sm gt-sm"
+              >
+                <q-tooltip>Painel Admin</q-tooltip>
+              </q-btn>
             </div>
           </router-link>
 
@@ -439,6 +483,7 @@ import CategoryIcon from 'src/components/CategoryIcon.vue'
 import FilterIcon from 'src/components/FilterIcon.vue'
 import { useQuasar } from 'quasar'
 import { useCategories } from 'src/composables/useCategories'
+import { useAuth } from 'src/composables/useAuth'
 
 const router = useRouter()
 const route = useRoute()
@@ -451,7 +496,8 @@ const $q = useQuasar()
 const isDrawerTransitioning = ref(false) // Flag para prevenir múltiplos cliques durante transição
 const savedScrollPosition = ref(0) // Preserva a posição de scroll quando o drawer abre
 
-// Composable para carregar categorias (com cache)
+// Auth
+const { isAdmin, initSession } = useAuth()
 const { categories, loadCategories } = useCategories()
 
 // Estado das categorias expansíveis
@@ -486,6 +532,7 @@ let debounceTimer = null
 
 // Carrega categorias ao montar o componente
 onMounted(async () => {
+  await initSession()
   await loadCategories()
   console.log('✅ Categorias carregadas no header:', categories.value?.length || 0)
 })
