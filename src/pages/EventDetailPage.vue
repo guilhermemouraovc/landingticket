@@ -163,7 +163,7 @@
 
     <!-- Dialog de Edição (Admin) -->
     <q-dialog v-model="showEditDialog" maximized persistent>
-      <q-card>
+      <q-card class="column full-height">
         <q-card-section class="row items-center q-pb-none bg-primary text-white">
           <div class="text-h6">Editar Evento</div>
           <q-space />
@@ -172,7 +172,7 @@
 
         <q-separator />
 
-        <q-card-section class="q-pt-md scroll" style="max-height: 80vh">
+        <q-card-section class="col q-pa-none">
           <EventForm
             v-if="showEditDialog && eventToEdit"
             :event="eventToEdit"

@@ -13,36 +13,7 @@
                 style="width: 220px"
                 class="q-mr-sm"
               />
-              <!-- Admin Login Button -->
-              <q-btn
-                v-if="!isAdmin"
-                flat
-                dense
-                round
-                size="sm"
-                color="grey-5"
-                icon="lock"
-                to="/login"
-                class="q-ml-sm lt-md"
-                aria-label="Admin Login"
-              >
-                <q-tooltip>Acesso Admin</q-tooltip>
-              </q-btn>
-              <q-btn
-                v-if="!isAdmin"
-                flat
-                dense
-                no-caps
-                size="sm"
-                color="grey-5"
-                icon="lock"
-                label="Login"
-                to="/login"
-                class="q-ml-sm gt-sm"
-                aria-label="Admin Login"
-              >
-                <q-tooltip>Acesso Admin</q-tooltip>
-              </q-btn>
+              <!-- Admin Panel Button (Only visible if logged in) -->
               <q-btn
                 v-if="isAdmin"
                 flat

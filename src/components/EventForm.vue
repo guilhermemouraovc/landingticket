@@ -1,274 +1,404 @@
 <template>
-  <q-form @submit="handleSubmit" class="q-gutter-md">
-    <!-- Título e Descrições -->
-    <div class="text-h6 text-primary q-mb-md">Informações Básicas</div>
+  <q-form @submit="handleSubmit" class="column full-height">
+    <div class="col-auto">
+      <q-tabs
+        v-model="tab"
+        dense
+        class="text-grey"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        narrow-indicator
+      >
+        <q-tab name="geral" icon="info" label="Geral" />
+        <q-tab name="data_local" icon="event" label="Data e Local" />
+        <q-tab name="precos" icon="payments" label="Valores" />
+        <q-tab name="imagens" icon="image" label="Imagens" />
+      </q-tabs>
 
-    <q-input
-      v-model="formData.title"
-      label="Título do Evento *"
-      outlined
-      :rules="[(val) => !!val || 'Título é obrigatório']"
-      hint="Nome do evento"
-    />
-
-    <q-input
-      v-model="formData.description"
-      label="Descrição"
-      outlined
-      type="textarea"
-      rows="4"
-      hint="Descrição completa do evento"
-    />
-
-    <q-input
-      v-model="formData.additional_info"
-      label="Informações Adicionais"
-      outlined
-      type="textarea"
-      rows="3"
-      hint="Informações extras, atrações, etc."
-    />
-
-    <q-separator class="q-my-lg" />
-
-    <!-- Datas -->
-    <div class="text-h6 text-primary q-mb-md">Data e Horário</div>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-6">
-        <q-input
-          v-model="formData.start_date"
-          label="Data de Início"
-          outlined
-          type="datetime-local"
-          hint="Data e hora de início do evento"
-        />
-      </div>
-
-      <div class="col-12 col-md-6">
-        <q-input
-          v-model="formData.end_date"
-          label="Data de Término"
-          outlined
-          type="datetime-local"
-          hint="Data e hora de término (opcional)"
-        />
-      </div>
+      <q-separator />
     </div>
 
-    <q-separator class="q-my-lg" />
-
-    <!-- Localização -->
-    <div class="text-h6 text-primary q-mb-md">Localização</div>
-
-    <q-input
-      v-model="formData.location"
-      label="Local"
-      outlined
-      hint="Nome do local/estabelecimento"
-    />
-
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-6">
-        <q-input
-          v-model="formData.city"
-          label="Cidade"
-          outlined
-          hint="Cidade onde o evento ocorre"
-        />
-      </div>
-
-      <div class="col-12 col-md-6">
-        <q-input v-model="formData.state" label="Estado" outlined hint="Estado (ex: PE, SP, RJ)" />
-      </div>
-    </div>
-
-    <q-separator class="q-my-lg" />
-
-    <!-- Contato -->
-    <div class="text-h6 text-primary q-mb-md">Contato e Compartilhamento</div>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-6">
-        <q-input
-          v-model="formData.whatsapp"
-          label="WhatsApp"
-          outlined
-          hint="Número com código do país (ex: +5581998471385)"
-        />
-      </div>
-
-      <div class="col-12 col-md-6">
-        <q-input
-          v-model="formData.share_url"
-          label="Link de Compartilhamento"
-          outlined
-          hint="URL para compartilhar o evento"
-        />
-      </div>
-    </div>
-
-    <q-input
-      v-model="formData.whatsapp_message"
-      label="Mensagem WhatsApp"
-      outlined
-      hint="Mensagem padrão ao clicar no WhatsApp"
-    />
-
-    <q-separator class="q-my-lg" />
-
-    <!-- Preços -->
-    <div class="text-h6 text-primary q-mb-md">Informações de Preço</div>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model.number="formData.price"
-          label="Preço"
-          outlined
-          type="number"
-          step="0.01"
-          hint="Preço do ingresso em reais"
-          prefix="R$"
-        />
-      </div>
-
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model.number="formData.price_installments"
-          label="Número de Parcelas"
-          outlined
-          type="number"
-          hint="Quantidade de parcelas"
-        />
-      </div>
-
-      <div class="col-12 col-md-4">
-        <q-input
-          v-model.number="formData.installment_value"
-          label="Valor da Parcela"
-          outlined
-          type="number"
-          step="0.01"
-          hint="Valor de cada parcela"
-          prefix="R$"
-        />
-      </div>
-    </div>
-
-    <q-separator class="q-my-lg" />
-
-    <!-- Configurações -->
-    <div class="text-h6 text-primary q-mb-md">Configurações</div>
-
-    <q-toggle
-      v-model="formData.highlight"
-      label="Marcar como Evento em Destaque"
-      color="positive"
-      class="q-mb-md"
-    />
-
-    <q-select
-      v-model="formData.tagIds"
-      :options="tagOptions"
-      option-value="id"
-      option-label="name"
-      label="Categorias/Tags"
-      outlined
-      multiple
-      use-chips
-      hint="Selecione as categorias do evento"
-    >
-      <template v-slot:selected-item="scope">
-        <q-chip
-          removable
-          @remove="scope.removeAtIndex(scope.index)"
-          :tabindex="scope.tabindex"
-          color="primary"
-          text-color="white"
-        >
-          {{ scope.opt.name }}
-        </q-chip>
-      </template>
-    </q-select>
-
-    <q-separator class="q-my-lg" />
-
-    <!-- Imagens -->
-    <div class="text-h6 text-primary q-mb-md">Imagens do Evento</div>
-
-    <div class="q-mb-md">
-      <q-btn outline color="primary" icon="add" label="Adicionar Imagem" @click="addImageField" />
-    </div>
-
-    <div v-for="(image, index) in formData.images" :key="index" class="q-mb-md">
-      <q-card bordered>
-        <q-card-section>
-          <div class="row q-col-gutter-md items-start">
-            <div class="col-12 col-md-6">
-              <q-input
-                v-model="image.url"
-                label="URL da Imagem"
-                outlined
-                hint="Link completo da imagem"
-              />
-            </div>
-
-            <div class="col-12 col-md-3">
-              <q-select
-                v-model="image.image_type"
-                :options="imageTypeOptions"
-                label="Tipo de Imagem"
-                outlined
-                hint="Onde usar a imagem"
-              />
-            </div>
-
-            <div class="col-12 col-md-3">
-              <div class="column q-gutter-sm">
-                <q-toggle
-                  v-model="image.is_primary"
-                  label="Imagem Principal"
-                  color="positive"
-                  @update:model-value="(val) => handlePrimaryToggle(index, val)"
-                />
-                <q-btn
-                  flat
-                  dense
-                  color="negative"
-                  icon="delete"
-                  label="Remover"
-                  @click="removeImageField(index)"
-                />
-              </div>
-            </div>
-
-            <div class="col-12">
-              <q-input
-                v-model="image.alt_text"
-                label="Texto Alternativo"
-                outlined
-                hint="Descrição da imagem para acessibilidade"
-              />
-            </div>
+    <q-tab-panels v-model="tab" animated class="col scroll bg-grey-1">
+      <!-- Aba Geral -->
+      <q-tab-panel name="geral" class="q-pa-md">
+        <div class="row q-col-gutter-md">
+          <div class="col-12">
+            <q-input
+              v-model="formData.title"
+              label="Título do Evento *"
+              outlined
+              :rules="[(val) => !!val || 'Título é obrigatório']"
+              hint="Nome principal do evento"
+            >
+              <template v-slot:prepend>
+                <q-icon name="title" />
+              </template>
+            </q-input>
           </div>
-        </q-card-section>
-      </q-card>
-    </div>
 
-    <q-separator class="q-my-lg" />
+          <div class="col-12">
+            <q-select
+              v-model="formData.tagIds"
+              :options="tagOptions"
+              option-value="id"
+              option-label="name"
+              label="Categorias/Tags"
+              outlined
+              multiple
+              use-chips
+              hint="Selecione as categorias do evento"
+            >
+              <template v-slot:prepend>
+                <q-icon name="category" />
+              </template>
+              <template v-slot:selected-item="scope">
+                <q-chip
+                  removable
+                  @remove="scope.removeAtIndex(scope.index)"
+                  :tabindex="scope.tabindex"
+                  color="primary"
+                  text-color="white"
+                  dense
+                >
+                  {{ scope.opt.name }}
+                </q-chip>
+              </template>
+            </q-select>
+          </div>
 
-    <!-- Botões de Ação -->
-    <div class="row q-gutter-md q-mt-lg justify-end">
-      <q-btn label="Cancelar" color="grey" @click="$emit('cancel')" :disable="saving" outline />
-      <q-btn
-        type="submit"
-        label="Salvar Evento"
-        color="primary"
-        icon="save"
-        :loading="saving"
-        :disable="saving"
-      />
+          <div class="col-12">
+            <q-toggle
+              v-model="formData.highlight"
+              label="Marcar como Evento em Destaque"
+              color="warning"
+              icon="star"
+              class="q-mb-md"
+            />
+          </div>
+
+          <div class="col-12">
+            <q-input
+              v-model="formData.description"
+              label="Descrição Resumida"
+              outlined
+              type="textarea"
+              rows="3"
+              hint="Breve descrição para cards e listagens"
+            />
+          </div>
+
+          <div class="col-12">
+            <q-input
+              v-model="formData.additional_info"
+              label="Informações Detalhadas"
+              outlined
+              type="textarea"
+              rows="6"
+              hint="Informações completas, atrações, regras, etc."
+            />
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <!-- Aba Data e Local -->
+      <q-tab-panel name="data_local">
+        <div class="text-subtitle1 text-primary q-mb-md">Agenda</div>
+        <div class="row q-col-gutter-md q-mb-lg">
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="formData.start_date"
+              label="Início"
+              outlined
+              type="datetime-local"
+            >
+              <template v-slot:prepend>
+                <q-icon name="event_available" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="formData.end_date"
+              label="Término"
+              outlined
+              type="datetime-local"
+            >
+              <template v-slot:prepend>
+                <q-icon name="event_busy" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+
+        <q-separator class="q-mb-md" />
+
+        <div class="text-subtitle1 text-primary q-mb-md">Localização</div>
+        <div class="row q-col-gutter-md">
+          <div class="col-12">
+            <q-input
+              v-model="formData.location"
+              label="Nome do Local"
+              outlined
+              hint="Ex: Classic Hall, Marco Zero"
+            >
+              <template v-slot:prepend>
+                <q-icon name="place" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-8">
+            <q-input
+              v-model="formData.city"
+              label="Cidade"
+              outlined
+            >
+              <template v-slot:prepend>
+                <q-icon name="location_city" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model="formData.state"
+              label="Estado"
+              outlined
+              hint="Ex: PE"
+            >
+              <template v-slot:prepend>
+                <q-icon name="map" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <!-- Aba Preços e Contato -->
+      <q-tab-panel name="precos">
+        <div class="text-subtitle1 text-primary q-mb-md">Valores</div>
+        <div class="row q-col-gutter-md q-mb-lg">
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model.number="formData.price"
+              label="Preço à Vista"
+              outlined
+              type="number"
+              step="0.01"
+              prefix="R$"
+            >
+              <template v-slot:prepend>
+                <q-icon name="attach_money" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model.number="formData.price_installments"
+              label="Qtd. Parcelas"
+              outlined
+              type="number"
+            >
+              <template v-slot:prepend>
+                <q-icon name="filter_1" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model.number="formData.installment_value"
+              label="Valor da Parcela"
+              outlined
+              type="number"
+              step="0.01"
+              prefix="R$"
+            >
+              <template v-slot:prepend>
+                <q-icon name="money" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+
+        <q-separator class="q-mb-md" />
+
+        <div class="text-subtitle1 text-primary q-mb-md">Contato e Redes</div>
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="formData.whatsapp"
+              label="WhatsApp"
+              outlined
+              mask="+## (##) #####-####"
+              fill-mask
+              hint="Ex: +55 (81) 99999-9999"
+            >
+              <template v-slot:prepend>
+                <q-icon name="whatsapp" color="positive" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model="formData.share_url"
+              label="Link Externo / Ingressos"
+              outlined
+            >
+              <template v-slot:prepend>
+                <q-icon name="link" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12">
+            <q-input
+              v-model="formData.whatsapp_message"
+              label="Mensagem Padrão WhatsApp"
+              outlined
+              type="textarea"
+              rows="2"
+            >
+              <template v-slot:prepend>
+                <q-icon name="chat" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <!-- Aba Imagens -->
+      <q-tab-panel name="imagens">
+        <div class="row items-center justify-between q-mb-md">
+          <div class="text-subtitle1 text-primary">Galeria de Imagens</div>
+          <q-btn
+            color="primary"
+            icon="add_photo_alternate"
+            label="Adicionar Imagem"
+            @click="addImageField"
+            unelevated
+          />
+        </div>
+
+        <div v-if="formData.images.length === 0" class="text-center q-pa-lg text-grey">
+          <q-icon name="image_not_supported" size="4em" />
+          <div class="q-mt-sm">Nenhuma imagem adicionada</div>
+        </div>
+
+        <div v-else class="row q-col-gutter-md">
+          <div v-for="(image, index) in formData.images" :key="index" class="col-12">
+            <q-card bordered flat class="bg-grey-1">
+              <q-card-section>
+                <div class="row q-col-gutter-sm">
+                  <!-- Preview da Imagem (se houver URL válida) -->
+                  <div class="col-12 col-sm-3 flex flex-center bg-white q-pa-sm rounded-borders">
+                     <q-img
+                        v-if="image.url"
+                        :src="image.url"
+                        style="max-height: 150px; width: 100%"
+                        fit="contain"
+                        class="rounded-borders"
+                      >
+                        <template v-slot:error>
+                          <div class="absolute-full flex flex-center bg-grey-3 text-grey-7">
+                            <q-icon name="broken_image" size="2em" />
+                          </div>
+                        </template>
+                     </q-img>
+                     <div v-else class="text-center text-grey-5">
+                       <q-icon name="image" size="3em" />
+                       <div class="text-caption">Preview</div>
+                     </div>
+                  </div>
+
+                  <!-- Campos -->
+                  <div class="col-12 col-sm-9">
+                    <div class="row q-col-gutter-sm">
+                       <div class="col-12">
+                        <q-input
+                          v-model="image.url"
+                          label="URL da Imagem"
+                          outlined
+                          dense
+                          bg-color="white"
+                        >
+                          <template v-slot:prepend>
+                            <q-icon name="link" />
+                          </template>
+                        </q-input>
+                      </div>
+                      
+                      <div class="col-12 col-md-6">
+                        <q-input
+                          v-model="image.alt_text"
+                          label="Texto Alternativo (Alt)"
+                          outlined
+                          dense
+                          bg-color="white"
+                        />
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <q-select
+                          v-model="image.image_type"
+                          :options="imageTypeOptions"
+                          label="Onde Exibir?"
+                          outlined
+                          dense
+                          bg-color="white"
+                          emit-value
+                          map-options
+                        />
+                      </div>
+
+                      <div class="col-12 row items-center justify-between q-mt-xs">
+                        <q-toggle
+                          v-model="image.is_primary"
+                          label="Capa Principal"
+                          color="positive"
+                          dense
+                          @update:model-value="(val) => handlePrimaryToggle(index, val)"
+                        />
+                        <q-btn
+                          flat
+                          dense
+                          color="negative"
+                          icon="delete"
+                          label="Remover"
+                          class="q-px-sm"
+                          @click="removeImageField(index)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </q-tab-panel>
+    </q-tab-panels>
+
+    <!-- Botões de Ação Fixos -->
+    <div class="col-auto bg-white">
+      <q-separator />
+      <div class="row q-gutter-md q-pa-md justify-end">
+        <q-btn
+          label="Cancelar"
+          flat
+          color="grey-8"
+          @click="$emit('cancel')"
+          :disable="saving"
+          class="q-px-md"
+        />
+        <q-btn
+          type="submit"
+          label="Salvar Evento"
+          color="primary"
+          icon="save"
+          unelevated
+          :loading="saving"
+          :disable="saving"
+          class="q-px-md"
+        />
+      </div>
     </div>
   </q-form>
 </template>
@@ -291,6 +421,8 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel'])
 
 const { createEvent, updateEvent, loading: saving } = useAdminEvents()
+
+const tab = ref('geral')
 
 const formData = ref({
   title: '',
@@ -345,6 +477,7 @@ watch(
 
 function loadEventData() {
   const event = props.event
+  tab.value = 'geral' // Reseta para a primeira aba ao carregar
 
   // Mapeia as tags selecionadas
   const selectedTags =
@@ -383,6 +516,7 @@ function loadEventData() {
 }
 
 function resetForm() {
+  tab.value = 'geral'
   formData.value = {
     title: '',
     description: '',
@@ -461,9 +595,14 @@ async function handleSubmit() {
     if (props.event) {
       const existingImages = eventData.images.filter((img) => img.id)
       const newImages = eventData.images.filter((img) => !img.id)
+      // Identifica imagens removidas (estavam no original mas não estão no form)
+      const originalImageIds = props.event.event_images?.map(img => img.id) || []
+      const currentImageIds = existingImages.map(img => img.id)
+      const removeImageIds = originalImageIds.filter(id => !currentImageIds.includes(id))
 
-      eventData.images = existingImages
+      eventData.images = existingImages // Imagens para atualizar (se necessário, a lógica de update pode precisar ser refinada no backend se houver update de campos de imagem existente)
       eventData.newImages = newImages
+      eventData.removeImageIds = removeImageIds
 
       await updateEvent(props.event.id, eventData)
     } else {
@@ -476,3 +615,7 @@ async function handleSubmit() {
   }
 }
 </script>
+
+<style scoped>
+/* Estilização via classes utilitárias */
+</style>
