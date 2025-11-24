@@ -22,7 +22,11 @@
     >
       <!-- Slot para badges/overlays na imagem -->
       <slot name="image-overlay">
-        <div v-if="adminMode" class="absolute-top-right q-pa-sm row q-gutter-sm no-wrap" style="z-index: 10">
+        <div
+          v-if="adminMode"
+          class="absolute-top-right q-pa-sm row q-gutter-sm no-wrap"
+          style="z-index: 10"
+        >
           <q-btn
             round
             dense
@@ -33,13 +37,7 @@
           >
             <q-tooltip>Editar Completo</q-tooltip>
           </q-btn>
-          <q-btn
-            round
-            dense
-            color="negative"
-            icon="delete"
-            @click.stop="$emit('delete', event)"
-          >
+          <q-btn round dense color="negative" icon="delete" @click.stop="$emit('delete', event)">
             <q-tooltip>Deletar</q-tooltip>
           </q-btn>
         </div>
@@ -60,13 +58,25 @@
           label-cancel="Cancelar"
           buttons
         >
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" label="Título" />
+          <q-input
+            v-model="scope.value"
+            dense
+            autofocus
+            counter
+            @keyup.enter="scope.set"
+            label="Título"
+          />
         </q-popup-edit>
-        <q-tooltip v-if="adminMode" anchor="top middle" self="bottom middle">Clique para editar título</q-tooltip>
+        <q-tooltip v-if="adminMode" anchor="top middle" self="bottom middle"
+          >Clique para editar título</q-tooltip
+        >
       </div>
 
       <!-- Descrição (opcional) -->
-      <div v-if="showDescription && event.description" class="event-card__description relative-position cursor-pointer">
+      <div
+        v-if="showDescription && event.description"
+        class="event-card__description relative-position cursor-pointer"
+      >
         {{ truncatedDescription }}
         <q-popup-edit
           v-if="adminMode"
@@ -77,7 +87,14 @@
           label-cancel="Cancelar"
           buttons
         >
-          <q-input v-model="scope.value" dense autofocus type="textarea" rows="3" label="Descrição" />
+          <q-input
+            v-model="scope.value"
+            dense
+            autofocus
+            type="textarea"
+            rows="3"
+            label="Descrição"
+          />
         </q-popup-edit>
         <q-tooltip v-if="adminMode">Clique para editar descrição</q-tooltip>
       </div>
