@@ -1,13 +1,13 @@
 <template>
   <q-card
     class="event-card"
-    :class="[`event-card--${variant}`, { 'event-card--clickable': clickable }]"
+    :class="[`event-card--${variant}`, { 'event-card--clickable': clickable && !adminMode }]"
     flat
-    :clickable="clickable"
-    v-ripple="clickable"
+    :clickable="clickable && !adminMode"
+    v-ripple="clickable && !adminMode"
     @click="handleClick"
     role="button"
-    :tabindex="clickable ? 0 : -1"
+    :tabindex="clickable && !adminMode ? 0 : -1"
     :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
   >
     <!-- Imagem do evento -->
@@ -21,19 +21,65 @@
       :loading="lazyLoad ? 'lazy' : 'eager'"
     >
       <!-- Slot para badges/overlays na imagem -->
-      <slot name="image-overlay"></slot>
+      <slot name="image-overlay">
+        <div v-if="adminMode" class="absolute-top-right q-pa-sm row q-gutter-sm no-wrap" style="z-index: 10">
+          <q-btn
+            round
+            dense
+            color="white"
+            text-color="primary"
+            icon="edit"
+            @click.stop="$emit('edit', event)"
+          >
+            <q-tooltip>Editar Completo</q-tooltip>
+          </q-btn>
+          <q-btn
+            round
+            dense
+            color="negative"
+            icon="delete"
+            @click.stop="$emit('delete', event)"
+          >
+            <q-tooltip>Deletar</q-tooltip>
+          </q-btn>
+        </div>
+      </slot>
     </q-img>
 
     <!-- Corpo do card -->
     <q-card-section class="event-card__body">
       <!-- Título -->
-      <div class="event-card__title text-weight-bold">
+      <div class="event-card__title text-weight-bold relative-position cursor-pointer">
         {{ event.title || 'Evento sem nome' }}
+        <q-popup-edit
+          v-if="adminMode"
+          :model-value="event.title"
+          @save="(val) => emit('patch', { id: event.id, title: val })"
+          v-slot="scope"
+          label-set="Salvar"
+          label-cancel="Cancelar"
+          buttons
+        >
+          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" label="Título" />
+        </q-popup-edit>
+        <q-tooltip v-if="adminMode" anchor="top middle" self="bottom middle">Clique para editar título</q-tooltip>
       </div>
 
       <!-- Descrição (opcional) -->
-      <div v-if="showDescription && event.description" class="event-card__description">
+      <div v-if="showDescription && event.description" class="event-card__description relative-position cursor-pointer">
         {{ truncatedDescription }}
+        <q-popup-edit
+          v-if="adminMode"
+          :model-value="event.description"
+          @save="(val) => emit('patch', { id: event.id, description: val })"
+          v-slot="scope"
+          label-set="Salvar"
+          label-cancel="Cancelar"
+          buttons
+        >
+          <q-input v-model="scope.value" dense autofocus type="textarea" rows="3" label="Descrição" />
+        </q-popup-edit>
+        <q-tooltip v-if="adminMode">Clique para editar descrição</q-tooltip>
       </div>
 
       <!-- Meta informações (data e localização) -->
@@ -54,8 +100,29 @@
       <!-- Seção de Preços -->
       <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
         <!-- Preço À Vista -->
-        <div v-if="event.fullPrice" class="price-full">
+        <div v-if="event.fullPrice" class="price-full relative-position cursor-pointer">
           {{ event.formattedFullPrice }}
+          <q-popup-edit
+            v-if="adminMode"
+            :model-value="event.fullPrice"
+            @save="(val) => emit('patch', { id: event.id, price: Number(val) })"
+            v-slot="scope"
+            label-set="Salvar"
+            label-cancel="Cancelar"
+            buttons
+          >
+            <q-input
+              v-model.number="scope.value"
+              dense
+              autofocus
+              type="number"
+              step="0.01"
+              @keyup.enter="scope.set"
+              prefix="R$"
+              label="Preço"
+            />
+          </q-popup-edit>
+          <q-tooltip v-if="adminMode">Clique para editar preço</q-tooltip>
         </div>
 
         <!-- Preço Parcelado (se existir) -->
@@ -85,6 +152,12 @@ const props = defineProps({
     validator: (value) => {
       return value && typeof value === 'object'
     },
+  },
+
+  // Modo Admin (Habilita edição inline e botões)
+  adminMode: {
+    type: Boolean,
+    default: false,
   },
 
   // Altura da imagem
@@ -162,7 +235,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'patch', 'edit', 'delete'])
 
 // Computed
 const metaLayoutClass = computed(() => {
@@ -178,7 +251,10 @@ const truncatedDescription = computed(() => {
 
 // Methods
 function handleClick() {
-  if (props.clickable) {
+  // No modo admin, o clique no card não navega, pois o usuário pode estar tentando clicar em um controle de edição
+  // Mas se clicar fora dos controles, talvez queira navegar?
+  // Por segurança, no adminMode, desabilitamos o click geral do card
+  if (props.clickable && !props.adminMode) {
     emit('click', props.event)
   }
 }

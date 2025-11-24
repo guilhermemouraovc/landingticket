@@ -379,6 +379,42 @@ export function useAdminEvents() {
     }
   }
 
+  // Atualiza apenas campos específicos de um evento (mais leve e seguro para edições rápidas)
+  async function patchEvent(id, fields) {
+    loading.value = true
+    error.value = null
+    try {
+      const { error: e } = await supabase
+        .from('events')
+        .update({
+          ...fields,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (e) throw e
+
+      $q.notify({
+        type: 'positive',
+        message: 'Evento atualizado com sucesso!',
+        position: 'top',
+        timeout: 1000,
+      })
+
+      return true
+    } catch (err) {
+      error.value = err.message || 'Erro ao atualizar evento'
+      $q.notify({
+        type: 'negative',
+        message: error.value,
+        position: 'top',
+      })
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
@@ -386,6 +422,7 @@ export function useAdminEvents() {
     fetchEventById,
     createEvent,
     updateEvent,
+    patchEvent,
     deleteEvent,
   }
 }

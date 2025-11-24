@@ -33,119 +33,60 @@
       </div>
     </div>
 
-    <!-- Lista de Eventos -->
-    <q-card>
-      <q-card-section>
-        <div class="row items-center q-mb-md">
-          <q-input
-            v-model="filter"
-            placeholder="Buscar eventos..."
-            outlined
-            dense
-            class="col-12 col-md-4"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" />
-            </template>
-            <template v-slot:append v-if="filter">
-              <q-icon
-                name="close"
-                class="cursor-pointer"
-                @click="filter = ''"
-              />
-            </template>
-          </q-input>
+    <!-- Lista de Eventos (Grid) -->
+    <div class="row items-center q-mb-md">
+      <q-input
+        v-model="filter"
+        placeholder="Buscar eventos..."
+        outlined
+        dense
+        class="col-12 col-md-4"
+      >
+        <template v-slot:prepend>
+          <q-icon name="search" />
+        </template>
+        <template v-slot:append v-if="filter">
+          <q-icon
+            name="close"
+            class="cursor-pointer"
+            @click="filter = ''"
+          />
+        </template>
+      </q-input>
+    </div>
+
+    <q-table
+      grid
+      :rows="filteredEvents"
+      :columns="columns"
+      row-key="id"
+      :loading="loading"
+      v-model:pagination="pagination"
+      :rows-per-page-options="[12, 24, 48]"
+      hide-header
+      card-container-class="q-col-gutter-md"
+    >
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+          <EventCard
+            :event="props.row.cardDisplay"
+            variant="grid"
+            admin-mode
+            :clickable="false"
+            @patch="handlePatch"
+            @edit="() => openEventDialog(props.row)"
+            @delete="() => confirmDelete(props.row)"
+          />
         </div>
+      </template>
 
-        <q-table
-          :rows="filteredEvents"
-          :columns="columns"
-          row-key="id"
-          :loading="loading"
-          v-model:pagination="pagination"
-          :rows-per-page-options="[10, 20, 50]"
-        >
-          <template v-slot:body-cell-title="props">
-            <q-td :props="props">
-              <div class="text-weight-medium">{{ props.value }}</div>
-            </q-td>
-          </template>
-
-          <template v-slot:body-cell-start_date="props">
-            <q-td :props="props">
-              {{ props.value ? new Date(props.value).toLocaleDateString('pt-BR') : '-' }}
-            </q-td>
-          </template>
-
-          <template v-slot:body-cell-highlight="props">
-            <q-td :props="props">
-              <q-badge
-                :color="props.row.highlight ? 'positive' : 'grey'"
-                :label="props.row.highlight ? 'Sim' : 'Não'"
-              />
-            </q-td>
-          </template>
-
-          <template v-slot:body-cell-tags="props">
-            <q-td :props="props">
-              <q-chip
-                v-for="tag in props.row.tags"
-                :key="tag.id"
-                size="sm"
-                color="primary"
-                text-color="white"
-              >
-                {{ tag.name }}
-              </q-chip>
-            </q-td>
-          </template>
-
-          <template v-slot:body-cell-actions="props">
-            <q-td :props="props">
-              <q-btn
-                flat
-                round
-                dense
-                icon="visibility"
-                color="info"
-                @click="viewEvent(props.row)"
-                class="q-mr-xs"
-              >
-                <q-tooltip>Ver Evento</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                dense
-                icon="edit"
-                color="primary"
-                @click="openEventDialog(props.row)"
-                class="q-mr-xs"
-              >
-                <q-tooltip>Editar</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                dense
-                icon="delete"
-                color="negative"
-                @click="confirmDelete(props.row)"
-              >
-                <q-tooltip>Deletar</q-tooltip>
-              </q-btn>
-            </q-td>
-          </template>
-
-          <template v-slot:no-data>
-            <div class="full-width row flex-center q-gutter-sm q-pa-lg">
-              <q-icon size="2em" name="event" />
-              <span>Nenhum evento encontrado</span>
-            </div>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
+      <template v-slot:no-data>
+        <div class="full-width row flex-center q-gutter-sm q-pa-lg text-grey-7">
+          <q-icon size="2em" name="event_busy" />
+          <span>Nenhum evento encontrado</span>
+        </div>
+      </template>
+    </q-table>
 
     <!-- Dialog de Evento -->
     <q-dialog v-model="showEventDialog" maximized persistent>
@@ -180,12 +121,13 @@ import { useQuasar } from 'quasar'
 import { useAuth } from 'src/composables/useAuth'
 import { useAdminEvents } from 'src/composables/useAdminEvents'
 import { useSupabaseTags } from 'src/composables/useSupabaseTags'
-import { generateSlug } from 'src/utils/stringUtils'
+import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
 import EventForm from 'src/components/EventForm.vue'
+import EventCard from 'src/components/EventCard.vue'
 
 const $q = useQuasar()
 const { checkAdminPermission, logout } = useAuth()
-const { fetchAllEvents, deleteEvent, loading } = useAdminEvents()
+const { fetchAllEvents, deleteEvent, patchEvent, loading } = useAdminEvents()
 const { fetchTags } = useSupabaseTags()
 
 const events = ref([])
@@ -194,53 +136,19 @@ const filter = ref('')
 const showEventDialog = ref(false)
 const editingEvent = ref(null)
 
+// Colunas são usadas apenas para filtragem interna do q-table, mesmo no modo grid
 const columns = [
-  {
-    name: 'title',
-    label: 'Título',
-    field: 'title',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'start_date',
-    label: 'Data de Início',
-    field: 'start_date',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'city',
-    label: 'Cidade',
-    field: 'city',
-    align: 'left',
-    sortable: true,
-  },
-  {
-    name: 'highlight',
-    label: 'Destaque',
-    field: 'highlight',
-    align: 'center',
-  },
-  {
-    name: 'tags',
-    label: 'Tags',
-    field: 'tags',
-    align: 'left',
-  },
-  {
-    name: 'actions',
-    label: 'Ações',
-    field: 'actions',
-    align: 'center',
-  },
+  { name: 'title', field: 'title' },
+  { name: 'city', field: 'city' },
+  { name: 'description', field: 'description' },
+  { name: 'location', field: 'location' }
 ]
 
 const pagination = ref({
-  sortBy: 'start_date',
-  descending: false,
+  sortBy: 'created_at',
+  descending: true,
   page: 1,
-  rowsPerPage: 20,
+  rowsPerPage: 12,
 })
 
 // Filtra eventos baseado no filtro de busca
@@ -259,15 +167,6 @@ const filteredEvents = computed(() => {
 })
 
 onMounted(async () => {
-  // Debug: Verificar sessão
-  const { supabase } = await import('src/utils/supabase')
-  const { data: { session } } = await supabase.auth.getSession()
-  console.log('🔍 Debug - Sessão:', session)
-  console.log('🔍 Debug - User:', session?.user)
-  console.log('🔍 Debug - Metadata:', session?.user?.user_metadata)
-  console.log('🔍 Debug - is_admin:', session?.user?.user_metadata?.is_admin)
-  console.log('🔍 Debug - role:', session?.user?.user_metadata?.role)
-
   // Verifica permissão
   const hasPermission = await checkAdminPermission()
   if (!hasPermission) {
@@ -280,20 +179,25 @@ onMounted(async () => {
 
 async function loadEvents() {
   try {
-    console.log('🔄 Iniciando carregamento de eventos...')
     const data = await fetchAllEvents()
-    console.log('✅ Dados recebidos do Supabase:', data)
-    console.log('📊 Total de eventos:', data?.length || 0)
     
-    events.value = data.map(event => ({
-      ...event,
-      tags: event.event_tags?.map(et => et.tags) || [],
-    }))
-    
-    console.log('✅ Eventos processados:', events.value.length)
+    events.value = data.map(event => {
+      // Prepara dados para o EventCard
+      const cardDisplay = toEventCardFromSb({
+        ...event,
+        images: event.event_images,
+        tags: event.event_tags?.map(et => et.tags)
+      })
+
+      // Mantém o objeto original para o EventForm e anexa o cardDisplay
+      return {
+        ...event,
+        tags: event.event_tags?.map(et => et.tags) || [],
+        cardDisplay
+      }
+    })
     
     if (events.value.length === 0) {
-      console.log('ℹ️ Nenhum evento encontrado no banco de dados')
       $q.notify({
         type: 'info',
         message: 'Nenhum evento cadastrado ainda. Clique em "Novo Evento" para criar o primeiro!',
@@ -302,19 +206,7 @@ async function loadEvents() {
       })
     }
   } catch (err) {
-    console.error('❌ Erro ao carregar eventos:', err)
-    console.error('❌ Detalhes do erro:', {
-      message: err.message,
-      details: err.details,
-      hint: err.hint,
-      code: err.code,
-    })
-    $q.notify({
-      type: 'negative',
-      message: `Erro ao carregar eventos: ${err.message || 'Erro desconhecido'}`,
-      position: 'top',
-      timeout: 5000,
-    })
+    console.error('Erro ao carregar eventos:', err)
   }
 }
 
@@ -341,9 +233,33 @@ async function handleSave() {
   }
 }
 
-function viewEvent(event) {
-  const slug = generateSlug(event.title)
-  window.open(`/#/event/${slug}`, '_blank')
+async function handlePatch({ id, ...fields }) {
+  try {
+    // Otimista: Atualiza localmente primeiro
+    const eventIndex = events.value.findIndex(e => e.id === id)
+    if (eventIndex !== -1) {
+      const updatedEvent = { ...events.value[eventIndex], ...fields }
+      
+      // Atualiza o cardDisplay também
+      updatedEvent.cardDisplay = toEventCardFromSb({
+        ...updatedEvent,
+        images: updatedEvent.event_images,
+        tags: updatedEvent.tags
+      })
+      
+      events.value[eventIndex] = updatedEvent
+    }
+
+    // Envia para o servidor
+    await patchEvent(id, fields)
+    
+    // Recarrega para garantir consistência (opcional, mas seguro)
+    // await loadEvents() 
+  } catch (err) {
+    // Reverte em caso de erro (poderia implementar revert aqui)
+    console.error('Erro ao atualizar evento:', err)
+    await loadEvents() // Recarrega para desfazer o otimismo
+  }
 }
 
 function confirmDelete(event) {
@@ -384,12 +300,12 @@ async function handleLogout() {
     },
   }).onOk(async () => {
     await logout()
+    // Redireciona para login ou home após logout
+    window.location.reload()
   })
 }
 </script>
 
 <style scoped>
-.q-table th {
-  font-weight: 600;
-}
+/* Estilização adicional se necessário */
 </style>

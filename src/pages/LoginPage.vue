@@ -87,11 +87,11 @@ const password = ref('')
 const isPwd = ref(true)
 
 onMounted(async () => {
-  // Se já estiver autenticado e for admin, redireciona para admin
+  // Se já estiver autenticado e for admin, redireciona para home
   if (isAuthenticated.value) {
     const hasPermission = await checkAdminPermission()
     if (hasPermission) {
-      router.push('/admin')
+      router.push('/')
     }
   }
 })
@@ -99,7 +99,8 @@ onMounted(async () => {
 async function handleLogin() {
   try {
     await login(email.value, password.value)
-    router.push('/admin')
+    // Redireciona para a home ao invés de /admin
+    router.push('/')
   } catch (err) {
     // Erro já é tratado no composable
     console.error('Erro no login:', err)
