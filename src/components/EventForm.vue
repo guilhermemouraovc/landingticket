@@ -452,12 +452,38 @@ const imageTypeOptions = [
   { label: 'Ambos', value: 'both' },
 ]
 
-onMounted(() => {
+function updateTagOptions() {
   tagOptions.value = props.tags.map((tag) => ({
     id: tag.id,
     name: tag.name,
     slug: tag.slug,
   }))
+
+  // Se as tags carregarem depois do evento, precisamos remapear a seleção
+  if (props.event) {
+    const selectedTags =
+      props.event.event_tags
+        ?.map((et) => tagOptions.value.find((t) => t.id === et.tag_id))
+        .filter(Boolean) || []
+
+    // Atualiza apenas se tivermos tags correspondentes
+    if (selectedTags.length > 0) {
+      formData.value.tagIds = selectedTags
+    }
+  }
+}
+
+// Monitora mudanças nas tags (carregamento assíncrono)
+watch(
+  () => props.tags,
+  () => {
+    updateTagOptions()
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
+  // tagOptions é populado pelo watcher
 
   if (props.event) {
     loadEventData()

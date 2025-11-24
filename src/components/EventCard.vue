@@ -149,6 +149,8 @@
           <span class="installment-info">sem juros</span>
         </div>
       </div>
+      <!-- Spacer para manter consistência visual quando sem preço -->
+      <div v-else-if="showPrice && !isStacked" class="event-card__price-spacer"></div>
 
       <!-- Slot para conteúdo adicional -->
       <slot name="footer"></slot>
@@ -256,7 +258,14 @@ const emit = defineEmits(['click', 'patch', 'edit', 'delete'])
 
 // Computed
 const metaLayoutClass = computed(() => {
+  if (!props.event.hasPrice && props.showPrice && props.variant !== 'grid') {
+    return 'meta-layout--stacked'
+  }
   return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
+})
+
+const isStacked = computed(() => {
+  return !props.event.hasPrice && props.showPrice && props.variant !== 'grid'
 })
 
 const truncatedDescription = computed(() => {
@@ -393,7 +402,7 @@ function handleClick() {
   gap: 35px;
   color: #000000;
   font-family: 'Poppins', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
 }
 
@@ -404,6 +413,17 @@ function handleClick() {
 .meta-layout--row {
   flex-direction: row;
   flex-wrap: wrap;
+}
+
+.meta-layout--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  /* Ajuste para alinhar ícones e texto */
+  .meta-item {
+    width: 100%;
+  }
 }
 
 .meta-item {
@@ -430,6 +450,10 @@ function handleClick() {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.event-card__price-spacer {
+  height: 50px; /* Altura aproximada da seção de preços para manter alinhamento */
 }
 
 .price-full {

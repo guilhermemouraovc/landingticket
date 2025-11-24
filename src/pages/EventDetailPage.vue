@@ -126,6 +126,7 @@
             <!-- Botão de Comprar -->
             <q-btn
               class="buy-btn"
+              :class="{ 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
               label="Comprar"
@@ -779,6 +780,10 @@ function getEventTags(eventData) {
 
 .buy-btn:hover {
   background-color: #c3ac02 !important;
+}
+
+.buy-btn--no-price {
+  margin-top: 24px !important; /* Espaçamento normal quando não há seção de preço */
 }
 
 .event-section {
