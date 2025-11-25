@@ -4,7 +4,7 @@
       <!-- Toolbar ajustada para suportar botão de edição à direita -->
       <div class="event-toolbar row justify-between items-center">
         <BackButton :use-history="true" />
-        
+
         <q-btn
           v-if="isAdmin"
           color="primary"
@@ -126,14 +126,13 @@
             <!-- Botão de Comprar -->
             <q-btn
               class="buy-btn"
-              :class="{ 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
-              :label="event.hasPrice ? 'Comprar' : 'Participar'"
+              label="Comprar"
               unelevated
               no-caps
               :loading="openingWhatsapp"
-              :aria-label="event.hasPrice ? 'Comprar ingresso via WhatsApp' : 'Participar do evento via WhatsApp'"
+              aria-label="Comprar ingresso via WhatsApp"
               @click="openWhatsapp"
             >
               <template #loading>
@@ -164,7 +163,7 @@
 
     <!-- Dialog de Edição (Admin) -->
     <q-dialog v-model="showEditDialog" maximized persistent>
-      <q-card class="column full-height">
+      <q-card>
         <q-card-section class="row items-center q-pb-none bg-primary text-white">
           <div class="text-h6">Editar Evento</div>
           <q-space />
@@ -173,7 +172,7 @@
 
         <q-separator />
 
-        <q-card-section class="col q-pa-none">
+        <q-card-section class="q-pt-md scroll" style="max-height: 80vh">
           <EventForm
             v-if="showEditDialog && eventToEdit"
             :event="eventToEdit"
@@ -248,7 +247,7 @@ onMounted(async () => {
 
   // Inicializa sessão para verificar admin
   await initSession()
-  
+
   loadEvent(route.params.slug)
 })
 
@@ -291,13 +290,13 @@ async function loadEvent(slugParam) {
 // Admin functions
 async function openEditDialog() {
   if (!event.value) return
-  
+
   try {
     // Carrega tags se necessário
     if (allTags.value.length === 0) {
       allTags.value = await fetchTags()
     }
-    
+
     // Busca o evento raw (sem formatação) para edição
     // Precisamos do ID real, que deve estar no objeto formatado 'event.value.id'
     const rawEvent = await fetchAdminEventById(event.value.id)
@@ -307,7 +306,7 @@ async function openEditDialog() {
     console.error('Erro ao preparar edição:', err)
     $q.notify({
       type: 'negative',
-      message: 'Erro ao carregar dados para edição'
+      message: 'Erro ao carregar dados para edição',
     })
   }
 }
@@ -327,25 +326,12 @@ function openWhatsapp() {
 
   // Verifica se há tracking de influenciadora
   let phone = event.value.whatsapp
-  
-  // Lógica para definir a mensagem
-  let message = event.value.whatsappMessage
-
-  // Se a mensagem for a padrão (vinda do banco/mapper ou null) e for evento sem preço,
-  // sobrescreve com a mensagem específica de "Participar"
-  const isDefaultMessage = !message || message === DEFAULT_WHATSAPP_MESSAGE
-  
-  if (isDefaultMessage && !event.value.hasPrice) {
-    message = `Tenho interesse em participar do evento ${event.value.title}`
-  } else if (!message) {
-    // Se for null/undefined e tiver preço, usa o padrão normal
-    message = DEFAULT_WHATSAPP_MESSAGE
-  }
+  let message = event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
     phone = getInfluencerPhone()
-    message = getWhatsAppMessage(event.value.title, event.value.hasPrice) || message
+    message = getWhatsAppMessage(event.value.title) || message
   }
 
   const encodedMessage = encodeURIComponent(message)
@@ -649,7 +635,7 @@ function getEventTags(eventData) {
 
 .event-meta {
   display: grid;
-  gap: 24px;
+  gap: 0px;
   margin-top: 20px;
   margin-bottom: 40px;
 }
@@ -668,8 +654,8 @@ function getEventTags(eventData) {
 
 .meta-badge {
   /* Tile 80x80 com topo magenta e sombra */
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   background: #303b4f; /* leve contraste sobre #2A3447 */
   border-radius: 16px;
   box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
@@ -690,7 +676,7 @@ function getEventTags(eventData) {
 }
 
 .badge-day {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   line-height: 1;
   font-weight: 800;
   display: flex;
@@ -699,8 +685,8 @@ function getEventTags(eventData) {
 }
 
 .meta-icon {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -729,7 +715,7 @@ function getEventTags(eventData) {
   margin-right: -36px;
   padding-left: 0;
   padding-right: 0;
-  transform: translateY(-270px) translateX(-100px);
+  transform: translateY(-215px) translateX(-100px);
 }
 
 .pricing-info {
@@ -772,7 +758,7 @@ function getEventTags(eventData) {
   font-weight: 500;
   color: #d1d5db;
   line-height: 0.5;
-  margin-top: 70px; /* Distância exata conforme protótipo */
+  margin-top: 24px; /* Distância exata conforme protótipo */
 }
 
 .buy-btn {
@@ -785,18 +771,14 @@ function getEventTags(eventData) {
   margin-left: auto;
   margin-right: auto;
   display: block;
-  margin-top: -200px; /* Bem próximo */
-  margin-bottom: 60px;
+  margin-top: -130px; /* Bem próximo */
+  margin-bottom: 0px;
   background-color: #ffe100 !important;
   color: black !important;
 }
 
 .buy-btn:hover {
   background-color: #c3ac02 !important;
-}
-
-.buy-btn--no-price {
-  margin-top: 24px !important; /* Espaçamento normal quando não há seção de preço */
 }
 
 .event-section {
@@ -1023,7 +1005,7 @@ function getEventTags(eventData) {
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
-    margin-top: 24px;
+    margin-top: 40px;
     margin-bottom: 24px;
     margin-left: 0;
     margin-right: 0;

@@ -103,13 +103,6 @@ export function toEventCardFromSb(row) {
     cardImage = resolveImage(row, 'card')
   }
 
-  console.log('🔍 Mapeando evento para card:', {
-    id: row.id,
-    title: row.title,
-    cardImage,
-    hasImages: !!(row.images && row.images.length > 0),
-  })
-
   return {
     id: row.id,
     slug, // Adiciona o slug
