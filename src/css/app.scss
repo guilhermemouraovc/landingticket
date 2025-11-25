@@ -164,6 +164,38 @@ body {
   transition: opacity 0.3s ease;
 }
 
+/* ==================== PROTEÇÃO DE IMAGENS ==================== */
+/* Dificulta o download de imagens por clique direito, arrastar ou long press */
+img,
+.q-img,
+.q-img__image,
+.q-img__content,
+.protected-image {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: auto;
+  -webkit-touch-callout: none; /* Desabilita menu de contexto no iOS */
+}
+
+/* Overlay transparente para dificultar ainda mais */
+.q-img::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
 /* Efeito de ripple mais suave */
 .q-ripple {
   transition: opacity 0.4s ease;
