@@ -129,11 +129,11 @@
               :class="{ 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
-              label="Comprar"
+              :label="event.hasPrice ? 'Comprar' : 'Participar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
-              aria-label="Comprar ingresso via WhatsApp"
+              :aria-label="event.hasPrice ? 'Comprar ingresso via WhatsApp' : 'Participar do evento via WhatsApp'"
               @click="openWhatsapp"
             >
               <template #loading>
@@ -327,7 +327,20 @@ function openWhatsapp() {
 
   // Verifica se há tracking de influenciadora
   let phone = event.value.whatsapp
-  let message = event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
+  
+  // Lógica para definir a mensagem
+  let message = event.value.whatsappMessage
+
+  // Se a mensagem for a padrão (vinda do banco/mapper ou null) e for evento sem preço,
+  // sobrescreve com a mensagem específica de "Participar"
+  const isDefaultMessage = !message || message === DEFAULT_WHATSAPP_MESSAGE
+  
+  if (isDefaultMessage && !event.value.hasPrice) {
+    message = `Tenho interesse em participar do evento ${event.value.title}`
+  } else if (!message) {
+    // Se for null/undefined e tiver preço, usa o padrão normal
+    message = DEFAULT_WHATSAPP_MESSAGE
+  }
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
