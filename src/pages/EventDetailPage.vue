@@ -345,7 +345,7 @@ function openWhatsapp() {
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
     phone = getInfluencerPhone()
-    message = getWhatsAppMessage(event.value.title) || message
+    message = getWhatsAppMessage(event.value.title, event.value.hasPrice) || message
   }
 
   const encodedMessage = encodeURIComponent(message)

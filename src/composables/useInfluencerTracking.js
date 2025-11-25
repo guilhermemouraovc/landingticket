@@ -71,13 +71,16 @@ export function useInfluencerTracking() {
   }
 
   // Gera mensagem personalizada para WhatsApp
-  function getWhatsAppMessage(eventTitle) {
+  // @param {string} eventTitle - Título do evento
+  // @param {boolean} hasPrice - Se o evento tem preço (true = compra, false = participar)
+  function getWhatsAppMessage(eventTitle, hasPrice = true) {
     if (!hasInfluencer() || !eventTitle) {
       return null
     }
 
     const article = INFLUENCER_GENDER[influencerName.value] || 'pela'
-    return `Olá vim ${article} ${influencerName.value} e gostaria de finalizar a compra do ${eventTitle}`
+    const action = hasPrice ? 'finalizar a compra do' : 'participar do'
+    return `Olá vim ${article} ${influencerName.value} e gostaria de ${action} ${eventTitle}`
   }
 
   // Retorna o número do WhatsApp para influenciadoras
