@@ -505,7 +505,6 @@ let debounceTimer = null
 onMounted(async () => {
   await initSession()
   await loadCategories()
-  console.log('✅ Categorias carregadas no header:', categories.value?.length || 0)
 })
 
 // Limpeza ao desmontar: restaura o body se o drawer estiver aberto

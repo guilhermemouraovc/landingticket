@@ -70,7 +70,6 @@ onMounted(async () => {
     const { fetchTags } = useSupabaseTags()
     const tags = await fetchTags()
     rawCategories.value = mapToCategoryChips(tags)
-    console.log('✅ Tags carregadas no filtro:', rawCategories.value.length)
   } catch (e) {
     console.error('❌ Erro ao carregar tags no filtro:', e)
     rawCategories.value = []

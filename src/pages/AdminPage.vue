@@ -89,8 +89,8 @@
     </q-table>
 
     <!-- Dialog de Evento -->
-    <q-dialog v-model="showEventDialog" maximized persistent>
-      <q-card class="column full-height">
+    <q-dialog v-model="showEventDialog" :maximized="$q.screen.lt.md" persistent>
+      <q-card class="column full-height" :style="$q.screen.lt.md ? '' : 'min-width: 70vw; max-width: 90vw;'">
         <q-card-section class="row items-center q-pb-none bg-primary text-white">
           <div class="text-h6">
             {{ editingEvent ? 'Editar Evento' : 'Novo Evento' }}
@@ -101,7 +101,7 @@
 
         <q-separator />
 
-        <q-card-section class="col q-pa-none">
+        <q-card-section class="col q-pa-none scroll">
           <EventForm
             v-if="showEventDialog"
             :event="editingEvent"

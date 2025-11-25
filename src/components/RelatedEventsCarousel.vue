@@ -125,14 +125,6 @@ async function loadRelatedEvents() {
     // Determina a categoria/tag para buscar
     const categoryTag = getCategoryTag(props.eventTags)
     
-    if (import.meta.env.DEV) {
-      console.log('🔍 Debug RelatedEventsCarousel:', {
-        currentEventId: props.currentEventId,
-        eventTags: props.eventTags,
-        categoryTag,
-      })
-    }
-
     // Busca eventos pela tag usando view_events_by_tag
     // Usa ilike para busca case-insensitive
     const { data: tagRows, error: tagError } = await supabase
@@ -151,14 +143,6 @@ async function loadRelatedEvents() {
     const eventIds = (tagRows || [])
       .map((row) => row.event_id)
       .filter((id) => id !== props.currentEventId) // Exclui evento atual
-
-    if (import.meta.env.DEV) {
-      console.log('📊 Eventos encontrados:', {
-        totalTagRows: tagRows?.length || 0,
-        eventIdsAfterFilter: eventIds.length,
-        eventIds,
-      })
-    }
 
     if (eventIds.length === 0) {
       events.value = []
@@ -182,10 +166,6 @@ async function loadRelatedEvents() {
 
     // Mapeia os eventos para o formato da UI
     events.value = (eventsData || []).map(toEventCardFromSb).slice(0, 6) // Limita a 6 eventos no carrossel
-    
-    if (import.meta.env.DEV) {
-      console.log('✅ Eventos mapeados:', events.value.length)
-    }
   } catch (error) {
     if (import.meta.env.DEV) {
       console.error('❌ Erro ao carregar eventos relacionados:', error)

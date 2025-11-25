@@ -1,5 +1,5 @@
 <template>
-  <q-form @submit="handleSubmit" class="column full-height">
+  <q-form @submit="handleSubmit" class="column">
     <div class="col-auto">
       <q-tabs
         v-model="tab"
@@ -9,6 +9,8 @@
         indicator-color="primary"
         align="justify"
         narrow-indicator
+        mobile-arrows
+        outside-arrows
       >
         <q-tab name="geral" icon="info" label="Geral" />
         <q-tab name="data_local" icon="event" label="Data e Local" />
@@ -19,7 +21,7 @@
       <q-separator />
     </div>
 
-    <q-tab-panels v-model="tab" animated class="col scroll bg-grey-1">
+    <q-tab-panels v-model="tab" animated class="bg-grey-1">
       <!-- Aba Geral -->
       <q-tab-panel name="geral" class="q-pa-md">
         <div class="row q-col-gutter-md">
@@ -266,7 +268,7 @@
 
       <!-- Aba Imagens -->
       <q-tab-panel name="imagens">
-        <div class="row items-center justify-between q-mb-md">
+        <div class="row items-center justify-between q-mb-md wrap q-gap-md">
           <div class="text-subtitle1 text-primary">Galeria de Imagens</div>
           <q-btn
             color="primary"
@@ -274,6 +276,7 @@
             label="Adicionar Imagem"
             @click="addImageField"
             unelevated
+            :size="$q.screen.lt.sm ? 'sm' : 'md'"
           />
         </div>
 
@@ -348,7 +351,7 @@
                         />
                       </div>
 
-                      <div class="col-12 row items-center justify-between q-mt-xs">
+                      <div class="col-12 row items-center justify-between q-mt-xs wrap">
                         <q-toggle
                           v-model="image.is_primary"
                           label="Capa Principal"
@@ -379,7 +382,7 @@
     <!-- Botões de Ação Fixos -->
     <div class="col-auto bg-white">
       <q-separator />
-      <div class="row q-gutter-md q-pa-md justify-end">
+      <div class="row q-gutter-md q-pa-md justify-end wrap">
         <q-btn
           label="Cancelar"
           flat
@@ -387,6 +390,7 @@
           @click="$emit('cancel')"
           :disable="saving"
           class="q-px-md"
+          :class="{ 'full-width': $q.screen.lt.sm }"
         />
         <q-btn
           type="submit"
@@ -397,6 +401,7 @@
           :loading="saving"
           :disable="saving"
           class="q-px-md"
+          :class="{ 'full-width': $q.screen.lt.sm }"
         />
       </div>
     </div>
