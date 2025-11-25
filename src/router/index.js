@@ -74,13 +74,10 @@ export default defineRouter(function (/* { store, ssrContext } */) {
       try {
         // Importa dinamicamente para evitar problemas de SSR
         const { useAuth } = await import('src/composables/useAuth')
-        const { checkAdminPermission, initSession } = useAuth()
+        const { checkAdminPermission, getSession } = useAuth()
         
-        // Garante que a sessão está inicializada
-        await initSession()
-        
-        // Aguarda um pouco para garantir que o estado foi atualizado
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Verifica sessão existente sem re-inicializar listeners
+        await getSession()
         
         const hasPermission = await checkAdminPermission()
         if (!hasPermission) {

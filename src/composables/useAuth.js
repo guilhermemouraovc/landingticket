@@ -2,12 +2,17 @@ import { ref, computed } from 'vue'
 import { supabase } from 'src/utils/supabase'
 import { useQuasar } from 'quasar'
 
+// Singleton state - shared across all useAuth() calls
+const user = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+// Track initialization to avoid duplicate listeners
+let isInitialized = false
+let initPromise = null
+
 export function useAuth() {
   const $q = useQuasar()
-  
-  const user = ref(null)
-  const loading = ref(false)
-  const error = ref(null)
   
   // Função helper para navegação segura
   // Usa window.location para garantir que sempre funciona, mesmo durante inicialização do router
@@ -33,20 +38,53 @@ export function useAuth() {
     // return checkUserRole(user.value.id)
   })
 
-  // Inicializa a sessão atual
+  // Inicializa a sessão atual (singleton - only runs once)
   async function initSession() {
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      user.value = session?.user || null
-      
-      // Escuta mudanças na autenticação
-      supabase.auth.onAuthStateChange((_event, session) => {
-        user.value = session?.user || null
-      })
-    } catch (err) {
-      console.error('Erro ao inicializar sessão:', err)
-      error.value = 'Erro ao verificar autenticação'
+    // If already initialized, return immediately
+    if (isInitialized) {
+      return
     }
+    
+    // If initialization is in progress, wait for it
+    if (initPromise) {
+      return initPromise
+    }
+    
+    // Start initialization
+    initPromise = (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        user.value = session?.user || null
+        
+        // Register listener only once
+        supabase.auth.onAuthStateChange((_event, session) => {
+          user.value = session?.user || null
+        })
+        
+        isInitialized = true
+      } catch (err) {
+        console.error('Erro ao inicializar sessão:', err)
+        error.value = 'Erro ao verificar autenticação'
+        // Reset so it can be retried
+        initPromise = null
+        throw err
+      }
+    })()
+    
+    return initPromise
+  }
+  
+  // Get current session without re-initializing
+  // Used by navigation guards to check auth state
+  async function getSession() {
+    // If already initialized, use cached state
+    if (isInitialized) {
+      return user.value
+    }
+    
+    // Otherwise, initialize first
+    await initSession()
+    return user.value
   }
 
   // Login com email e senha
@@ -145,6 +183,7 @@ export function useAuth() {
     isAuthenticated,
     isAdmin,
     initSession,
+    getSession,
     login,
     logout,
     checkAdminPermission,
