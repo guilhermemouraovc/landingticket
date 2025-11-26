@@ -106,8 +106,56 @@
               </div>
             </div>
 
-            <!-- Seção de Preços -->
-            <div v-if="event.hasPrice" class="pricing-section q-mt-xl">
+            <!-- Seção de Ingressos (Múltiplos Dias) -->
+            <div v-if="event.days && event.days.length > 0" class="tickets-section q-mt-xl">
+              <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
+
+              <div class="tickets-grid">
+                <div v-for="day in event.days" :key="day.id" class="ticket-card">
+                  <!-- Data Header -->
+                  <div class="ticket-header q-mb-md">
+                    <div class="text-h6 text-weight-bold text-white">{{ day.label }}</div>
+                    <div class="row items-center text-grey-4 text-caption q-gutter-x-xs">
+                      <q-icon name="event" size="14px" />
+                      <span v-if="day.dateBadge.day"
+                        >{{ day.dateBadge.day }}/{{ day.dateBadge.month }}</span
+                      >
+                      <span v-if="event.cityState">• {{ event.cityState }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Preço -->
+                  <div class="ticket-price-info q-mb-md">
+                    <div v-if="day.hasPrice">
+                      <div class="text-h5 text-weight-bold text-white">
+                        {{ day.formattedFullPrice }}
+                      </div>
+                      <div v-if="day.installments" class="text-caption text-grey-4">
+                        Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
+                        {{ day.installments && 'sem juros' }}
+                      </div>
+                    </div>
+                    <div v-else class="text-h6 text-white">Consulte</div>
+                  </div>
+
+                  <q-separator class="bg-grey-8 q-mb-md" />
+
+                  <!-- Botão -->
+                  <q-btn
+                    class="ticket-buy-btn full-width"
+                    color="warning"
+                    text-color="black"
+                    label="Comprar"
+                    unelevated
+                    no-caps
+                    @click="openTicketUrl(day)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Seção de Preços (Único Dia) -->
+            <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
                 <div
                   v-if="event.installments && event.installmentValue"
@@ -123,8 +171,9 @@
               </div>
             </div>
 
-            <!-- Botão de Comprar -->
+            <!-- Botão de Comprar (Único Dia) -->
             <q-btn
+              v-if="!event.days || event.days.length === 0"
               class="buy-btn"
               color="warning"
               text-color="black"
@@ -133,12 +182,8 @@
               no-caps
               :loading="openingWhatsapp"
               aria-label="Comprar ingresso via WhatsApp"
-              @click="openWhatsapp"
-            >
-              <template #loading>
-                <q-spinner-dots size="20px" />
-              </template>
-            </q-btn>
+              @click="openWhatsapp()"
+            />
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
               <div class="section-title">Atrações</div>
@@ -319,19 +364,36 @@ async function handleSave() {
 }
 
 // Utilitários de ação
-function openWhatsapp() {
+function openTicketUrl(day) {
+  if (day.ticketUrl) {
+    window.open(day.ticketUrl, '_blank')
+    return
+  }
+
+  // Fallback: WhatsApp com mensagem específica
+  const message = `Olá! Tenho interesse no ingresso para ${event.value.title} - ${day.label}`
+  openWhatsapp(message)
+}
+
+function openWhatsapp(customMessageOrEvent) {
   if (!event.value) return
 
   openingWhatsapp.value = true
 
+  // Verifica se foi passado uma mensagem customizada (string) ou é evento de click
+  let customMessage = typeof customMessageOrEvent === 'string' ? customMessageOrEvent : null
+
   // Verifica se há tracking de influenciadora
   let phone = event.value.whatsapp
-  let message = event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
+  let message = customMessage || event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
     phone = getInfluencerPhone()
-    message = getWhatsAppMessage(event.value.title) || message
+    // Se não foi passada mensagem customizada, tenta pegar a da influencer
+    if (!customMessage) {
+      message = getWhatsAppMessage(event.value.title) || message
+    }
   }
 
   const encodedMessage = encodeURIComponent(message)
@@ -1035,8 +1097,57 @@ function getEventTags(eventData) {
   outline-offset: 3px;
 }
 
-.buy-btn:focus-visible {
+  .buy-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
+}
+
+/* ==================== TICKETS SECTION (MULTIPLE DAYS) ==================== */
+.tickets-section {
+  margin-left: -36px;
+  margin-right: -36px;
+  padding: 32px 36px;
+  background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 24px;
+}
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ticket-card {
+  background: #303b4f;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ticket-card:hover {
+  transform: translateY(-4px);
+  border-color: #ffe100;
+}
+
+.ticket-buy-btn {
+  font-weight: 600;
+  border-radius: 8px;
+  height: 40px;
+}
+
+@media (max-width: 599px) {
+  .tickets-section {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 24px 20px;
+  }
+
+  .tickets-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -81,7 +81,16 @@ export function useSupabaseEvents() {
           .eq('id', idOrSlug)
           .single()
         if (e) throw e
-        return toEventDetailFromSb(data)
+
+        // Busca dias do evento
+        const { data: days } = await supabase
+          .from('event_days')
+          .select('*')
+          .eq('event_id', data.id)
+          .eq('is_active', true)
+          .order('date', { ascending: true })
+
+        return toEventDetailFromSb({ ...data, days })
       } else {
         // Se for slug, busca por título normalizado
         const { data: allEvents, error: e1 } = await supabase.from('view_event_detail').select('*')
@@ -95,7 +104,15 @@ export function useSupabaseEvents() {
           throw new Error('Evento não encontrado')
         }
 
-        return toEventDetailFromSb(event)
+        // Busca dias do evento
+        const { data: days } = await supabase
+          .from('event_days')
+          .select('*')
+          .eq('event_id', event.id)
+          .eq('is_active', true)
+          .order('date', { ascending: true })
+
+        return toEventDetailFromSb({ ...event, days })
       }
     } catch (err) {
       if (import.meta.env.DEV) {
