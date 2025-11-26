@@ -31,17 +31,15 @@
                 @click="$q.screen.lt.sm ? $router.push(ev.link || '#') : null"
               >
                 <!-- Imagem -->
-                <div class="featured-img">
-                  <q-img
-                    :src="ev.image"
-                    :alt="`Imagem do evento ${ev.title}`"
-                    fit="cover"
-                    class="full"
-                    :ratio="16 / 9"
-                    spinner-color="white"
-                    loading="lazy"
-                  />
-                </div>
+                <q-img
+                  :src="ev.image"
+                  :alt="`Imagem do evento ${ev.title}`"
+                  fit="cover"
+                  class="featured-img"
+                  :ratio="16 / 9"
+                  spinner-color="white"
+                  loading="lazy"
+                />
 
                 <!-- Painel -->
                 <div class="featured-panel">
@@ -375,6 +373,8 @@ async function scrollToSection(sectionId) {
         top: offsetPosition,
         behavior: 'smooth',
       })
+    } else {
+      console.warn(`⚠️ Seção com ID "${sectionId}" não encontrada`)
     }
   }, 150)
 }
@@ -453,6 +453,7 @@ async function loadFeatured() {
 
     // Se não há eventos em destaque, busca eventos recentes do Supabase
     if (!events.length) {
+      console.log('🔄 Nenhum evento em destaque encontrado, buscando eventos recentes...')
       events = await fetchEventsSupabase({ limit: 25 })
     }
 
@@ -466,9 +467,12 @@ async function loadFeatured() {
 
 async function loadUpcomingEvents() {
   try {
+    console.log('🔍 Carregando eventos próximos...')
+
     // Busca eventos com data >= hoje, ordenados por data crescente
     upcomingEvents.value = await fetchUpcomingEventsSupabase({ limit: 100 })
 
+    console.log('✅ Eventos próximos carregados:', upcomingEvents.value.length)
   } catch (err) {
     console.error('❌ Falha ao carregar eventos próximos', err)
     upcomingEvents.value = []
@@ -477,6 +481,8 @@ async function loadUpcomingEvents() {
 
 async function loadReveillon() {
   try {
+    console.log('🔍 Carregando eventos de Réveillon...')
+
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Reveillons' // Nome padrão atualizado
 
@@ -510,6 +516,7 @@ async function loadReveillon() {
     }
 
     reveillonEvents.value = events
+    console.log('✅ Eventos de Réveillon carregados:', reveillonEvents.value.length)
   } catch (err) {
     console.error('❌ Falha ao carregar reveillon', err)
     reveillonEvents.value = []
@@ -518,6 +525,8 @@ async function loadReveillon() {
 
 async function loadCarnaval() {
   try {
+    console.log('🔍 Carregando eventos de Carnaval...')
+
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Carnaval' // Nome padrão atualizado
 
@@ -551,6 +560,7 @@ async function loadCarnaval() {
     }
 
     carnavalEvents.value = events
+    console.log('✅ Eventos de Carnaval carregados:', events.length)
   } catch (err) {
     console.error('❌ Falha ao carregar carnaval', err)
     carnavalEvents.value = []
@@ -559,6 +569,8 @@ async function loadCarnaval() {
 
 async function loadFestivais() {
   try {
+    console.log('🔍 Carregando eventos de Festivais...')
+
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Festivais' // Nome padrão atualizado
 
@@ -583,6 +595,7 @@ async function loadFestivais() {
     }
 
     saoJoaoEvents.value = events
+    console.log('✅ Total de eventos de Festivais carregados:', events.length)
   } catch (err) {
     console.error('❌ Falha ao carregar Festivais', err)
     saoJoaoEvents.value = []
@@ -592,6 +605,7 @@ async function loadFestivais() {
 async function loadAllEvents() {
   try {
     allEvents.value = await fetchAllEventsSupabase(100)
+    console.log('✅ Programação completa carregada:', allEvents.value.length)
   } catch (err) {
     console.error('❌ Falha ao carregar programação completa', err)
     allEvents.value = []
@@ -690,18 +704,22 @@ function clearCategories() {
 async function filterEventsByCategories(categoryLabels) {
   loadingCarousels.value = true
   try {
+    console.log('🔍 Filtrando eventos por categorias:', categoryLabels)
+
     // Converte labels para tagNames
     const tagNames = categoryLabels
       .map((label) => getTagNameByLabel(label))
       .filter((tagName) => tagName !== null)
 
     if (tagNames.length === 0) {
+      console.warn('⚠️ Nenhuma categoria mapeada encontrada')
       filteredEvents.value = []
       return Promise.resolve()
     }
 
     // Usa função para buscar eventos com múltiplas tags (AND lógico)
     filteredEvents.value = await fetchEventsByMultipleTagsSupabase(tagNames, { limit: 100 })
+    console.log('✅ Eventos filtrados:', filteredEvents.value.length)
 
     // Faz scroll até a seção de eventos filtrados
     const sectionId = getCombinedSectionId()
@@ -808,10 +826,11 @@ async function filterEventsByCategories(categoryLabels) {
   display: grid;
   grid-template-columns: 60% 40%;
   height: 100%;
-  background: #fff;
+  background: transparent; /* Removido fundo branco para evitar borda pixelada */
   border-radius: 32px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateZ(0); /* Força GPU para melhor recorte */
 }
 
 /* Mobile: layout em coluna (imagem em cima, info embaixo) com altura fixa */
@@ -830,39 +849,66 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 .featured-img {
-  overflow: hidden;
-}
-
-.featured-img .q-img__content img {
-  object-fit: cover;
   width: 100%;
   height: 100%;
-}
-
-.featured-img .full {
-  width: 100%;
-  height: 100%;
-}
-
-.featured-img .full img {
   object-fit: cover;
-}
+  border-radius: 0; /* REMOVIDO RADIUS: Deixa o pai (.featured-grid) cortar via overflow: hidden */
+  display: block;
+  flex-shrink: 0;
+  background-color: transparent !important;
 
-/* Mobile: imagem com altura fixa e radius apenas no topo */
-@media (max-width: 599px) {
-  .featured-img {
-    height: 358px;
-    border-radius: 24px 24px 0 0;
+  /* Força o q-img a NÃO ter border-radius */
+  :deep(.q-img__container) {
+    border-radius: 0;
+    background-color: transparent !important;
   }
 
-  .featured-img .full {
-    height: 358px;
+  :deep(.q-img__image) {
+    border-radius: 0;
+    background-color: transparent !important;
+  }
+
+  :deep(img) {
+    border-radius: 0;
+    display: block;
+    transform: scale(1.01); /* Leve aumento para garantir cobertura total do container */
+    backface-visibility: hidden;
+  }
+}
+
+/* Mobile: imagem com altura fixa */
+@media (max-width: 599px) {
+  .featured-img {
+    height: 358px !important;
+    border-radius: 0;
+  }
+
+  /* Mobile: remove radius */
+  .featured-img :deep(.q-img__container) {
+    border-radius: 0;
+  }
+
+  .featured-img :deep(.q-img__image) {
+    border-radius: 0;
+  }
+
+  .featured-img :deep(img) {
+    border-radius: 0;
+    transform: scale(1.01);
   }
 }
 .featured-panel {
   background: #fff;
   color: #1f2937;
   display: flex;
+  border-radius: 0 32px 32px 0; /* Radius apenas do lado direito no desktop */
+}
+
+/* Mobile: painel com radius apenas embaixo */
+@media (max-width: 599px) {
+  .featured-panel {
+    border-radius: 0 0 24px 24px;
+  }
 }
 .featured-panel,
 .featured-panel * {
