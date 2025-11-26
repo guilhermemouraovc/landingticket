@@ -124,7 +124,7 @@ async function loadRelatedEvents() {
 
     // Determina a categoria/tag para buscar
     const categoryTag = getCategoryTag(props.eventTags)
-    
+
     // Busca eventos pela tag usando view_events_by_tag
     // Usa ilike para busca case-insensitive
     const { data: tagRows, error: tagError } = await supabase
@@ -293,10 +293,6 @@ onMounted(async () => {
 
 .nav-button:hover:not(:disabled) {
   opacity: 0.7;
-}
-
-.nav-button:active:not(:disabled) {
-  /* Sem efeito visual */
 }
 
 .nav-button:disabled {
