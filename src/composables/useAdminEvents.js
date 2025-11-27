@@ -292,6 +292,26 @@ export function useAdminEvents() {
         if (e4) throw e4
       }
 
+      // Atualiza imagens existentes (is_primary, alt_text, image_type, order_index)
+      if (eventData.images && eventData.images.length > 0) {
+        for (const img of eventData.images) {
+          if (img.id) {
+            const { error: e5 } = await supabase
+              .from('event_images')
+              .update({
+                url: img.url,
+                alt_text: img.alt_text || eventData.title,
+                is_primary: img.is_primary || false,
+                order_index: img.order_index,
+                image_type: img.image_type || 'both',
+              })
+              .eq('id', img.id)
+
+            if (e5) throw e5
+          }
+        }
+      }
+
       // Adiciona novas imagens
       if (eventData.newImages && eventData.newImages.length > 0) {
         const imageRecords = eventData.newImages.map((img, index) => ({
@@ -303,11 +323,11 @@ export function useAdminEvents() {
           image_type: img.image_type || 'both',
         }))
 
-        const { error: e5 } = await supabase
+        const { error: e6 } = await supabase
           .from('event_images')
           .insert(imageRecords)
 
-        if (e5) throw e5
+        if (e6) throw e6
       }
 
       $q.notify({
