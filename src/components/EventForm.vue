@@ -16,6 +16,7 @@
         <q-tab name="data_local" icon="event" label="Data e Local" />
         <q-tab name="precos" icon="payments" label="Valores" />
         <q-tab name="imagens" icon="image" label="Imagens" />
+        <q-tab name="dias" icon="calendar_today" label="Múltiplos Dias" />
       </q-tabs>
 
       <q-separator />
@@ -171,6 +172,189 @@
                 <q-icon name="map" />
               </template>
             </q-input>
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <!-- Aba Múltiplos Dias -->
+      <q-tab-panel name="dias">
+        <div class="row items-center justify-between q-mb-md wrap q-gap-md">
+          <div class="text-subtitle1 text-primary">Dias do Evento</div>
+          <q-btn
+            color="primary"
+            icon="add"
+            label="Adicionar Dia"
+            @click="addDayField"
+            unelevated
+            :size="$q.screen.lt.sm ? 'sm' : 'md'"
+          />
+        </div>
+
+        <div v-if="formData.days.length === 0" class="text-center q-pa-lg text-grey">
+          <q-icon name="event_busy" size="4em" />
+          <div class="q-mt-sm">Nenhum dia adicionado</div>
+          <div class="text-caption q-mt-xs">Adicione dias específicos para eventos com múltiplas datas</div>
+        </div>
+
+        <div v-else class="row q-col-gutter-md">
+          <div v-for="(day, index) in formData.days" :key="index" class="col-12">
+            <q-card bordered flat class="bg-grey-1">
+              <q-card-section>
+                <div class="row items-center justify-between q-mb-md">
+                  <div class="text-h6 text-primary">Dia {{ index + 1 }}</div>
+                  <q-btn
+                    flat
+                    dense
+                    color="negative"
+                    icon="delete"
+                    label="Remover"
+                    @click="removeDayField(index)"
+                  />
+                </div>
+
+                <div class="row q-col-gutter-md">
+                  <!-- Data -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model="day.date"
+                      label="Data *"
+                      outlined
+                      type="date"
+                      :rules="[(val) => !!val || 'Data é obrigatória']"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="calendar_today" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Horário de Início -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model="day.start_time"
+                      label="Horário de Início"
+                      outlined
+                      type="time"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="schedule" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Horário de Término -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model="day.end_time"
+                      label="Horário de Término"
+                      outlined
+                      type="time"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="schedule" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Título do Dia -->
+                  <div class="col-12">
+                    <q-input
+                      v-model="day.title"
+                      label="Título do Dia"
+                      outlined
+                      hint="Ex: Dia 1, Sábado, Abertura"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="title" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Descrição -->
+                  <div class="col-12">
+                    <q-input
+                      v-model="day.description"
+                      label="Descrição"
+                      outlined
+                      type="textarea"
+                      rows="2"
+                      hint="Informações específicas deste dia"
+                    />
+                  </div>
+
+                  <!-- Preço à Vista -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model.number="day.price"
+                      label="Preço à Vista"
+                      outlined
+                      type="number"
+                      step="0.01"
+                      prefix="R$"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="attach_money" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Qtd. Parcelas -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model.number="day.price_installments"
+                      label="Qtd. Parcelas"
+                      outlined
+                      type="number"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="filter_1" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Valor da Parcela -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model.number="day.installment_value"
+                      label="Valor da Parcela"
+                      outlined
+                      type="number"
+                      step="0.01"
+                      prefix="R$"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="money" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Link do Ingresso -->
+                  <div class="col-12">
+                    <q-input
+                      v-model="day.ticket_url"
+                      label="Link do Ingresso"
+                      outlined
+                      hint="URL para compra de ingressos deste dia"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="link" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Ativo -->
+                  <div class="col-12">
+                    <q-toggle
+                      v-model="day.is_active"
+                      label="Dia ativo (visível no site)"
+                      color="positive"
+                      :true-value="true"
+                      :false-value="false"
+                    />
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
           </div>
         </div>
       </q-tab-panel>
@@ -448,6 +632,7 @@ const formData = ref({
   highlight: false,
   tagIds: [],
   images: [],
+  days: [],
 })
 
 const tagOptions = ref([])
@@ -543,6 +728,20 @@ function loadEventData() {
         order_index: img.order_index,
         image_type: img.image_type || 'both',
       })) || [],
+    days:
+      event.event_days?.map((day) => ({
+        id: day.id,
+        date: day.date || '',
+        start_time: day.start_time || '',
+        end_time: day.end_time || '',
+        title: day.title || '',
+        description: day.description || '',
+        price: day.price || null,
+        price_installments: day.price_installments || null,
+        installment_value: day.installment_value || null,
+        ticket_url: day.ticket_url || '',
+        is_active: day.is_active !== undefined ? day.is_active : true,
+      })) || [],
   }
 }
 
@@ -567,6 +766,7 @@ function resetForm() {
     highlight: false,
     tagIds: [],
     images: [],
+    days: [],
   }
 }
 
@@ -610,6 +810,25 @@ function handlePrimaryToggle(index, value) {
   }
 }
 
+function addDayField() {
+  formData.value.days.push({
+    date: '',
+    start_time: '',
+    end_time: '',
+    title: '',
+    description: '',
+    price: null,
+    price_installments: null,
+    installment_value: null,
+    ticket_url: '',
+    is_active: true,
+  })
+}
+
+function removeDayField(index) {
+  formData.value.days.splice(index, 1)
+}
+
 async function handleSubmit() {
   try {
     const eventData = {
@@ -634,6 +853,18 @@ async function handleSubmit() {
       eventData.images = existingImages // Imagens para atualizar (se necessário, a lógica de update pode precisar ser refinada no backend se houver update de campos de imagem existente)
       eventData.newImages = newImages
       eventData.removeImageIds = removeImageIds
+
+      // Separa dias novos dos existentes
+      const existingDays = eventData.days.filter((day) => day.id)
+      const newDays = eventData.days.filter((day) => !day.id)
+      // Identifica dias removidos (estavam no original mas não estão no form)
+      const originalDayIds = props.event.event_days?.map(day => day.id) || []
+      const currentDayIds = existingDays.map(day => day.id)
+      const removeDayIds = originalDayIds.filter(id => !currentDayIds.includes(id))
+
+      eventData.days = existingDays
+      eventData.newDays = newDays
+      eventData.removeDayIds = removeDayIds
 
       await updateEvent(props.event.id, eventData)
     } else {

@@ -218,6 +218,7 @@ function formatEventDays(days) {
   return days.map((day) => {
     let dateLabel = ''
     let dateBadge = { day: '', month: '' }
+    let formattedDateShort = ''
 
     if (day.date) {
       // Cria data garantindo que não haja problema de timezone (adiciona hora meio dia)
@@ -231,11 +232,16 @@ function formatEventDays(days) {
         const weekStrCap = weekStr.charAt(0).toUpperCase() + weekStr.slice(1)
         
         dateLabel = `${dayStr} ${weekStrCap}`
+
+        // Formato curto: "14 FEV" (para fallback)
+        const dayNum = dateObj.getDate()
+        const monthShort = dateObj.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
+        formattedDateShort = `${dayNum} ${monthShort}`
         
         // Badge info
         dateBadge = {
           day: dateObj.getDate().toString().padStart(2, '0'),
-          month: dateObj.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
+          month: monthShort
         }
       }
     }
@@ -251,6 +257,7 @@ function formatEventDays(days) {
       date: day.date,
       title: day.title, // Ex: "Dia 1", "Sábado"
       label: dateLabel, // Ex: "14/02 Sábado"
+      formattedDateShort, // Ex: "14 FEV"
       description: day.description,
       ticketUrl: day.ticket_url,
       dateBadge,

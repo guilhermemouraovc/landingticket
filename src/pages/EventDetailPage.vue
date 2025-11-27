@@ -111,46 +111,66 @@
               <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
 
               <div class="tickets-grid">
-                <div v-for="day in event.days" :key="day.id" class="ticket-card">
+                <div
+                  v-for="day in event.days"
+                  :key="day.id"
+                  class="ticket-card cursor-pointer"
+                  :class="{ 'selected-card': selectedDay?.id === day.id }"
+                  @click="selectedDay = day"
+                  role="button"
+                  :aria-pressed="selectedDay?.id === day.id"
+                >
                   <!-- Data Header -->
-                  <div class="ticket-header q-mb-md">
-                    <div class="text-h6 text-weight-bold text-white">{{ day.label }}</div>
-                    <div class="row items-center text-grey-4 text-caption q-gutter-x-xs">
-                      <q-icon name="event" size="14px" />
-                      <span v-if="day.dateBadge.day"
-                        >{{ day.dateBadge.day }}/{{ day.dateBadge.month }}</span
-                      >
-                      <span v-if="event.cityState">• {{ event.cityState }}</span>
+                  <div class="ticket-header q-mb-sm">
+                    <div class="text-h6 text-weight-bold text-dark ticket-day-title">
+                      {{ day.label }}
+                    </div>
+                  </div>
+
+                  <!-- Meta Info (Data Evento e Local) -->
+                  <div class="ticket-meta row items-center q-mb-md">
+                    <div class="row items-center q-mr-md">
+                      <q-icon name="calendar_today" class="text-magenta q-mr-xs" size="16px" />
+                      <span class="text-grey-7 text-caption text-weight-medium">
+                        {{ event.date || day.formattedDateShort || 'Data a definir' }}
+                      </span>
+                    </div>
+                    <div class="row items-center">
+                      <q-icon name="location_on" class="text-magenta q-mr-xs" size="16px" />
+                      <span class="text-grey-7 text-caption text-weight-medium">
+                        {{ event.cityState || 'Local a definir' }}
+                      </span>
                     </div>
                   </div>
 
                   <!-- Preço -->
-                  <div class="ticket-price-info q-mb-md">
+                  <div class="ticket-price-info">
                     <div v-if="day.hasPrice">
-                      <div class="text-h5 text-weight-bold text-white">
+                      <div class="text-h5 text-weight-bold text-dark">
                         {{ day.formattedFullPrice }}
                       </div>
-                      <div v-if="day.installments" class="text-caption text-grey-4">
+                      <div v-if="day.installments" class="ticket-installments">
                         Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
                         {{ day.installments && 'sem juros' }}
                       </div>
                     </div>
-                    <div v-else class="text-h6 text-white">Consulte</div>
+                    <div v-else class="text-h6 text-dark">Consulte</div>
                   </div>
-
-                  <q-separator class="bg-grey-8 q-mb-md" />
-
-                  <!-- Botão -->
-                  <q-btn
-                    class="ticket-buy-btn full-width"
-                    color="warning"
-                    text-color="black"
-                    label="Comprar"
-                    unelevated
-                    no-caps
-                    @click="openTicketUrl(day)"
-                  />
                 </div>
+              </div>
+
+              <!-- Botão de Comprar (Global da Seção) -->
+              <div class="row justify-center q-mt-lg">
+                <q-btn
+                  class="multi-day-buy-btn"
+                  color="warning"
+                  text-color="black"
+                  label="Comprar"
+                  unelevated
+                  no-caps
+                  :disable="!selectedDay"
+                  @click="openTicketUrl(selectedDay)"
+                />
               </div>
             </div>
 
@@ -271,6 +291,7 @@ const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } 
 // Estado base da tela
 const error = ref('')
 const event = ref(null)
+const selectedDay = ref(null)
 
 // Admin state
 const showEditDialog = ref(false)
@@ -323,6 +344,11 @@ async function loadEvent(slugParam) {
     // Atualiza a URL se ainda estiver usando ID (redireciona para slug)
     if (eventData.slug && route.params.slug !== eventData.slug) {
       router.replace({ name: 'event-detail', params: { slug: eventData.slug } })
+    }
+
+    // Seleciona o primeiro dia por padrão se houver dias
+    if (eventData.days && eventData.days.length > 0) {
+      selectedDay.value = eventData.days[0]
     }
   } catch (err) {
     if (import.meta.env.DEV) {
@@ -828,6 +854,23 @@ function getEventTags(eventData) {
   background-color: #c3ac02 !important;
 }
 
+/* Botão de compra específico para múltiplos dias (sem margem negativa) */
+.multi-day-buy-btn {
+  width: 572px;
+  height: 57px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  background-color: #ffe100 !important;
+  color: black !important;
+  /* Sem margin-top negativa */
+}
+
+.multi-day-buy-btn:hover {
+  background-color: #c3ac02 !important;
+}
+
 .event-section {
   background: transparent; /* Sem fundo */
   padding: 24px 0; /* Remove padding horizontal para alinhar com o título */
@@ -1061,7 +1104,15 @@ function getEventTags(eventData) {
     justify-content: center;
   }
 
-  .buy-btn .q-btn__content {
+  .multi-day-buy-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 8px !important;
+    font-size: 16px;
+  }
+
+  .buy-btn .q-btn__content,
+  .multi-day-buy-btn .q-btn__content {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1102,35 +1153,62 @@ function getEventTags(eventData) {
   outline-offset: 3px;
 }
 
+.multi-day-buy-btn:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
+}
+
 /* ==================== TICKETS SECTION (MULTIPLE DAYS) ==================== */
 .tickets-section {
   margin-left: -36px;
   margin-right: -36px;
   padding: 32px 36px;
-  background: rgba(0, 0, 0, 0.2);
+  /* background: rgba(0, 0, 0, 0.2); -- Removido background escuro da seção */
   margin-bottom: 24px;
 }
 
 .tickets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
 .ticket-card {
-  background: #303b4f;
+  background: #ffffff;
   border-radius: 16px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  padding: 24px;
+  border: 2px solid transparent; /* Borda transparente para layout fixo */
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  height: 100%;
 }
 
 .ticket-card:hover {
   transform: translateY(-4px);
-  border-color: #ffe100;
+}
+
+/* Estado Selecionado */
+.selected-card {
+  border-color: #ffe100; /* Amarelo do tema */
+  box-shadow: 0 0 0 2px rgba(255, 225, 0, 0.3);
+}
+
+.text-magenta {
+  color: #d946ef !important;
+}
+
+.text-dark {
+  color: #111827 !important;
+}
+
+.ticket-installments {
+  color: #35c7ee; /* Cyan/Azul claro */
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 4px;
 }
 
 .ticket-buy-btn {
