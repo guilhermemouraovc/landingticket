@@ -574,7 +574,7 @@ function getEventTags(eventData) {
 }
 
 .event-container {
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -587,15 +587,15 @@ function getEventTags(eventData) {
   margin-bottom: 24px;
   box-shadow: none;
   position: relative;
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
 }
 
 .event-hero {
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
-  height: 309px;
+  /* height: 309px; - Altura controlada pelo aspect ratio */
 }
 
 .event-hero :where(.q-img__content, .q-img__image, img) {

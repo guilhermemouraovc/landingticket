@@ -739,7 +739,7 @@ async function filterEventsByCategories(categoryLabels) {
 <style scoped>
 .event-groups {
   padding: 0 80px;
-  max-width: 1200px;
+  max-width: 80%;
   margin: 0 auto;
   margin-bottom: 100px;
 }
@@ -791,7 +791,7 @@ async function filterEventsByCategories(categoryLabels) {
 
 .featured-wrap {
   width: 100%;
-  max-width: 1760px;
+  max-width: 100%;
   height: 440px;
   margin: 0 auto;
   padding: 0 80px;
@@ -1057,7 +1057,7 @@ async function filterEventsByCategories(categoryLabels) {
 }
 .categories-wrap {
   width: calc(100vw - 160px);
-  max-width: 1760px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 80px;
 }

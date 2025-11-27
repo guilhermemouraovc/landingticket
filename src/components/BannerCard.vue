@@ -97,7 +97,7 @@ const bannerRatio = computed(() => {
 
 .banner-card-wrap {
   width: 100%;
-  max-width: 1760px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 80px;
   box-sizing: border-box;
