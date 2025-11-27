@@ -1,117 +1,140 @@
 <template>
-  <div class="q-pa-md" style="min-height: 100vh">
-    <!-- Header com botão de logout -->
-    <div class="row items-center justify-between q-mb-lg">
-      <div>
-        <div class="text-h4">Gerenciamento de Eventos</div>
-        <div class="text-subtitle2 text-grey-7">
-          Gerencie todos os eventos da plataforma
-        </div>
-      </div>
-      <div class="row q-gutter-sm">
-        <q-btn
-          outline
-          color="grey"
-          icon="home"
-          label="Voltar ao Site"
-          @click="$router.push('/')"
-        />
-        <q-btn
-          color="primary"
-          icon="add"
-          label="Novo Evento"
-          @click="openEventDialog(null)"
-          :disable="loading"
-        />
-        <q-btn
-          outline
-          color="negative"
-          icon="logout"
-          label="Sair"
-          @click="handleLogout"
-        />
-      </div>
-    </div>
-
-    <!-- Lista de Eventos (Grid) -->
-    <div class="row items-center q-mb-md">
-      <q-input
-        v-model="filter"
-        placeholder="Buscar eventos..."
-        outlined
-        dense
-        class="col-12 col-md-4"
-      >
-        <template v-slot:prepend>
-          <q-icon name="search" />
-        </template>
-        <template v-slot:append v-if="filter">
-          <q-icon
-            name="close"
-            class="cursor-pointer"
-            @click="filter = ''"
-          />
-        </template>
-      </q-input>
-    </div>
-
-    <q-table
-      grid
-      :rows="filteredEvents"
-      :columns="columns"
-      row-key="id"
-      :loading="loading"
-      v-model:pagination="pagination"
-      :rows-per-page-options="[12, 24, 48]"
-      hide-header
-      card-container-class="q-col-gutter-md"
-    >
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-          <EventCard
-            :event="props.row.cardDisplay"
-            variant="grid"
-            admin-mode
-            :clickable="false"
-            @patch="handlePatch"
-            @edit="() => openEventDialog(props.row)"
-            @delete="() => confirmDelete(props.row)"
-          />
-        </div>
-      </template>
-
-      <template v-slot:no-data>
-        <div class="full-width row flex-center q-gutter-sm q-pa-lg text-grey-7">
-          <q-icon size="2em" name="event_busy" />
-          <span>Nenhum evento encontrado</span>
-        </div>
-      </template>
-    </q-table>
-
-    <!-- Dialog de Evento -->
-    <q-dialog v-model="showEventDialog" :maximized="$q.screen.lt.md" persistent>
-      <q-card class="column full-height" :style="$q.screen.lt.md ? '' : 'min-width: 70vw; max-width: 90vw;'">
-        <q-card-section class="row items-center q-pb-none bg-primary text-white">
-          <div class="text-h6">
-            {{ editingEvent ? 'Editar Evento' : 'Novo Evento' }}
+  <div class="admin-page">
+    <!-- Header fixo com logo e título -->
+    <header class="admin-header">
+      <div class="admin-header__inner">
+        <div class="admin-header__brand">
+          <router-link to="/" class="admin-logo-link">
+            <img
+              src="/logo.svg"
+              alt="Ticketpe"
+              class="admin-logo"
+            />
+          </router-link>
+          <div class="admin-header__title-group">
+            <h1 class="admin-header__title">Admin Page Ticketpe</h1>
+            <span class="admin-header__subtitle">Gerencie todos os eventos da plataforma</span>
           </div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
+        </div>
 
-        <q-separator />
-
-        <q-card-section class="col q-pa-none scroll">
-          <EventForm
-            v-if="showEventDialog"
-            :event="editingEvent"
-            :tags="allTags"
-            @save="handleSave"
-            @cancel="showEventDialog = false"
+        <div class="admin-header__actions">
+          <q-btn
+            flat
+            no-caps
+            color="white"
+            icon="home"
+            label="Voltar ao Site"
+            class="admin-btn admin-btn--ghost"
+            @click="$router.push('/')"
           />
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+          <q-btn
+            unelevated
+            no-caps
+            color="cyan"
+            text-color="dark"
+            icon="add"
+            label="Novo Evento"
+            class="admin-btn admin-btn--primary"
+            @click="openEventDialog(null)"
+            :disable="loading"
+          />
+          <q-btn
+            flat
+            no-caps
+            color="negative"
+            icon="logout"
+            label="Sair"
+            class="admin-btn admin-btn--danger"
+            @click="handleLogout"
+          />
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="admin-content">
+      <!-- Lista de Eventos (Grid) -->
+      <div class="row items-center q-mb-md">
+        <q-input
+          v-model="filter"
+          placeholder="Buscar eventos..."
+          outlined
+          dense
+          dark
+          class="col-12 col-md-4 admin-search"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" />
+          </template>
+          <template v-slot:append v-if="filter">
+            <q-icon
+              name="close"
+              class="cursor-pointer"
+              @click="filter = ''"
+            />
+          </template>
+        </q-input>
+      </div>
+
+      <q-table
+        grid
+        dark
+        :rows="filteredEvents"
+        :columns="columns"
+        row-key="id"
+        :loading="loading"
+        v-model:pagination="pagination"
+        :rows-per-page-options="[12, 24, 48]"
+        hide-header
+        card-container-class="q-col-gutter-md"
+      >
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <EventCard
+              :event="props.row.cardDisplay"
+              variant="grid"
+              admin-mode
+              :clickable="false"
+              @patch="handlePatch"
+              @edit="() => openEventDialog(props.row)"
+              @delete="() => confirmDelete(props.row)"
+            />
+          </div>
+        </template>
+
+        <template v-slot:no-data>
+          <div class="full-width row flex-center q-gutter-sm q-pa-lg text-grey-5">
+            <q-icon size="2em" name="event_busy" />
+            <span>Nenhum evento encontrado</span>
+          </div>
+        </template>
+      </q-table>
+
+      <!-- Dialog de Evento -->
+      <q-dialog v-model="showEventDialog" :maximized="$q.screen.lt.md" persistent>
+        <q-card class="column full-height" :style="$q.screen.lt.md ? '' : 'min-width: 70vw; max-width: 90vw;'">
+          <q-card-section class="row items-center q-pb-none bg-primary text-white">
+            <div class="text-h6">
+              {{ editingEvent ? 'Editar Evento' : 'Novo Evento' }}
+            </div>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section class="col q-pa-none scroll">
+            <EventForm
+              v-if="showEventDialog"
+              :event="editingEvent"
+              :tags="allTags"
+              @save="handleSave"
+              @cancel="showEventDialog = false"
+            />
+          </q-card-section>
+        </q-card>
+      </q-dialog>
+    </main>
   </div>
 </template>
 
@@ -154,7 +177,7 @@ const pagination = ref({
 // Filtra eventos baseado no filtro de busca
 const filteredEvents = computed(() => {
   if (!filter.value) return events.value
-  
+
   const searchTerm = filter.value.toLowerCase()
   return events.value.filter(event => {
     return (
@@ -180,7 +203,7 @@ onMounted(async () => {
 async function loadEvents() {
   try {
     const data = await fetchAllEvents()
-    
+
     events.value = data.map(event => {
       // Prepara dados para o EventCard
       const cardDisplay = toEventCardFromSb({
@@ -196,7 +219,7 @@ async function loadEvents() {
         cardDisplay
       }
     })
-    
+
     if (events.value.length === 0) {
       $q.notify({
         type: 'info',
@@ -239,22 +262,22 @@ async function handlePatch({ id, ...fields }) {
     const eventIndex = events.value.findIndex(e => e.id === id)
     if (eventIndex !== -1) {
       const updatedEvent = { ...events.value[eventIndex], ...fields }
-      
+
       // Atualiza o cardDisplay também
       updatedEvent.cardDisplay = toEventCardFromSb({
         ...updatedEvent,
         images: updatedEvent.event_images,
         tags: updatedEvent.tags
       })
-      
+
       events.value[eventIndex] = updatedEvent
     }
 
     // Envia para o servidor
     await patchEvent(id, fields)
-    
+
     // Recarrega para garantir consistência (opcional, mas seguro)
-    // await loadEvents() 
+    // await loadEvents()
   } catch (err) {
     // Reverte em caso de erro (poderia implementar revert aqui)
     console.error('Erro ao atualizar evento:', err)
@@ -307,5 +330,199 @@ async function handleLogout() {
 </script>
 
 <style scoped>
-/* Estilização adicional se necessário */
+.admin-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+/* ========== HEADER ========== */
+.admin-header {
+  background: linear-gradient(90deg, #161f2f 0%, #1a2742 100%);
+  border-bottom: 1px solid rgba(53, 199, 238, 0.2);
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.admin-header__inner {
+  max-width: 1800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.admin-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.admin-logo-link:hover {
+  opacity: 0.85;
+}
+
+.admin-logo {
+  width: 160px;
+  height: auto;
+}
+
+.admin-header__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 2px solid #35c7ee;
+  padding-left: 20px;
+}
+
+.admin-header__title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #fff 0%, #35c7ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.admin-header__subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.admin-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-btn {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.admin-btn--ghost {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-btn--primary {
+  box-shadow: 0 4px 14px rgba(53, 199, 238, 0.3);
+}
+
+.admin-btn--primary:hover {
+  box-shadow: 0 6px 20px rgba(53, 199, 238, 0.4);
+  transform: translateY(-1px);
+}
+
+.admin-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ========== CONTENT ========== */
+.admin-content {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.admin-search :deep(.q-field__control) {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-search :deep(.q-field__control:hover) {
+  border-color: rgba(53, 199, 238, 0.3);
+}
+
+.admin-search :deep(.q-field--focused .q-field__control) {
+  border-color: #35c7ee;
+  box-shadow: 0 0 0 2px rgba(53, 199, 238, 0.2);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 1024px) {
+  .admin-header__inner {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .admin-header__actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 12px 16px;
+  }
+
+  .admin-header__brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-header__title-group {
+    border-left: none;
+    padding-left: 0;
+    border-top: 2px solid #35c7ee;
+    padding-top: 12px;
+  }
+
+  .admin-logo {
+    width: 140px;
+  }
+
+  .admin-header__title {
+    font-size: 1.25rem;
+  }
+
+  .admin-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .admin-btn :deep(.q-btn__content) {
+    font-size: 0.8rem;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-header__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .admin-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
 </style>
