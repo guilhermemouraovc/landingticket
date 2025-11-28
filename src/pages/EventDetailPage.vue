@@ -110,53 +110,74 @@
             <div v-if="event.days && event.days.length > 0" class="tickets-section q-mt-xl">
               <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
 
-              <div class="tickets-grid">
-                <div
-                  v-for="day in event.days"
-                  :key="day.id"
-                  class="ticket-card cursor-pointer"
-                  :class="{ 'selected-card': selectedDay?.id === day.id }"
-                  @click="selectedDay = day"
-                  role="button"
-                  :aria-pressed="selectedDay?.id === day.id"
-                >
-                  <!-- Data Header -->
-                  <div class="ticket-header q-mb-sm">
-                    <div class="text-h6 text-weight-bold text-dark ticket-day-title">
-                      {{ day.label }}
-                    </div>
-                  </div>
+              <div class="tickets-carousel-wrapper relative-position">
+                <!-- Botão Anterior -->
+                <q-btn
+                  round
+                  flat
+                  :ripple="false"
+                  color="white"
+                  icon="chevron_left"
+                  class="carousel-btn prev-btn"
+                  @click="scrollTickets('left')"
+                />
 
-                  <!-- Meta Info (Data Evento e Local) -->
-                  <div class="ticket-meta row items-center q-mb-md">
-                    <div class="row items-center q-mr-md">
-                      <q-icon name="calendar_today" class="text-magenta q-mr-xs" size="16px" />
-                      <span class="text-grey-7 text-caption text-weight-medium">
-                        {{ event.date || day.formattedDateShort || 'Data a definir' }}
-                      </span>
-                    </div>
-                    <div class="row items-center">
-                      <q-icon name="location_on" class="text-magenta q-mr-xs" size="16px" />
-                      <span class="text-grey-7 text-caption text-weight-medium">
-                        {{ event.cityState || 'Local a definir' }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Preço -->
-                  <div class="ticket-price-info">
-                    <div v-if="day.hasPrice">
-                      <div class="text-h5 text-weight-bold text-dark">
-                        {{ day.formattedFullPrice }}
-                      </div>
-                      <div v-if="day.installments" class="ticket-installments">
-                        Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
-                        {{ day.installments && 'sem juros' }}
+                <div ref="ticketsContainer" class="tickets-scroll-container row no-wrap">
+                  <div
+                    v-for="(day, index) in event.days"
+                    :key="day.id"
+                    class="ticket-item-column q-px-md"
+                    :class="{ 'no-border': index === event.days.length - 1 }"
+                  >
+                    <!-- Data Header -->
+                    <div class="ticket-header q-mb-sm">
+                      <div class="text-h6 text-weight-bold text-white ticket-day-title">
+                        {{ day.label }}
                       </div>
                     </div>
-                    <div v-else class="text-h6 text-dark">Consulte</div>
+
+                    <!-- Meta Info (Data Evento e Local) -->
+                    <div class="ticket-meta column q-mb-md">
+                      <div class="row items-center q-mb-xs">
+                        <q-icon name="calendar_today" class="text-magenta q-mr-xs" size="16px" />
+                        <span class="text-grey-5 text-caption text-weight-medium">
+                          {{ day.formattedDateShort || event.date || 'Data a definir' }}
+                        </span>
+                      </div>
+                      <div class="row items-center">
+                        <q-icon name="location_on" class="text-magenta q-mr-xs" size="16px" />
+                        <span class="text-grey-5 text-caption text-weight-medium">
+                          {{ event.cityState || 'Local a definir' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Preço -->
+                    <div class="ticket-price-info q-mt-auto">
+                      <div v-if="day.hasPrice">
+                        <div class="text-h4 text-weight-bold text-white">
+                          {{ day.formattedFullPrice }}
+                        </div>
+                        <div v-if="day.installments" class="ticket-installments text-grey-5">
+                          Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
+                          {{ day.installments && 'sem juros' }}
+                        </div>
+                      </div>
+                      <div v-else class="text-h5 text-white">Consulte</div>
+                    </div>
                   </div>
                 </div>
+
+                <!-- Botão Próximo -->
+                <q-btn
+                  round
+                  flat
+                  :ripple="false"
+                  color="white"
+                  icon="chevron_right"
+                  class="carousel-btn next-btn"
+                  @click="scrollTickets('right')"
+                />
               </div>
 
               <!-- Botão de Comprar (Global da Seção) -->
@@ -168,8 +189,8 @@
                   label="Comprar"
                   unelevated
                   no-caps
-                  :disable="!selectedDay"
-                  @click="openTicketUrl(selectedDay)"
+                  :disable="!event.days || event.days.length === 0"
+                  @click="openTicketUrl(event.days[0])"
                 />
               </div>
             </div>
@@ -292,6 +313,17 @@ const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } 
 const error = ref('')
 const event = ref(null)
 const selectedDay = ref(null)
+const ticketsContainer = ref(null)
+
+function scrollTickets(direction) {
+  if (!ticketsContainer.value) return
+  const scrollAmount = 300
+  if (direction === 'left') {
+    ticketsContainer.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+  } else {
+    ticketsContainer.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+  }
+}
 
 // Admin state
 const showEditDialog = ref(false)
@@ -1148,7 +1180,7 @@ function getEventTags(eventData) {
   outline-offset: 3px;
 }
 
-  .buy-btn:focus-visible {
+.buy-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
 }
@@ -1163,58 +1195,76 @@ function getEventTags(eventData) {
   margin-left: -36px;
   margin-right: -36px;
   padding: 32px 36px;
-  /* background: rgba(0, 0, 0, 0.2); -- Removido background escuro da seção */
   margin-bottom: 24px;
 }
 
-.tickets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+.tickets-carousel-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 48px; /* Espaço para setas */
 }
 
-.ticket-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  border: 2px solid transparent; /* Borda transparente para layout fixo */
-  transition: all 0.2s ease;
+.tickets-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  width: 100%;
+}
+
+.tickets-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.ticket-item-column {
+  min-width: 280px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  height: 100%;
 }
 
-.ticket-card:hover {
-  transform: translateY(-4px);
+.ticket-item-column:last-child,
+.ticket-item-column.no-border {
+  border-right: none;
 }
 
-/* Estado Selecionado */
-.selected-card {
-  border-color: #ffe100; /* Amarelo do tema */
-  box-shadow: 0 0 0 2px rgba(255, 225, 0, 0.3);
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) !important;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(42, 52, 71, 0.8); /* Mesma cor do fundo com transparência */
+}
+
+.carousel-btn:hover {
+  background: rgba(42, 52, 71, 0.8) !important;
+  color: white !important;
+  transform: translateY(-50%) !important;
+}
+
+.carousel-btn :deep(.q-focus-helper) {
+  display: none !important;
+}
+
+.prev-btn {
+  left: 0;
+}
+
+.next-btn {
+  right: 0;
 }
 
 .text-magenta {
   color: #d946ef !important;
 }
 
-.text-dark {
-  color: #111827 !important;
-}
-
 .ticket-installments {
-  color: #35c7ee; /* Cyan/Azul claro */
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 400;
   margin-top: 4px;
-}
-
-.ticket-buy-btn {
-  font-weight: 600;
-  border-radius: 8px;
-  height: 40px;
 }
 
 @media (max-width: 599px) {
@@ -1224,8 +1274,17 @@ function getEventTags(eventData) {
     padding: 24px 20px;
   }
 
-  .tickets-grid {
-    grid-template-columns: 1fr;
+  .tickets-carousel-wrapper {
+    padding: 0; /* Remove padding das setas no mobile */
+  }
+
+  .carousel-btn {
+    display: none; /* Remove setas no mobile, usa scroll touch */
+  }
+
+  .ticket-item-column {
+    min-width: 80vw; /* Cards ocupam quase toda tela no mobile */
+    padding: 0 16px;
   }
 }
 </style>
