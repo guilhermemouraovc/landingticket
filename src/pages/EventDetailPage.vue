@@ -126,7 +126,7 @@
                   <div
                     v-for="(day, index) in event.days"
                     :key="day.id"
-                    class="ticket-item-column q-px-md"
+                    class="ticket-item-column"
                     :class="{ 'no-border': index === event.days.length - 1 }"
                   >
                     <!-- Data Header -->
@@ -136,9 +136,9 @@
                       </div>
                     </div>
 
-                    <!-- Meta Info (Data Evento e Local) -->
-                    <div class="ticket-meta column q-mb-md">
-                      <div class="row items-center q-mb-xs">
+                    <!-- Meta Info (Data Evento e Local) - Na mesma linha -->
+                    <div class="ticket-meta row items-center q-mb-md q-gutter-x-md">
+                      <div class="row items-center">
                         <q-icon name="calendar_today" class="text-magenta q-mr-xs" size="16px" />
                         <span class="text-grey-5 text-caption text-weight-medium">
                           {{ day.formattedDateShort || event.date || 'Data a definir' }}
@@ -189,8 +189,9 @@
                   label="Comprar"
                   unelevated
                   no-caps
-                  :disable="!event.days || event.days.length === 0"
-                  @click="openTicketUrl(event.days[0])"
+                  :loading="openingWhatsapp"
+                  aria-label="Comprar ingresso via WhatsApp"
+                  @click="openWhatsapp()"
                 />
               </div>
             </div>
@@ -422,17 +423,6 @@ async function handleSave() {
 }
 
 // Utilitários de ação
-function openTicketUrl(day) {
-  if (day.ticketUrl) {
-    window.open(day.ticketUrl, '_blank')
-    return
-  }
-
-  // Fallback: WhatsApp com mensagem específica
-  const message = `Olá! Tenho interesse no ingresso para ${event.value.title} - ${day.label}`
-  openWhatsapp(message)
-}
-
 function openWhatsapp(customMessageOrEvent) {
   if (!event.value) return
 
@@ -1141,6 +1131,7 @@ function getEventTags(eventData) {
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
+    margin-top: 25 px;
   }
 
   .buy-btn .q-btn__content,
@@ -1212,6 +1203,8 @@ function getEventTags(eventData) {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
   width: 100%;
+  display: flex;
+  justify-content: center; /* Centraliza os cards horizontalmente */
 }
 
 .tickets-scroll-container::-webkit-scrollbar {
@@ -1219,10 +1212,12 @@ function getEventTags(eventData) {
 }
 
 .ticket-item-column {
-  min-width: 280px;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 320px;
+  border-right: 1px solid rgba(255, 255, 255, 0.991);
   display: flex;
   flex-direction: column;
+  padding-left: 48px;
+  padding-right: 48px;
 }
 
 .ticket-item-column:last-child,
@@ -1276,6 +1271,10 @@ function getEventTags(eventData) {
 
   .tickets-carousel-wrapper {
     padding: 0; /* Remove padding das setas no mobile */
+  }
+
+  .tickets-scroll-container {
+    justify-content: flex-start; /* Alinha à esquerda no mobile */
   }
 
   .carousel-btn {
