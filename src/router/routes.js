@@ -95,6 +95,86 @@
         name: 'tulio-cisneiro',
         component: () => import('pages/TulioCisneiroPage.vue'),
       },
+      {
+        path: 'clara-borba',
+        name: 'clara-borba',
+        component: () => import('pages/ClaraBorbaPage.vue'),
+      },
+      {
+        path: 'maria-eloisa',
+        name: 'maria-eloisa',
+        component: () => import('pages/MariaEloisaPage.vue'),
+      },
+      {
+        path: 'brenda-neves',
+        name: 'brenda-neves',
+        component: () => import('pages/BrendaNevesPage.vue'),
+      },
+      {
+        path: 'ricardo-costa',
+        name: 'ricardo-costa',
+        component: () => import('pages/RicardoCostaPage.vue'),
+      },
+      {
+        path: 'diego-escorel',
+        name: 'diego-escorel',
+        component: () => import('pages/DiegoEscorelPage.vue'),
+      },
+      {
+        path: 'carlos-oliveira',
+        name: 'carlos-oliveira',
+        component: () => import('pages/CarlosOliveiraPage.vue'),
+      },
+      {
+        path: 'giovanna-lucena',
+        name: 'giovanna-lucena',
+        component: () => import('pages/GiovannaLucenaPage.vue'),
+      },
+      {
+        path: 'guilherme-santana',
+        name: 'guilherme-santana',
+        component: () => import('pages/GuilhermeSantanaPage.vue'),
+      },
+      {
+        path: 'luis-felipe',
+        name: 'luis-felipe',
+        component: () => import('pages/LuisFelipePage.vue'),
+      },
+      {
+        path: 'eduardo-loyo',
+        name: 'eduardo-loyo',
+        component: () => import('pages/EduardoLoyoPage.vue'),
+      },
+      {
+        path: 'jao',
+        name: 'jao',
+        component: () => import('pages/JaoPage.vue'),
+      },
+      {
+        path: 'samuel-brito',
+        name: 'samuel-brito',
+        component: () => import('pages/SamuelBritoPage.vue'),
+      },
+      {
+        path: 'larissa-balta',
+        name: 'larissa-balta',
+        component: () => import('pages/LarissaBaltaPage.vue'),
+      },
+      {
+        path: 'luisa-oliveira',
+        name: 'luisa-oliveira',
+        component: () => import('pages/LuisaOliveiraPage.vue'),
+      },
+      {
+        path: 'bianka-alcantara',
+        name: 'bianka-alcantara',
+        component: () => import('pages/BiankaAlcantaraPage.vue'),
+      },
+      {
+        path: 'eduarda-teixeira',
+        name: 'eduarda-teixeira',
+        component: () => import('pages/EduardaTeixeiraPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
