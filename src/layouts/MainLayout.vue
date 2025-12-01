@@ -23,7 +23,7 @@
                 color="positive"
                 icon="admin_panel_settings"
                 label="Admin"
-                to="/admin"
+                to="/melanciamaluca"
                 class="q-ml-sm gt-sm"
               >
                 <q-tooltip>Painel Admin</q-tooltip>

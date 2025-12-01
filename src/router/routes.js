@@ -90,6 +90,11 @@
         name: 'mariana-almeida',
         component: () => import('pages/MarianaAlmeidaPage.vue'),
       },
+      {
+        path: 'tulio-cisneiro',
+        name: 'tulio-cisneiro',
+        component: () => import('pages/TulioCisneiroPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
@@ -99,7 +104,7 @@
     component: () => import('pages/LoginPage.vue'),
   },
   {
-    path: '/admin',
+    path: '/melanciamaluca',
     name: 'admin',
     component: () => import('pages/AdminPage.vue'),
     meta: { requiresAuth: true },
