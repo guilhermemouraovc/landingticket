@@ -209,6 +209,63 @@ function resolveImage(row, context = 'detail') {
   return '/semfoto.webp'
 }
 
+/**
+ * Formata os dias do evento
+ */
+function formatEventDays(days) {
+  if (!days || !Array.isArray(days) || days.length === 0) return []
+
+  return days.map((day) => {
+    let dateLabel = ''
+    let dateBadge = { day: '', month: '' }
+    let formattedDateShort = ''
+
+    if (day.date) {
+      // Cria data garantindo que não haja problema de timezone (adiciona hora meio dia)
+      const dateObj = new Date(`${day.date}T12:00:00`)
+      
+      if (!Number.isNaN(dateObj.getTime())) {
+        // Formato: "14/02 Sábado"
+        const dayStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+        const weekStr = dateObj.toLocaleDateString('pt-BR', { weekday: 'long' })
+        // Capitaliza primeira letra
+        const weekStrCap = weekStr.charAt(0).toUpperCase() + weekStr.slice(1)
+        
+        dateLabel = `${dayStr} ${weekStrCap}`
+
+        // Formato curto: "14 FEV" (para fallback)
+        const dayNum = dateObj.getDate()
+        const monthShort = dateObj.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
+        formattedDateShort = `${dayNum} ${monthShort}`
+        
+        // Badge info
+        dateBadge = {
+          day: dateObj.getDate().toString().padStart(2, '0'),
+          month: monthShort
+        }
+      }
+    }
+
+    const priceInfo = formatPriceInfo({
+      price: day.price,
+      price_installments: day.price_installments,
+      installment_value: day.installment_value
+    })
+
+    return {
+      id: day.id,
+      date: day.date,
+      title: day.title, // Ex: "Dia 1", "Sábado"
+      label: dateLabel, // Ex: "14/02 Sábado"
+      formattedDateShort, // Ex: "14 FEV"
+      description: day.description,
+      ticketUrl: day.ticket_url,
+      dateBadge,
+      ...priceInfo
+    }
+  })
+}
+
 export function toEventDetailFromSb(row) {
   const parsedDate = parseDate(row.start_date)
   const dateBadge = buildDateBadge(parsedDate)
@@ -216,6 +273,7 @@ export function toEventDetailFromSb(row) {
   const image = resolveImage(row, 'detail')
   const priceInfo = formatPriceInfo(row)
   const slug = generateSlug(row.title)
+  const days = formatEventDays(row.days)
 
   return {
     id: row.id,
@@ -235,6 +293,7 @@ export function toEventDetailFromSb(row) {
     shareUrl: row.share_url || null,
     // Informações de preço
     ...priceInfo,
+    days, // Lista de dias formatada
     // Campos adicionais para compatibilidade
     tags: Array.isArray(row.tags) ? row.tags.map((t) => t.name) : [],
     images: Array.isArray(row.images) ? row.images : [],

@@ -6,6 +6,8 @@
     :clickable="clickable && !adminMode"
     v-ripple="clickable && !adminMode"
     @click="handleClick"
+    @touchstart.passive="handleTouchStart"
+    @touchmove.passive="handleTouchMove"
     role="button"
     :tabindex="clickable && !adminMode ? 0 : -1"
     :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
@@ -159,7 +161,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 
 // Props
@@ -256,6 +258,10 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['click', 'patch', 'edit', 'delete'])
 
+// State for touch handling
+const touchStartPos = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
+
 // Computed
 const metaLayoutClass = computed(() => {
   if (!props.event.hasPrice && props.showPrice && props.variant !== 'grid') {
@@ -276,7 +282,34 @@ const truncatedDescription = computed(() => {
 })
 
 // Methods
-function handleClick() {
+function handleTouchStart(e) {
+  isDragging.value = false
+  if (e.touches && e.touches.length > 0) {
+    touchStartPos.value = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    }
+  }
+}
+
+function handleTouchMove(e) {
+  if (isDragging.value) return
+  if (!e.touches || e.touches.length === 0) return
+
+  const deltaX = Math.abs(e.touches[0].clientX - touchStartPos.value.x)
+  const deltaY = Math.abs(e.touches[0].clientY - touchStartPos.value.y)
+
+  if (deltaX > 10 || deltaY > 10) {
+    isDragging.value = true
+  }
+}
+
+function handleClick(e) {
+  if (isDragging.value) {
+    e?.preventDefault()
+    e?.stopPropagation()
+    return
+  }
   // No modo admin, o clique no card não navega, pois o usuário pode estar tentando clicar em um controle de edição
   // Mas se clicar fora dos controles, talvez queira navegar?
   // Por segurança, no adminMode, desabilitamos o click geral do card

@@ -121,6 +121,19 @@ export function useAdminEvents() {
             is_primary,
             order_index,
             image_type
+          ),
+          event_days (
+            id,
+            date,
+            start_time,
+            end_time,
+            title,
+            description,
+            price,
+            price_installments,
+            installment_value,
+            ticket_url,
+            is_active
           )
         `)
         .eq('id', id)
@@ -205,6 +218,29 @@ export function useAdminEvents() {
           .insert(imageRecords)
 
         if (e3) throw e3
+      }
+
+      // Adiciona dias do evento se houver
+      if (eventData.days && eventData.days.length > 0) {
+        const dayRecords = eventData.days.map((day) => ({
+          event_id: event.id,
+          date: day.date || null,
+          start_time: day.start_time || null,
+          end_time: day.end_time || null,
+          title: day.title || null,
+          description: day.description || null,
+          price: day.price || null,
+          price_installments: day.price_installments || null,
+          installment_value: day.installment_value || null,
+          ticket_url: day.ticket_url || null,
+          is_active: day.is_active !== undefined ? day.is_active : true,
+        }))
+
+        const { error: e4 } = await supabase
+          .from('event_days')
+          .insert(dayRecords)
+
+        if (e4) throw e4
       }
 
       $q.notify({
@@ -330,6 +366,65 @@ export function useAdminEvents() {
         if (e6) throw e6
       }
 
+      // Gerencia dias do evento
+      // Remove dias que foram deletados
+      if (eventData.removeDayIds && eventData.removeDayIds.length > 0) {
+        const { error: e7 } = await supabase
+          .from('event_days')
+          .delete()
+          .in('id', eventData.removeDayIds)
+
+        if (e7) throw e7
+      }
+
+      // Atualiza dias existentes
+      if (eventData.days && eventData.days.length > 0) {
+        for (const day of eventData.days) {
+          if (day.id) {
+            const { error: e8 } = await supabase
+              .from('event_days')
+              .update({
+                date: day.date || null,
+                start_time: day.start_time || null,
+                end_time: day.end_time || null,
+                title: day.title || null,
+                description: day.description || null,
+                price: day.price || null,
+                price_installments: day.price_installments || null,
+                installment_value: day.installment_value || null,
+                ticket_url: day.ticket_url || null,
+                is_active: day.is_active !== undefined ? day.is_active : true,
+              })
+              .eq('id', day.id)
+
+            if (e8) throw e8
+          }
+        }
+      }
+
+      // Adiciona novos dias
+      if (eventData.newDays && eventData.newDays.length > 0) {
+        const dayRecords = eventData.newDays.map((day) => ({
+          event_id: id,
+          date: day.date || null,
+          start_time: day.start_time || null,
+          end_time: day.end_time || null,
+          title: day.title || null,
+          description: day.description || null,
+          price: day.price || null,
+          price_installments: day.price_installments || null,
+          installment_value: day.installment_value || null,
+          ticket_url: day.ticket_url || null,
+          is_active: day.is_active !== undefined ? day.is_active : true,
+        }))
+
+        const { error: e9 } = await supabase
+          .from('event_days')
+          .insert(dayRecords)
+
+        if (e9) throw e9
+      }
+
       $q.notify({
         type: 'positive',
         message: 'Evento atualizado com sucesso!',
@@ -355,6 +450,14 @@ export function useAdminEvents() {
     loading.value = true
     error.value = null
     try {
+      // Deleta dias do evento primeiro (devido a foreign key)
+      const { error: e0 } = await supabase
+        .from('event_days')
+        .delete()
+        .eq('event_id', id)
+
+      if (e0) throw e0
+
       // Deleta imagens primeiro (devido a foreign key)
       const { error: e1 } = await supabase
         .from('event_images')

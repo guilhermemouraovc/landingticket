@@ -106,8 +106,98 @@
               </div>
             </div>
 
-            <!-- Seção de Preços -->
-            <div v-if="event.hasPrice" class="pricing-section q-mt-xl">
+            <!-- Seção de Ingressos (Múltiplos Dias) -->
+            <div v-if="event.days && event.days.length > 0" class="tickets-section q-mt-xl">
+              <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
+
+              <div class="tickets-carousel-wrapper relative-position">
+                <!-- Botão Anterior -->
+                <q-btn
+                  round
+                  flat
+                  :ripple="false"
+                  color="white"
+                  icon="chevron_left"
+                  class="carousel-btn prev-btn"
+                  @click="scrollTickets('left')"
+                />
+
+                <div ref="ticketsContainer" class="tickets-scroll-container row no-wrap">
+                  <div
+                    v-for="(day, index) in event.days"
+                    :key="day.id"
+                    class="ticket-item-column"
+                    :class="{ 'no-border': index === event.days.length - 1 }"
+                  >
+                    <!-- Data Header -->
+                    <div class="ticket-header q-mb-sm">
+                      <div class="text-h6 text-weight-bold text-white ticket-day-title">
+                        {{ day.label }}
+                      </div>
+                    </div>
+
+                    <!-- Meta Info (Data Evento e Local) - Na mesma linha -->
+                    <div class="ticket-meta row items-center q-mb-md q-gutter-x-md">
+                      <div class="row items-center">
+                        <q-icon name="calendar_today" class="text-magenta q-mr-xs" size="16px" />
+                        <span class="text-grey-5 text-caption text-weight-medium">
+                          {{ day.formattedDateShort || event.date || 'Data a definir' }}
+                        </span>
+                      </div>
+                      <div class="row items-center">
+                        <q-icon name="location_on" class="text-magenta q-mr-xs" size="16px" />
+                        <span class="text-grey-5 text-caption text-weight-medium">
+                          {{ event.cityState || 'Local a definir' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Preço -->
+                    <div class="ticket-price-info q-mt-auto">
+                      <div v-if="day.hasPrice">
+                        <div class="text-h4 text-weight-bold text-white">
+                          {{ day.formattedFullPrice }}
+                        </div>
+                        <div v-if="day.installments" class="ticket-installments text-grey-5">
+                          Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
+                          {{ day.installments && 'sem juros' }}
+                        </div>
+                      </div>
+                      <div v-else class="text-h5 text-white">Consulte</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botão Próximo -->
+                <q-btn
+                  round
+                  flat
+                  :ripple="false"
+                  color="white"
+                  icon="chevron_right"
+                  class="carousel-btn next-btn"
+                  @click="scrollTickets('right')"
+                />
+              </div>
+
+              <!-- Botão de Comprar (Global da Seção) -->
+              <div class="row justify-center q-mt-lg">
+                <q-btn
+                  class="multi-day-buy-btn"
+                  color="warning"
+                  text-color="black"
+                  label="Comprar"
+                  unelevated
+                  no-caps
+                  :loading="openingWhatsapp"
+                  aria-label="Comprar ingresso via WhatsApp"
+                  @click="openWhatsapp()"
+                />
+              </div>
+            </div>
+
+            <!-- Seção de Preços (Único Dia) -->
+            <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
                 <div
                   v-if="event.installments && event.installmentValue"
@@ -123,8 +213,9 @@
               </div>
             </div>
 
-            <!-- Botão de Comprar -->
+            <!-- Botão de Comprar (Único Dia) -->
             <q-btn
+              v-if="!event.days || event.days.length === 0"
               class="buy-btn"
               color="warning"
               text-color="black"
@@ -133,12 +224,8 @@
               no-caps
               :loading="openingWhatsapp"
               aria-label="Comprar ingresso via WhatsApp"
-              @click="openWhatsapp"
-            >
-              <template #loading>
-                <q-spinner-dots size="20px" />
-              </template>
-            </q-btn>
+              @click="openWhatsapp()"
+            />
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
               <div class="section-title">Atrações</div>
@@ -226,6 +313,18 @@ const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } 
 // Estado base da tela
 const error = ref('')
 const event = ref(null)
+const selectedDay = ref(null)
+const ticketsContainer = ref(null)
+
+function scrollTickets(direction) {
+  if (!ticketsContainer.value) return
+  const scrollAmount = 300
+  if (direction === 'left') {
+    ticketsContainer.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+  } else {
+    ticketsContainer.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+  }
+}
 
 // Admin state
 const showEditDialog = ref(false)
@@ -279,6 +378,11 @@ async function loadEvent(slugParam) {
     if (eventData.slug && route.params.slug !== eventData.slug) {
       router.replace({ name: 'event-detail', params: { slug: eventData.slug } })
     }
+
+    // Seleciona o primeiro dia por padrão se houver dias
+    if (eventData.days && eventData.days.length > 0) {
+      selectedDay.value = eventData.days[0]
+    }
   } catch (err) {
     if (import.meta.env.DEV) {
       console.error('Falha ao carregar evento', err)
@@ -319,19 +423,25 @@ async function handleSave() {
 }
 
 // Utilitários de ação
-function openWhatsapp() {
+function openWhatsapp(customMessageOrEvent) {
   if (!event.value) return
 
   openingWhatsapp.value = true
 
+  // Verifica se foi passado uma mensagem customizada (string) ou é evento de click
+  let customMessage = typeof customMessageOrEvent === 'string' ? customMessageOrEvent : null
+
   // Verifica se há tracking de influenciadora
   let phone = event.value.whatsapp
-  let message = event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
+  let message = customMessage || event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
     phone = getInfluencerPhone()
-    message = getWhatsAppMessage(event.value.title) || message
+    // Se não foi passada mensagem customizada, tenta pegar a da influencer
+    if (!customMessage) {
+      message = getWhatsAppMessage(event.value.title) || message
+    }
   }
 
   const encodedMessage = encodeURIComponent(message)
@@ -486,7 +596,7 @@ function getEventTags(eventData) {
 }
 
 .event-container {
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -499,15 +609,15 @@ function getEventTags(eventData) {
   margin-bottom: 24px;
   box-shadow: none;
   position: relative;
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
 }
 
 .event-hero {
-  width: 1120px;
+  width: 100%;
   max-width: 100%;
-  height: 309px;
+  /* height: 309px; - Altura controlada pelo aspect ratio */
 }
 
 .event-hero :where(.q-img__content, .q-img__image, img) {
@@ -766,6 +876,23 @@ function getEventTags(eventData) {
   background-color: #c3ac02 !important;
 }
 
+/* Botão de compra específico para múltiplos dias (sem margem negativa) */
+.multi-day-buy-btn {
+  width: 572px;
+  height: 57px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  background-color: #ffe100 !important;
+  color: black !important;
+  /* Sem margin-top negativa */
+}
+
+.multi-day-buy-btn:hover {
+  background-color: #c3ac02 !important;
+}
+
 .event-section {
   background: transparent; /* Sem fundo */
   padding: 24px 0; /* Remove padding horizontal para alinhar com o título */
@@ -999,7 +1126,16 @@ function getEventTags(eventData) {
     justify-content: center;
   }
 
-  .buy-btn .q-btn__content {
+  .multi-day-buy-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 8px !important;
+    font-size: 16px;
+    margin-top: 25 px;
+  }
+
+  .buy-btn .q-btn__content,
+  .multi-day-buy-btn .q-btn__content {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1038,5 +1174,116 @@ function getEventTags(eventData) {
 .buy-btn:focus-visible {
   outline: 3px solid #35c7ee;
   outline-offset: 3px;
+}
+
+.multi-day-buy-btn:focus-visible {
+  outline: 3px solid #35c7ee;
+  outline-offset: 3px;
+}
+
+/* ==================== TICKETS SECTION (MULTIPLE DAYS) ==================== */
+.tickets-section {
+  margin-left: -36px;
+  margin-right: -36px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+}
+
+.tickets-carousel-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 48px; /* Espaço para setas */
+}
+
+.tickets-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centraliza os cards horizontalmente */
+}
+
+.tickets-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.ticket-item-column {
+  min-width: 320px;
+  border-right: 1px solid rgba(255, 255, 255, 0.991);
+  display: flex;
+  flex-direction: column;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.ticket-item-column:last-child,
+.ticket-item-column.no-border {
+  border-right: none;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) !important;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(42, 52, 71, 0.8); /* Mesma cor do fundo com transparência */
+}
+
+.carousel-btn:hover {
+  background: rgba(42, 52, 71, 0.8) !important;
+  color: white !important;
+  transform: translateY(-50%) !important;
+}
+
+.carousel-btn :deep(.q-focus-helper) {
+  display: none !important;
+}
+
+.prev-btn {
+  left: 0;
+}
+
+.next-btn {
+  right: 0;
+}
+
+.text-magenta {
+  color: #d946ef !important;
+}
+
+.ticket-installments {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+@media (max-width: 599px) {
+  .tickets-section {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding: 24px 20px;
+  }
+
+  .tickets-carousel-wrapper {
+    padding: 0; /* Remove padding das setas no mobile */
+  }
+
+  .tickets-scroll-container {
+    justify-content: flex-start; /* Alinha à esquerda no mobile */
+  }
+
+  .carousel-btn {
+    display: none; /* Remove setas no mobile, usa scroll touch */
+  }
+
+  .ticket-item-column {
+    min-width: 80vw; /* Cards ocupam quase toda tela no mobile */
+    padding: 0 16px;
+  }
 }
 </style>
