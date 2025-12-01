@@ -32,6 +32,7 @@ const INFLUENCER_NAMES = {
   'luisa-oliveira': 'Luisa Oliveira',
   'bianka-alcantara': 'Bianka Alcantara',
   'eduarda-teixeira': 'Eduarda Teixeira',
+  'eduardo-franca': 'Eduardo França',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -63,6 +64,7 @@ const INFLUENCER_GENDER = {
   'Luisa Oliveira': 'pela',
   'Bianka Alcantara': 'pela',
   'Eduarda Teixeira': 'pela',
+  'Eduardo França': 'pelo',
 }
 
 export function useInfluencerTracking() {

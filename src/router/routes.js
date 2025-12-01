@@ -175,6 +175,11 @@
         name: 'eduarda-teixeira',
         component: () => import('pages/EduardaTeixeiraPage.vue'),
       },
+      {
+        path: 'eduardo-franca',
+        name: 'eduardo-franca',
+        component: () => import('pages/EduardoFrancaPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
