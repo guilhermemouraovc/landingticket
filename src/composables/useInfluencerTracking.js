@@ -15,6 +15,7 @@ const INFLUENCER_NAMES = {
   'tallita-manta': 'Tallita Manta',
   'hypepe': 'Hype PE',
   'mariana-almeida': 'Mariana Almeida',
+  'tulio-cisneiro': 'Tulio Cisneiro',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -29,6 +30,7 @@ const INFLUENCER_GENDER = {
   'Tallita Manta': 'pela',
   'Hype PE': 'pela',
   'Mariana Almeida': 'pela',
+  'Tulio Cisneiro': 'pelo',
 }
 
 export function useInfluencerTracking() {
