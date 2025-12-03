@@ -373,8 +373,6 @@ async function scrollToSection(sectionId) {
         top: offsetPosition,
         behavior: 'smooth',
       })
-    } else {
-      console.warn(`⚠️ Seção com ID "${sectionId}" não encontrada`)
     }
   }, 150)
 }
@@ -453,36 +451,27 @@ async function loadFeatured() {
 
     // Se não há eventos em destaque, busca eventos recentes do Supabase
     if (!events.length) {
-      console.log('🔄 Nenhum evento em destaque encontrado, buscando eventos recentes...')
       events = await fetchEventsSupabase({ limit: 25 })
     }
 
     featured.value = events
     activeSlide.value = events[0]?.id ?? null
-  } catch (err) {
-    console.error('Falha ao carregar eventos em destaque', err)
+  } catch {
     featured.value = []
   }
 }
 
 async function loadUpcomingEvents() {
   try {
-    console.log('🔍 Carregando eventos próximos...')
-
     // Busca eventos com data >= hoje, ordenados por data crescente
     upcomingEvents.value = await fetchUpcomingEventsSupabase({ limit: 100 })
-
-    console.log('✅ Eventos próximos carregados:', upcomingEvents.value.length)
-  } catch (err) {
-    console.error('❌ Falha ao carregar eventos próximos', err)
+  } catch {
     upcomingEvents.value = []
   }
 }
 
 async function loadReveillon() {
   try {
-    console.log('🔍 Carregando eventos de Réveillon...')
-
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Reveillons' // Nome padrão atualizado
 
@@ -516,17 +505,13 @@ async function loadReveillon() {
     }
 
     reveillonEvents.value = events
-    console.log('✅ Eventos de Réveillon carregados:', reveillonEvents.value.length)
-  } catch (err) {
-    console.error('❌ Falha ao carregar reveillon', err)
+  } catch {
     reveillonEvents.value = []
   }
 }
 
 async function loadCarnaval() {
   try {
-    console.log('🔍 Carregando eventos de Carnaval...')
-
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Carnaval' // Nome padrão atualizado
 
@@ -560,17 +545,13 @@ async function loadCarnaval() {
     }
 
     carnavalEvents.value = events
-    console.log('✅ Eventos de Carnaval carregados:', events.length)
-  } catch (err) {
-    console.error('❌ Falha ao carregar carnaval', err)
+  } catch {
     carnavalEvents.value = []
   }
 }
 
 async function loadFestivais() {
   try {
-    console.log('🔍 Carregando eventos de Festivais...')
-
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Festivais' // Nome padrão atualizado
 
@@ -595,9 +576,7 @@ async function loadFestivais() {
     }
 
     saoJoaoEvents.value = events
-    console.log('✅ Total de eventos de Festivais carregados:', events.length)
-  } catch (err) {
-    console.error('❌ Falha ao carregar Festivais', err)
+  } catch {
     saoJoaoEvents.value = []
   }
 }
@@ -605,9 +584,7 @@ async function loadFestivais() {
 async function loadAllEvents() {
   try {
     allEvents.value = await fetchAllEventsSupabase(100)
-    console.log('✅ Programação completa carregada:', allEvents.value.length)
-  } catch (err) {
-    console.error('❌ Falha ao carregar programação completa', err)
+  } catch {
     allEvents.value = []
   }
 }
@@ -704,28 +681,23 @@ function clearCategories() {
 async function filterEventsByCategories(categoryLabels) {
   loadingCarousels.value = true
   try {
-    console.log('🔍 Filtrando eventos por categorias:', categoryLabels)
-
     // Converte labels para tagNames
     const tagNames = categoryLabels
       .map((label) => getTagNameByLabel(label))
       .filter((tagName) => tagName !== null)
 
     if (tagNames.length === 0) {
-      console.warn('⚠️ Nenhuma categoria mapeada encontrada')
       filteredEvents.value = []
       return Promise.resolve()
     }
 
     // Usa função para buscar eventos com múltiplas tags (AND lógico)
     filteredEvents.value = await fetchEventsByMultipleTagsSupabase(tagNames, { limit: 100 })
-    console.log('✅ Eventos filtrados:', filteredEvents.value.length)
 
     // Faz scroll até a seção de eventos filtrados
     const sectionId = getCombinedSectionId()
     await scrollToSection(sectionId)
-  } catch (err) {
-    console.error('❌ Falha ao filtrar eventos por categorias:', err)
+  } catch {
     filteredEvents.value = []
   } finally {
     loadingCarousels.value = false
