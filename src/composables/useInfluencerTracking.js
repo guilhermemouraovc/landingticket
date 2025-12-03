@@ -33,6 +33,10 @@ const INFLUENCER_NAMES = {
   'bianka-alcantara': 'Bianka Alcantara',
   'eduarda-teixeira': 'Eduarda Teixeira',
   'eduardo-franca': 'Eduardo França',
+  'ralph': 'Ralph',
+  'mariana-moreira': 'Mariana Moreira',
+  'lucas-emery': 'Lucas Emery',
+  'eli': 'Eli',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -65,6 +69,10 @@ const INFLUENCER_GENDER = {
   'Bianka Alcantara': 'pela',
   'Eduarda Teixeira': 'pela',
   'Eduardo França': 'pelo',
+  'Ralph': 'pelo',
+  'Mariana Moreira': 'pela',
+  'Lucas Emery': 'pelo',
+  'Eli': 'pelo',
 }
 
 export function useInfluencerTracking() {

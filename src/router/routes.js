@@ -180,6 +180,26 @@
         name: 'eduardo-franca',
         component: () => import('pages/EduardoFrancaPage.vue'),
       },
+      {
+        path: 'ralph',
+        name: 'ralph',
+        component: () => import('pages/RalphPage.vue'),
+      },
+      {
+        path: 'mariana-moreira',
+        name: 'mariana-moreira',
+        component: () => import('pages/MarianaMoreiraPage.vue'),
+      },
+      {
+        path: 'lucas-emery',
+        name: 'lucas-emery',
+        component: () => import('pages/LucasEmeryPage.vue'),
+      },
+      {
+        path: 'eli',
+        name: 'eli',
+        component: () => import('pages/EliPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
