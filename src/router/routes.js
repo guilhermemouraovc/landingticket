@@ -90,6 +90,11 @@
         name: 'mariana-almeida',
         component: () => import('pages/MarianaAlmeidaPage.vue'),
       },
+      {
+        path: 'julinha',
+        name: 'julinha',
+        component: () => import('pages/JulinhaPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
