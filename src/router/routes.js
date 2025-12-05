@@ -136,6 +136,11 @@
         component: () => import('pages/GuilhermeSantanaPage.vue'),
       },
       {
+        path: 'guilherme-mourao',
+        name: 'guilherme-mourao',
+        component: () => import('pages/GuilhermeMouraoPage.vue'),
+      },
+      {
         path: 'luis-felipe',
         name: 'luis-felipe',
         component: () => import('pages/LuisFelipePage.vue'),
@@ -161,6 +166,11 @@
         component: () => import('pages/LarissaBaltaPage.vue'),
       },
       {
+        path: 'leite',
+        name: 'leite',
+        component: () => import('pages/LeitePage.vue'),
+      },
+      {
         path: 'luisa-oliveira',
         name: 'luisa-oliveira',
         component: () => import('pages/LuisaOliveiraPage.vue'),
@@ -174,6 +184,11 @@
         path: 'eduarda-teixeira',
         name: 'eduarda-teixeira',
         component: () => import('pages/EduardaTeixeiraPage.vue'),
+      },
+      {
+        path: 'elielton-fontes',
+        name: 'elielton-fontes',
+        component: () => import('pages/ElieltonFontesPage.vue'),
       },
       {
         path: 'eduardo-franca',
