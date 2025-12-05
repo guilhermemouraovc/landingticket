@@ -200,6 +200,11 @@
         name: 'eli',
         component: () => import('pages/EliPage.vue'),
       },
+      {
+        path: 'julinha',
+        name: 'julinha',
+        component: () => import('pages/JulinhaPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)

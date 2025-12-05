@@ -37,6 +37,7 @@ const INFLUENCER_NAMES = {
   'mariana-moreira': 'Mariana Moreira',
   'lucas-emery': 'Lucas Emery',
   'eli': 'Eli',
+  'julinha': 'Julinha',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -73,6 +74,7 @@ const INFLUENCER_GENDER = {
   'Mariana Moreira': 'pela',
   'Lucas Emery': 'pelo',
   'Eli': 'pelo',
+  'Julinha': 'pela',
 }
 
 export function useInfluencerTracking() {
