@@ -235,6 +235,11 @@ const routes = [
         name: 'tonin',
         component: () => import('pages/ToninPage.vue'),
       },
+      {
+        path: 'fabio-daniel',
+        name: 'fabio-daniel',
+        component: () => import('pages/FabioDanielPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
