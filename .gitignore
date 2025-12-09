@@ -35,6 +35,9 @@ yarn-error.log*
 .env.*
 !.env.example
 
+# Node version manager
+.nvmrc
+
 # Cursor AI files
 .cursorindexingignore
 
