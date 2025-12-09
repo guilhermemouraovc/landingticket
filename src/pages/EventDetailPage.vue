@@ -1193,7 +1193,7 @@ function getEventTags(eventData) {
   display: flex;
   align-items: center;
   position: relative;
-  padding: 0 48px; /* Espaço para setas */
+  padding: 0; /* Remove padding, setas ficam nas bordas */
 }
 
 .tickets-scroll-container {
@@ -1204,7 +1204,7 @@ function getEventTags(eventData) {
   scrollbar-width: none; /* Firefox */
   width: 100%;
   display: flex;
-  justify-content: center; /* Centraliza os cards horizontalmente */
+  justify-content: flex-start; /* Alinha à esquerda */
 }
 
 .tickets-scroll-container::-webkit-scrollbar {
@@ -1212,12 +1212,14 @@ function getEventTags(eventData) {
 }
 
 .ticket-item-column {
-  min-width: 320px;
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.991);
   display: flex;
   flex-direction: column;
-  padding-left: 48px;
-  padding-right: 48px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .ticket-item-column:last-child,
@@ -1245,11 +1247,11 @@ function getEventTags(eventData) {
 }
 
 .prev-btn {
-  left: 0;
+  left: -48px;
 }
 
 .next-btn {
-  right: 0;
+  right: -48px;
 }
 
 .text-magenta {
@@ -1282,7 +1284,7 @@ function getEventTags(eventData) {
   }
 
   .ticket-item-column {
-    min-width: 80vw; /* Cards ocupam quase toda tela no mobile */
+    min-width: 80%; /* Cards ocupam 80% do container, mostrando parte do próximo */
     padding: 0 16px;
   }
 }
