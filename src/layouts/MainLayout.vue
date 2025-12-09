@@ -275,10 +275,7 @@
           <template v-if="$q.screen.lt.sm">
             <div class="category-list-mobile">
               <!-- Texto "Limpar" acima da primeira categoria -->
-              <div
-                v-if="selectedCategories.length > 0"
-                class="clear-categories-wrapper"
-              >
+              <div v-if="selectedCategories.length > 0" class="clear-categories-wrapper">
                 <span
                   class="clear-categories-text"
                   @click="clearAllCategories"
@@ -422,6 +419,7 @@
           <div class="footer-column">
             <div class="footer-title">Links Úteis</div>
             <router-link to="/programacao" class="footer-link">Programação Completa</router-link>
+            <router-link to="/embaixadores" class="footer-link">Seja um Embaixador</router-link>
           </div>
 
           <div class="footer-column">
