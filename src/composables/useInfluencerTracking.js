@@ -42,6 +42,7 @@ const INFLUENCER_NAMES = {
   'elielton-fontes': 'Elielton Fontes',
   leite: 'Leite',
   'gabriela-siqueira': 'Gabriela Siqueira',
+  tonin: 'Tonin',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -83,6 +84,7 @@ const INFLUENCER_GENDER = {
   'Elielton Fontes': 'pelo',
   Leite: 'pelo',
   'Gabriela Siqueira': 'pela',
+  Tonin: 'pelo',
 }
 
 export function useInfluencerTracking() {

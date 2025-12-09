@@ -225,6 +225,16 @@ const routes = [
         name: 'gabriela-siqueira',
         component: () => import('pages/GabrielaSiqueiraPage.vue'),
       },
+      {
+        path: 'embaixadores',
+        name: 'embaixadores',
+        component: () => import('pages/EmbaixadoresPage.vue'),
+      },
+      {
+        path: 'tonin',
+        name: 'tonin',
+        component: () => import('pages/ToninPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
