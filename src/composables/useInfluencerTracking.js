@@ -41,6 +41,7 @@ const INFLUENCER_NAMES = {
   julinha: 'Julinha',
   'elielton-fontes': 'Elielton Fontes',
   leite: 'Leite',
+  'gabriela-siqueira': 'Gabriela Siqueira',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -81,6 +82,7 @@ const INFLUENCER_GENDER = {
   Julinha: 'pela',
   'Elielton Fontes': 'pelo',
   Leite: 'pelo',
+  'Gabriela Siqueira': 'pela',
 }
 
 export function useInfluencerTracking() {

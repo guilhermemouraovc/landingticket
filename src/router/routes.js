@@ -1,4 +1,4 @@
-﻿const routes = [
+const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
@@ -219,6 +219,11 @@
         path: 'julinha',
         name: 'julinha',
         component: () => import('pages/JulinhaPage.vue'),
+      },
+      {
+        path: 'gabriela-siqueira',
+        name: 'gabriela-siqueira',
+        component: () => import('pages/GabrielaSiqueiraPage.vue'),
       },
     ],
   },
