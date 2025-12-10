@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <q-page class="event-page">
     <div class="event-container">
       <!-- Toolbar ajustada para suportar botão de edição à direita -->
@@ -239,6 +239,44 @@
           </div>
         </q-card>
 
+        <!-- Card de Newsletter -->
+        <div class="newsletter-card">
+          <div class="newsletter-content">
+            <div class="newsletter-text">
+              <p class="newsletter-title">
+                Quer ficar por dentro das novidades sobre os eventos que estão rolando em PE?
+                <span class="newsletter-highlight">Faça parte da Newsletter Ticketpe!</span>
+              </p>
+            </div>
+            <div class="newsletter-form">
+              <label for="newsletter-email" class="newsletter-label">Digite seu e-mail</label>
+              <q-input
+                id="newsletter-email"
+                v-model="newsletterEmail"
+                type="email"
+                placeholder="exemplo@gmail.com"
+                outlined
+                dense
+                dark
+                class="newsletter-input"
+                :rules="[(val) => !val || /.+@.+\..+/.test(val) || 'E-mail inválido']"
+                aria-label="Digite seu e-mail para newsletter"
+              />
+              <q-btn
+                class="newsletter-btn"
+                color="cyan"
+                text-color="white"
+                label="Inscrever-se"
+                unelevated
+                no-caps
+                :loading="newsletterLoading"
+                :disable="!newsletterEmail || newsletterLoading"
+                @click="subscribeNewsletter"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Carrossel de eventos relacionados -->
         <RelatedEventsCarousel
           v-if="event"
@@ -315,6 +353,10 @@ const error = ref('')
 const event = ref(null)
 const selectedDay = ref(null)
 const ticketsContainer = ref(null)
+
+// Newsletter state
+const newsletterEmail = ref('')
+const newsletterLoading = ref(false)
 
 function scrollTickets(direction) {
   if (!ticketsContainer.value) return
@@ -556,6 +598,53 @@ function copyToClipboardLegacy(text) {
 
 function goHome() {
   router.push('/')
+}
+
+// Newsletter subscription
+async function subscribeNewsletter() {
+  if (!newsletterEmail.value || newsletterLoading.value) return
+
+  // Validação básica de e-mail
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(newsletterEmail.value)) {
+    $q.notify({
+      type: 'warning',
+      message: 'Por favor, insira um e-mail válido.',
+      position: 'top',
+      timeout: 3000,
+      icon: 'warning',
+    })
+    return
+  }
+
+  newsletterLoading.value = true
+
+  try {
+    // TODO: Integrar com Supabase ou serviço de newsletter
+    // Simulação de delay para feedback visual
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    $q.notify({
+      type: 'positive',
+      message: 'Inscrição realizada com sucesso! Bem-vindo à Newsletter Ticketpe!',
+      position: 'top',
+      timeout: 4000,
+      icon: 'check_circle',
+    })
+
+    newsletterEmail.value = ''
+  } catch (err) {
+    console.error('Erro ao inscrever na newsletter:', err)
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao realizar inscrição. Tente novamente.',
+      position: 'top',
+      timeout: 3000,
+      icon: 'error',
+    })
+  } finally {
+    newsletterLoading.value = false
+  }
 }
 
 // Função para extrair tags do evento
@@ -1286,6 +1375,182 @@ function getEventTags(eventData) {
   .ticket-item-column {
     min-width: 80%; /* Cards ocupam 80% do container, mostrando parte do próximo */
     padding: 0 16px;
+  }
+}
+
+/* ==================== NEWSLETTER CARD ==================== */
+.newsletter-card {
+  background: #455066;
+  border-radius: 16px;
+  padding: 32px 48px;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  max-width: 1120px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.newsletter-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.newsletter-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.newsletter-title {
+  font-size: 30px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.newsletter-highlight {
+  color: #35c7ee;
+}
+
+.newsletter-form {
+  flex: 0 0 auto;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.newsletter-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: #e3e6eb;
+  margin-bottom: -4px;
+}
+
+.newsletter-input {
+  width: 100%;
+}
+
+.newsletter-input :deep(.q-field__control) {
+  background: #ffffff;
+  border-radius: 8px;
+
+  height: 44px;
+}
+
+.newsletter-input :deep(.q-field__control-container) {
+  padding-top: 0 !important;
+}
+
+.newsletter-input :deep(.q-field__native) {
+  color: #374151;
+  font-size: 14px;
+  padding: 10px 14px;
+}
+
+.newsletter-input :deep(.q-field__native::placeholder) {
+  color: #9ca3af;
+}
+
+.newsletter-input :deep(.q-field--outlined .q-field__control:before) {
+  border-color: #e5e7eb;
+}
+
+.newsletter-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 600;
+  background: #35c7ee !important;
+  color: #ffffff !important;
+  margin-top: 2px;
+}
+
+.newsletter-btn:hover {
+  background: #2ab0d4 !important;
+}
+
+.newsletter-btn:disabled {
+  background: #5a6a7a !important;
+  color: #9ca3af !important;
+  opacity: 0.8;
+}
+
+@media (max-width: 1024px) {
+  .newsletter-card {
+    padding: 28px 32px;
+  }
+
+  .newsletter-content {
+    gap: 24px;
+  }
+
+  .newsletter-title {
+    font-size: 18px;
+  }
+
+  .newsletter-form {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .newsletter-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .newsletter-text,
+  .newsletter-form {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .newsletter-title {
+    text-align: center;
+  }
+}
+
+@media (max-width: 599px) {
+  .newsletter-card {
+    padding: 20px 16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    min-height: auto;
+  }
+
+  .newsletter-title {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .newsletter-form {
+    gap: 6px;
+    width: 100%;
+  }
+
+  .newsletter-label {
+    font-size: 12px;
+  }
+
+  .newsletter-input :deep(.q-field__control) {
+    height: 40px;
+  }
+
+  .newsletter-btn {
+    height: 40px;
+    font-size: 13px;
   }
 }
 </style>
