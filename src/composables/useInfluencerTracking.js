@@ -44,6 +44,7 @@ const INFLUENCER_NAMES = {
   'gabriela-siqueira': 'Gabriela Siqueira',
   tonin: 'Tonin',
   'fabio-daniel': 'Fabio Daniel',
+  'anny-acioli': 'Anny Acioli',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -87,6 +88,7 @@ const INFLUENCER_GENDER = {
   'Gabriela Siqueira': 'pela',
   Tonin: 'pelo',
   'Fabio Daniel': 'pelo',
+  'Anny Acioli': 'pela',
 }
 
 export function useInfluencerTracking() {
