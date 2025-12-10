@@ -1409,6 +1409,13 @@ function getEventTags(eventData) {
 .newsletter-title {
   font-size: 30px;
   font-weight: 600;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   color: #ffffff;
   line-height: 1.4;
   margin: 0;
