@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <q-page class="event-page">
     <div class="event-container">
       <!-- Toolbar ajustada para suportar botão de edição à direita -->
@@ -155,12 +155,20 @@
                     <!-- Preço -->
                     <div class="ticket-price-info q-mt-auto">
                       <div v-if="day.hasPrice">
-                        <div class="text-h4 text-weight-bold text-white">
+                        <div
+                          class="text-h4 text-weight-bold text-white"
+                          :class="{
+                            'ticket-price--no-installments': !day.shouldShowInstallments,
+                          }"
+                        >
                           {{ day.formattedFullPrice }}
                         </div>
-                        <div v-if="day.installments" class="ticket-installments text-grey-5">
+                        <div
+                          v-if="day.shouldShowInstallments && day.installments"
+                          class="ticket-installments text-grey-5"
+                        >
                           Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
-                          {{ day.installments && 'sem juros' }}
+                          sem juros
                         </div>
                       </div>
                       <div v-else class="text-h5 text-white">Consulte</div>
@@ -199,16 +207,28 @@
             <!-- Seção de Preços (Único Dia) -->
             <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
+                <!-- Parcelas (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
                 <div
-                  v-if="event.installments && event.installmentValue"
+                  v-if="
+                    event.shouldShowInstallments && event.installments && event.installmentValue
+                  "
                   class="installment-details"
                 >
                   <span class="installment-prefix">{{ event.installments }}x de</span>
                   <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
                   <span class="installment-suffix">sem juros</span>
+                  <!-- Preço à vista logo abaixo de "sem juros" -->
+                  <div v-if="event.fullPrice" class="cash-price">
+                    ou {{ event.formattedFullPrice }} à vista
+                  </div>
                 </div>
-                <div v-if="event.fullPrice" class="cash-price">
-                  ou {{ event.formattedFullPrice }} à vista
+                <!-- Preço à vista destacado quando não há parcelas -->
+                <div v-else-if="event.fullPrice" class="cash-price cash-price--no-installments">
+                  {{ event.formattedFullPrice }}
+                </div>
+                <!-- Texto alternativo quando não há parcelas -->
+                <div v-if="!event.shouldShowInstallments" class="payment-info">
+                  No PIX ou no cartão
                 </div>
               </div>
             </div>
@@ -239,6 +259,44 @@
           </div>
         </q-card>
 
+        <!-- Card de Newsletter -->
+        <div class="newsletter-card">
+          <div class="newsletter-content">
+            <div class="newsletter-text">
+              <p class="newsletter-title">
+                Quer ficar por dentro das novidades sobre os eventos que estão rolando em PE?
+                <span class="newsletter-highlight">Faça parte da Newsletter Ticketpe!</span>
+              </p>
+            </div>
+            <div class="newsletter-form">
+              <label for="newsletter-email" class="newsletter-label">Digite seu e-mail</label>
+              <q-input
+                id="newsletter-email"
+                v-model="newsletterEmail"
+                type="email"
+                placeholder="exemplo@gmail.com"
+                outlined
+                dense
+                dark
+                class="newsletter-input"
+                :rules="[(val) => !val || /.+@.+\..+/.test(val) || 'E-mail inválido']"
+                aria-label="Digite seu e-mail para newsletter"
+              />
+              <q-btn
+                class="newsletter-btn"
+                color="cyan"
+                text-color="white"
+                label="Inscrever-se"
+                unelevated
+                no-caps
+                :loading="newsletterLoading"
+                :disable="!newsletterEmail || newsletterLoading"
+                @click="subscribeNewsletter"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- Carrossel de eventos relacionados -->
         <RelatedEventsCarousel
           v-if="event"
@@ -247,6 +305,37 @@
         />
       </div>
     </div>
+
+    <!-- Botão Flutuante de Compra -->
+    <transition name="floating-bar">
+      <div v-if="event" class="floating-buy-bar">
+        <div class="floating-buy-content">
+          <div class="floating-buy-info">
+            <div class="floating-buy-title">{{ event.title }}</div>
+            <div class="floating-buy-price">
+              <span class="floating-price-value">{{ event.formattedFullPrice || 'Consulte' }}</span>
+              <span
+                v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
+                class="floating-price-installments"
+              >
+                Ou até {{ event.installments }}x {{ event.formattedInstallmentValue }} sem juros
+              </span>
+            </div>
+          </div>
+          <q-btn
+            class="floating-buy-btn"
+            color="warning"
+            text-color="black"
+            label="Comprar"
+            unelevated
+            no-caps
+            :loading="openingWhatsapp"
+            aria-label="Comprar ingresso via WhatsApp"
+            @click="openWhatsapp()"
+          />
+        </div>
+      </div>
+    </transition>
 
     <!-- Dialog de Edição (Admin) -->
     <q-dialog v-model="showEditDialog" :maximized="$q.screen.lt.md" persistent>
@@ -315,6 +404,10 @@ const error = ref('')
 const event = ref(null)
 const selectedDay = ref(null)
 const ticketsContainer = ref(null)
+
+// Newsletter state
+const newsletterEmail = ref('')
+const newsletterLoading = ref(false)
 
 function scrollTickets(direction) {
   if (!ticketsContainer.value) return
@@ -556,6 +649,53 @@ function copyToClipboardLegacy(text) {
 
 function goHome() {
   router.push('/')
+}
+
+// Newsletter subscription
+async function subscribeNewsletter() {
+  if (!newsletterEmail.value || newsletterLoading.value) return
+
+  // Validação básica de e-mail
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(newsletterEmail.value)) {
+    $q.notify({
+      type: 'warning',
+      message: 'Por favor, insira um e-mail válido.',
+      position: 'top',
+      timeout: 3000,
+      icon: 'warning',
+    })
+    return
+  }
+
+  newsletterLoading.value = true
+
+  try {
+    // TODO: Integrar com Supabase ou serviço de newsletter
+    // Simulação de delay para feedback visual
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    $q.notify({
+      type: 'positive',
+      message: 'Inscrição realizada com sucesso! Bem-vindo à Newsletter Ticketpe!',
+      position: 'top',
+      timeout: 4000,
+      icon: 'check_circle',
+    })
+
+    newsletterEmail.value = ''
+  } catch (err) {
+    console.error('Erro ao inscrever na newsletter:', err)
+    $q.notify({
+      type: 'negative',
+      message: 'Erro ao realizar inscrição. Tente novamente.',
+      position: 'top',
+      timeout: 3000,
+      icon: 'error',
+    })
+  } finally {
+    newsletterLoading.value = false
+  }
 }
 
 // Função para extrair tags do evento
@@ -856,6 +996,26 @@ function getEventTags(eventData) {
   margin-top: 24px; /* Distância exata conforme protótipo */
 }
 
+/* Preço à vista destacado quando não há parcelas (eventos com preço baixo) */
+.cash-price--no-installments {
+  font-family: 'Poppins', sans-serif;
+  font-size: 45.18px;
+  font-weight: 600; /* Semibold */
+  color: white;
+  line-height: 1;
+  margin-top: 0;
+}
+
+/* Texto "No PIX ou no cartão" para eventos sem parcelas */
+.payment-info {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17.57px;
+  font-weight: 500;
+  color: #45c0e7;
+  line-height: 1.2;
+  margin-top: 8px;
+}
+
 .buy-btn {
   width: 572px;
   height: 57px;
@@ -1112,6 +1272,22 @@ function getEventTags(eventData) {
     margin-bottom: 0;
   }
 
+  /* Preço destacado no mobile quando não há parcelas */
+  .cash-price--no-installments {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: white;
+    line-height: 1;
+    margin-top: 0;
+  }
+
+  /* Texto "No PIX ou no cartão" no mobile */
+  .payment-info {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
   .buy-btn {
     width: 100%;
     height: 48px;
@@ -1193,7 +1369,7 @@ function getEventTags(eventData) {
   display: flex;
   align-items: center;
   position: relative;
-  padding: 0 48px; /* Espaço para setas */
+  padding: 0; /* Remove padding, setas ficam nas bordas */
 }
 
 .tickets-scroll-container {
@@ -1204,7 +1380,7 @@ function getEventTags(eventData) {
   scrollbar-width: none; /* Firefox */
   width: 100%;
   display: flex;
-  justify-content: center; /* Centraliza os cards horizontalmente */
+  justify-content: flex-start; /* Alinha à esquerda */
 }
 
 .tickets-scroll-container::-webkit-scrollbar {
@@ -1212,12 +1388,14 @@ function getEventTags(eventData) {
 }
 
 .ticket-item-column {
-  min-width: 320px;
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.991);
   display: flex;
   flex-direction: column;
-  padding-left: 48px;
-  padding-right: 48px;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .ticket-item-column:last-child,
@@ -1245,11 +1423,11 @@ function getEventTags(eventData) {
 }
 
 .prev-btn {
-  left: 0;
+  left: -48px;
 }
 
 .next-btn {
-  right: 0;
+  right: -48px;
 }
 
 .text-magenta {
@@ -1260,6 +1438,13 @@ function getEventTags(eventData) {
   font-size: 0.85rem;
   font-weight: 400;
   margin-top: 4px;
+}
+
+/* Preço destacado quando não há parcelas (eventos com preço baixo) */
+.ticket-price--no-installments {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600; /* Semibold */
 }
 
 @media (max-width: 599px) {
@@ -1282,8 +1467,339 @@ function getEventTags(eventData) {
   }
 
   .ticket-item-column {
-    min-width: 80vw; /* Cards ocupam quase toda tela no mobile */
+    min-width: 80%; /* Cards ocupam 80% do container, mostrando parte do próximo */
     padding: 0 16px;
+  }
+}
+
+/* ==================== NEWSLETTER CARD ==================== */
+.newsletter-card {
+  background: #455066;
+  border-radius: 16px;
+  padding: 32px 48px;
+  margin-top: 48px;
+  margin-bottom: 48px;
+  max-width: 1120px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.newsletter-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.newsletter-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.newsletter-title {
+  font-size: 30px;
+  font-weight: 600;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  color: #ffffff;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.newsletter-highlight {
+  color: #35c7ee;
+}
+
+.newsletter-form {
+  flex: 0 0 auto;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.newsletter-label {
+  font-size: 16px;
+  font-weight: 400;
+  color: #e3e6eb;
+  margin-bottom: -4px;
+}
+
+.newsletter-input {
+  width: 100%;
+}
+
+.newsletter-input :deep(.q-field__control) {
+  background: #ffffff;
+  border-radius: 8px;
+
+  height: 44px;
+}
+
+.newsletter-input :deep(.q-field__control-container) {
+  padding-top: 0 !important;
+}
+
+.newsletter-input :deep(.q-field__native) {
+  color: #374151;
+  font-size: 14px;
+  padding: 10px 14px;
+}
+
+.newsletter-input :deep(.q-field__native::placeholder) {
+  color: #9ca3af;
+}
+
+.newsletter-input :deep(.q-field--outlined .q-field__control:before) {
+  border-color: #e5e7eb;
+}
+
+.newsletter-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 600;
+  background: #35c7ee !important;
+  color: #ffffff !important;
+  margin-top: 2px;
+}
+
+.newsletter-btn:hover {
+  background: #2ab0d4 !important;
+}
+
+.newsletter-btn:disabled {
+  background: #5a6a7a !important;
+  color: #9ca3af !important;
+  opacity: 0.8;
+}
+
+@media (max-width: 1024px) {
+  .newsletter-card {
+    padding: 28px 32px;
+  }
+
+  .newsletter-content {
+    gap: 24px;
+  }
+
+  .newsletter-title {
+    font-size: 18px;
+  }
+
+  .newsletter-form {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .newsletter-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .newsletter-text,
+  .newsletter-form {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .newsletter-title {
+    text-align: center;
+  }
+}
+
+@media (max-width: 599px) {
+  .newsletter-card {
+    padding: 20px 16px;
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    min-height: auto;
+  }
+
+  .newsletter-title {
+    font-size: 16px;
+    text-align: left;
+  }
+
+  .newsletter-form {
+    gap: 6px;
+    width: 100%;
+  }
+
+  .newsletter-label {
+    font-size: 12px;
+  }
+
+  .newsletter-input :deep(.q-field__control) {
+    height: 40px;
+  }
+
+  .newsletter-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+}
+
+/* ==================== FLOATING BUY BAR ==================== */
+.floating-buy-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: calc(100% - 48px);
+  max-width: 1120px;
+}
+
+.floating-buy-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: rgba(42, 52, 71, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.floating-buy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.floating-buy-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-buy-price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.floating-price-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.floating-price-installments {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.floating-buy-btn {
+  min-width: 280px;
+  height: 52px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: #ffe100 !important;
+  color: black !important;
+  flex-shrink: 0;
+}
+
+.floating-buy-btn:hover {
+  background-color: #c3ac02 !important;
+}
+
+/* Animação de entrada/saída */
+.floating-bar-enter-active,
+.floating-bar-leave-active {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.floating-bar-enter-from,
+.floating-bar-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .floating-buy-bar {
+    bottom: 16px;
+    width: calc(100% - 32px);
+  }
+
+  .floating-buy-content {
+    padding: 12px 16px;
+    gap: 16px;
+  }
+
+  .floating-buy-title {
+    font-size: 16px;
+  }
+
+  .floating-price-value {
+    font-size: 18px;
+  }
+
+  .floating-price-installments {
+    font-size: 11px;
+  }
+
+  .floating-buy-btn {
+    min-width: 120px;
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-buy-bar {
+    bottom: 12px;
+    width: calc(100% - 24px);
+  }
+
+  .floating-buy-content {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .floating-buy-info {
+    text-align: left;
+  }
+
+  .floating-buy-price {
+    align-items: flex-start;
+  }
+
+  .floating-buy-btn {
+    min-width: 100px;
+    height: 40px;
   }
 }
 </style>

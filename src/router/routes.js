@@ -245,6 +245,11 @@ const routes = [
         name: 'anny-acioli',
         component: () => import('pages/AnnyAcioliPage.vue'),
       },
+      {
+        path: 'hugo',
+        name: 'hugo',
+        component: () => import('pages/HugoPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)

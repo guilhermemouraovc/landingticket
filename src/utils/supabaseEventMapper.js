@@ -54,6 +54,7 @@ function formatPrice(value) {
 
 /**
  * Calcula e formata informações de preço
+ * Inclui lógica para determinar se deve mostrar parcelas baseado no valor do ingresso
  */
 function formatPriceInfo(row) {
   if (!row.price || row.price <= 0) {
@@ -64,12 +65,20 @@ function formatPriceInfo(row) {
       installmentValue: null,
       formattedFullPrice: null,
       formattedInstallmentValue: null,
+      shouldShowInstallments: false,
     }
   }
 
   const fullPrice = row.price
   const installments = row.price_installments || null
   const installmentValue = row.installment_value || null
+
+  // Não mostra parcelas se:
+  // - Preço for baixo (menor que R$100) - não faz sentido mostrar parcelas para valores baixos
+  // - Número de parcelas for 1 ou menos (não faz sentido mostrar "1x")
+  const PRICE_THRESHOLD = 100
+  const shouldShowInstallments =
+    fullPrice >= PRICE_THRESHOLD && installments && installments > 1 && installmentValue
 
   return {
     hasPrice: true,
@@ -78,6 +87,7 @@ function formatPriceInfo(row) {
     installmentValue,
     formattedFullPrice: formatPrice(fullPrice),
     formattedInstallmentValue: installmentValue ? formatPrice(installmentValue) : null,
+    shouldShowInstallments,
   }
 }
 
@@ -97,7 +107,7 @@ export function toEventCardFromSb(row) {
 
   // Tenta usar image_url da view, se não existir, resolve do array images com context='card'
   let cardImage = row.image_url || '/semfoto.webp'
-  
+
   // Se há array de imagens, usa resolveImage com context 'card' para respeitar image_type
   if (row.images && Array.isArray(row.images) && row.images.length > 0) {
     cardImage = resolveImage(row, 'card')
@@ -223,25 +233,28 @@ function formatEventDays(days) {
     if (day.date) {
       // Cria data garantindo que não haja problema de timezone (adiciona hora meio dia)
       const dateObj = new Date(`${day.date}T12:00:00`)
-      
+
       if (!Number.isNaN(dateObj.getTime())) {
         // Formato: "14/02 Sábado"
         const dayStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
         const weekStr = dateObj.toLocaleDateString('pt-BR', { weekday: 'long' })
         // Capitaliza primeira letra
         const weekStrCap = weekStr.charAt(0).toUpperCase() + weekStr.slice(1)
-        
+
         dateLabel = `${dayStr} ${weekStrCap}`
 
         // Formato curto: "14 FEV" (para fallback)
         const dayNum = dateObj.getDate()
-        const monthShort = dateObj.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '').toUpperCase()
+        const monthShort = dateObj
+          .toLocaleDateString('pt-BR', { month: 'short' })
+          .replace('.', '')
+          .toUpperCase()
         formattedDateShort = `${dayNum} ${monthShort}`
-        
+
         // Badge info
         dateBadge = {
           day: dateObj.getDate().toString().padStart(2, '0'),
-          month: monthShort
+          month: monthShort,
         }
       }
     }
@@ -249,7 +262,7 @@ function formatEventDays(days) {
     const priceInfo = formatPriceInfo({
       price: day.price,
       price_installments: day.price_installments,
-      installment_value: day.installment_value
+      installment_value: day.installment_value,
     })
 
     return {
@@ -261,7 +274,7 @@ function formatEventDays(days) {
       description: day.description,
       ticketUrl: day.ticket_url,
       dateBadge,
-      ...priceInfo
+      ...priceInfo,
     }
   })
 }

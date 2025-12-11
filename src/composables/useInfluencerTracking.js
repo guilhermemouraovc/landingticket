@@ -45,6 +45,7 @@ const INFLUENCER_NAMES = {
   tonin: 'Tonin',
   'fabio-daniel': 'Fabio Daniel',
   'anny-acioli': 'Anny Acioli',
+  hugo: 'Hugo',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -89,6 +90,7 @@ const INFLUENCER_GENDER = {
   Tonin: 'pelo',
   'Fabio Daniel': 'pelo',
   'Anny Acioli': 'pela',
+  Hugo: 'pelo',
 }
 
 export function useInfluencerTracking() {
