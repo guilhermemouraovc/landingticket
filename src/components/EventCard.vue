@@ -119,7 +119,11 @@
       <!-- Seção de Preços -->
       <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
         <!-- Preço À Vista -->
-        <div v-if="event.fullPrice" class="price-full relative-position cursor-pointer">
+        <div
+          v-if="event.fullPrice"
+          class="price-full relative-position cursor-pointer"
+          :class="{ 'price-full--no-installments': !event.shouldShowInstallments }"
+        >
           {{ event.formattedFullPrice }}
           <q-popup-edit
             v-if="adminMode"
@@ -144,11 +148,19 @@
           <q-tooltip v-if="adminMode">Clique para editar preço</q-tooltip>
         </div>
 
-        <!-- Preço Parcelado (se existir) -->
-        <div v-if="event.installments && event.installmentValue" class="price-installment">
+        <!-- Preço Parcelado (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
+        <div
+          v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
+          class="price-installment"
+        >
           <span class="installment-label">{{ event.installments }}x de</span>
           <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
           <span class="installment-info">sem juros</span>
+        </div>
+
+        <!-- Mensagem alternativa quando não há parcelas -->
+        <div v-else-if="event.hasPrice && !event.shouldShowInstallments" class="price-installment">
+          <span class="installment-info">No pix ou no cartão</span>
         </div>
       </div>
       <!-- Spacer para manter consistência visual quando sem preço -->
@@ -495,6 +507,13 @@ function handleClick(e) {
   font-weight: 600; /* Semibold */
   color: #000000;
   line-height: 1.2;
+}
+
+/* Preço quando não há parcelas (eventos com preço baixo) - mesmo tamanho para manter consistência */
+.price-full--no-installments {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600; /* Semibold */
 }
 
 .price-installment {

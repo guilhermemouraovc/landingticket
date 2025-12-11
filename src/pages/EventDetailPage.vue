@@ -155,12 +155,20 @@
                     <!-- Preço -->
                     <div class="ticket-price-info q-mt-auto">
                       <div v-if="day.hasPrice">
-                        <div class="text-h4 text-weight-bold text-white">
+                        <div
+                          class="text-h4 text-weight-bold text-white"
+                          :class="{
+                            'ticket-price--no-installments': !day.shouldShowInstallments,
+                          }"
+                        >
                           {{ day.formattedFullPrice }}
                         </div>
-                        <div v-if="day.installments" class="ticket-installments text-grey-5">
+                        <div
+                          v-if="day.shouldShowInstallments && day.installments"
+                          class="ticket-installments text-grey-5"
+                        >
                           Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }}
-                          {{ day.installments && 'sem juros' }}
+                          sem juros
                         </div>
                       </div>
                       <div v-else class="text-h5 text-white">Consulte</div>
@@ -199,16 +207,31 @@
             <!-- Seção de Preços (Único Dia) -->
             <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
+                <!-- Parcelas (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
                 <div
-                  v-if="event.installments && event.installmentValue"
+                  v-if="
+                    event.shouldShowInstallments && event.installments && event.installmentValue
+                  "
                   class="installment-details"
                 >
                   <span class="installment-prefix">{{ event.installments }}x de</span>
                   <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
                   <span class="installment-suffix">sem juros</span>
                 </div>
-                <div v-if="event.fullPrice" class="cash-price">
-                  ou {{ event.formattedFullPrice }} à vista
+                <!-- Preço à vista (destaque diferente quando não há parcelas) -->
+                <div
+                  v-if="event.fullPrice"
+                  class="cash-price"
+                  :class="{
+                    'cash-price--no-installments': !event.shouldShowInstallments,
+                  }"
+                >
+                  {{ event.shouldShowInstallments ? 'ou ' : '' }}{{ event.formattedFullPrice
+                  }}{{ event.shouldShowInstallments ? ' à vista' : '' }}
+                </div>
+                <!-- Texto alternativo quando não há parcelas -->
+                <div v-if="!event.shouldShowInstallments" class="payment-info">
+                  No PIX ou no cartão
                 </div>
               </div>
             </div>
@@ -945,6 +968,26 @@ function getEventTags(eventData) {
   margin-top: 24px; /* Distância exata conforme protótipo */
 }
 
+/* Preço à vista destacado quando não há parcelas (eventos com preço baixo) */
+.cash-price--no-installments {
+  font-family: 'Poppins', sans-serif;
+  font-size: 45.18px;
+  font-weight: 600; /* Semibold */
+  color: white;
+  line-height: 1;
+  margin-top: 0;
+}
+
+/* Texto "No PIX ou no cartão" para eventos sem parcelas */
+.payment-info {
+  font-family: 'Poppins', sans-serif;
+  font-size: 17.57px;
+  font-weight: 500;
+  color: #45c0e7;
+  line-height: 1.2;
+  margin-top: 8px;
+}
+
 .buy-btn {
   width: 572px;
   height: 57px;
@@ -1201,6 +1244,22 @@ function getEventTags(eventData) {
     margin-bottom: 0;
   }
 
+  /* Preço destacado no mobile quando não há parcelas */
+  .cash-price--no-installments {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: white;
+    line-height: 1;
+    margin-top: 0;
+  }
+
+  /* Texto "No PIX ou no cartão" no mobile */
+  .payment-info {
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
   .buy-btn {
     width: 100%;
     height: 48px;
@@ -1351,6 +1410,13 @@ function getEventTags(eventData) {
   font-size: 0.85rem;
   font-weight: 400;
   margin-top: 4px;
+}
+
+/* Preço destacado quando não há parcelas (eventos com preço baixo) */
+.ticket-price--no-installments {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600; /* Semibold */
 }
 
 @media (max-width: 599px) {
