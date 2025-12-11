@@ -217,17 +217,14 @@
                   <span class="installment-prefix">{{ event.installments }}x de</span>
                   <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
                   <span class="installment-suffix">sem juros</span>
+                  <!-- Preço à vista logo abaixo de "sem juros" -->
+                  <div v-if="event.fullPrice" class="cash-price">
+                    ou {{ event.formattedFullPrice }} à vista
+                  </div>
                 </div>
-                <!-- Preço à vista (destaque diferente quando não há parcelas) -->
-                <div
-                  v-if="event.fullPrice"
-                  class="cash-price"
-                  :class="{
-                    'cash-price--no-installments': !event.shouldShowInstallments,
-                  }"
-                >
-                  {{ event.shouldShowInstallments ? 'ou ' : '' }}{{ event.formattedFullPrice
-                  }}{{ event.shouldShowInstallments ? ' à vista' : '' }}
+                <!-- Preço à vista destacado quando não há parcelas -->
+                <div v-else-if="event.fullPrice" class="cash-price cash-price--no-installments">
+                  {{ event.formattedFullPrice }}
                 </div>
                 <!-- Texto alternativo quando não há parcelas -->
                 <div v-if="!event.shouldShowInstallments" class="payment-info">
@@ -308,6 +305,37 @@
         />
       </div>
     </div>
+
+    <!-- Botão Flutuante de Compra -->
+    <transition name="floating-bar">
+      <div v-if="event" class="floating-buy-bar">
+        <div class="floating-buy-content">
+          <div class="floating-buy-info">
+            <div class="floating-buy-title">{{ event.title }}</div>
+            <div class="floating-buy-price">
+              <span class="floating-price-value">{{ event.formattedFullPrice || 'Consulte' }}</span>
+              <span
+                v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
+                class="floating-price-installments"
+              >
+                Ou até {{ event.installments }}x {{ event.formattedInstallmentValue }} sem juros
+              </span>
+            </div>
+          </div>
+          <q-btn
+            class="floating-buy-btn"
+            color="warning"
+            text-color="black"
+            label="Comprar"
+            unelevated
+            no-caps
+            :loading="openingWhatsapp"
+            aria-label="Comprar ingresso via WhatsApp"
+            @click="openWhatsapp()"
+          />
+        </div>
+      </div>
+    </transition>
 
     <!-- Dialog de Edição (Admin) -->
     <q-dialog v-model="showEditDialog" :maximized="$q.screen.lt.md" persistent>
@@ -1624,6 +1652,154 @@ function getEventTags(eventData) {
   .newsletter-btn {
     height: 40px;
     font-size: 13px;
+  }
+}
+
+/* ==================== FLOATING BUY BAR ==================== */
+.floating-buy-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: calc(100% - 48px);
+  max-width: 1120px;
+}
+
+.floating-buy-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: rgba(42, 52, 71, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.floating-buy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.floating-buy-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-buy-price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.floating-price-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.floating-price-installments {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.floating-buy-btn {
+  min-width: 280px;
+  height: 52px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: #ffe100 !important;
+  color: black !important;
+  flex-shrink: 0;
+}
+
+.floating-buy-btn:hover {
+  background-color: #c3ac02 !important;
+}
+
+/* Animação de entrada/saída */
+.floating-bar-enter-active,
+.floating-bar-leave-active {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.floating-bar-enter-from,
+.floating-bar-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .floating-buy-bar {
+    bottom: 16px;
+    width: calc(100% - 32px);
+  }
+
+  .floating-buy-content {
+    padding: 12px 16px;
+    gap: 16px;
+  }
+
+  .floating-buy-title {
+    font-size: 16px;
+  }
+
+  .floating-price-value {
+    font-size: 18px;
+  }
+
+  .floating-price-installments {
+    font-size: 11px;
+  }
+
+  .floating-buy-btn {
+    min-width: 120px;
+    height: 44px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-buy-bar {
+    bottom: 12px;
+    width: calc(100% - 24px);
+  }
+
+  .floating-buy-content {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .floating-buy-info {
+    text-align: left;
+  }
+
+  .floating-buy-price {
+    align-items: flex-start;
+  }
+
+  .floating-buy-btn {
+    min-width: 100px;
+    height: 40px;
   }
 }
 </style>
