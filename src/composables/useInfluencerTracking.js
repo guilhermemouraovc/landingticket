@@ -47,6 +47,7 @@ const INFLUENCER_NAMES = {
   'anny-acioli': 'Anny Acioli',
   hugo: 'Hugo',
   'bruno-neves': 'Bruno Neves',
+  'ana-clara': 'Ana Clara',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -93,6 +94,7 @@ const INFLUENCER_GENDER = {
   'Anny Acioli': 'pela',
   Hugo: 'pelo',
   'Bruno Neves': 'pelo',
+  'Ana Clara': 'pela',
 }
 
 export function useInfluencerTracking() {
