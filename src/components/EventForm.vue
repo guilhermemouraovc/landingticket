@@ -82,23 +82,23 @@
 
           <div class="col-12">
             <q-input
+              v-model="formData.additional_info"
+              label="Atrações"
+              outlined
+              type="textarea"
+              rows="6"
+              hint="Atrações do evento, artistas, bandas, etc."
+            />
+          </div>
+
+          <div class="col-12">
+            <q-input
               v-model="formData.description"
               label="Descrição Resumida"
               outlined
               type="textarea"
               rows="3"
               hint="Breve descrição para cards e listagens"
-            />
-          </div>
-
-          <div class="col-12">
-            <q-input
-              v-model="formData.additional_info"
-              label="Informações Detalhadas"
-              outlined
-              type="textarea"
-              rows="6"
-              hint="Informações completas, atrações, regras, etc."
             />
           </div>
         </div>
