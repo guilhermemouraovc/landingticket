@@ -109,24 +109,14 @@
         <div class="text-subtitle1 text-primary q-mb-md">Agenda</div>
         <div class="row q-col-gutter-md q-mb-lg">
           <div class="col-12 col-md-6">
-            <q-input
-              v-model="formData.start_date"
-              label="Início"
-              outlined
-              type="datetime-local"
-            >
+            <q-input v-model="formData.start_date" label="Início" outlined type="datetime-local">
               <template v-slot:prepend>
                 <q-icon name="event_available" />
               </template>
             </q-input>
           </div>
           <div class="col-12 col-md-6">
-            <q-input
-              v-model="formData.end_date"
-              label="Término"
-              outlined
-              type="datetime-local"
-            >
+            <q-input v-model="formData.end_date" label="Término" outlined type="datetime-local">
               <template v-slot:prepend>
                 <q-icon name="event_busy" />
               </template>
@@ -151,23 +141,14 @@
             </q-input>
           </div>
           <div class="col-12 col-md-8">
-            <q-input
-              v-model="formData.city"
-              label="Cidade"
-              outlined
-            >
+            <q-input v-model="formData.city" label="Cidade" outlined>
               <template v-slot:prepend>
                 <q-icon name="location_city" />
               </template>
             </q-input>
           </div>
           <div class="col-12 col-md-4">
-            <q-input
-              v-model="formData.state"
-              label="Estado"
-              outlined
-              hint="Ex: PE"
-            >
+            <q-input v-model="formData.state" label="Estado" outlined hint="Ex: PE">
               <template v-slot:prepend>
                 <q-icon name="map" />
               </template>
@@ -193,7 +174,9 @@
         <div v-if="formData.days.length === 0" class="text-center q-pa-lg text-grey">
           <q-icon name="event_busy" size="4em" />
           <div class="q-mt-sm">Nenhum dia adicionado</div>
-          <div class="text-caption q-mt-xs">Adicione dias específicos para eventos com múltiplas datas</div>
+          <div class="text-caption q-mt-xs">
+            Adicione dias específicos para eventos com múltiplas datas
+          </div>
         </div>
 
         <div v-else class="row q-col-gutter-md">
@@ -244,12 +227,7 @@
 
                   <!-- Horário de Término -->
                   <div class="col-12 col-md-4">
-                    <q-input
-                      v-model="day.end_time"
-                      label="Horário de Término"
-                      outlined
-                      type="time"
-                    >
+                    <q-input v-model="day.end_time" label="Horário de Término" outlined type="time">
                       <template v-slot:prepend>
                         <q-icon name="schedule" />
                       </template>
@@ -424,11 +402,7 @@
             </q-input>
           </div>
           <div class="col-12 col-md-6">
-            <q-input
-              v-model="formData.share_url"
-              label="Link Externo / Ingressos"
-              outlined
-            >
+            <q-input v-model="formData.share_url" label="Link Externo / Ingressos" outlined>
               <template v-slot:prepend>
                 <q-icon name="link" />
               </template>
@@ -476,29 +450,29 @@
                 <div class="row q-col-gutter-sm">
                   <!-- Preview da Imagem (se houver URL válida) -->
                   <div class="col-12 col-sm-3 flex flex-center bg-white q-pa-sm rounded-borders">
-                     <q-img
-                        v-if="image.url"
-                        :src="image.url"
-                        style="max-height: 150px; width: 100%"
-                        fit="contain"
-                        class="rounded-borders"
-                      >
-                        <template v-slot:error>
-                          <div class="absolute-full flex flex-center bg-grey-3 text-grey-7">
-                            <q-icon name="broken_image" size="2em" />
-                          </div>
-                        </template>
-                     </q-img>
-                     <div v-else class="text-center text-grey-5">
-                       <q-icon name="image" size="3em" />
-                       <div class="text-caption">Preview</div>
-                     </div>
+                    <q-img
+                      v-if="image.url"
+                      :src="image.url"
+                      style="max-height: 150px; width: 100%"
+                      fit="contain"
+                      class="rounded-borders"
+                    >
+                      <template v-slot:error>
+                        <div class="absolute-full flex flex-center bg-grey-3 text-grey-7">
+                          <q-icon name="broken_image" size="2em" />
+                        </div>
+                      </template>
+                    </q-img>
+                    <div v-else class="text-center text-grey-5">
+                      <q-icon name="image" size="3em" />
+                      <div class="text-caption">Preview</div>
+                    </div>
                   </div>
 
                   <!-- Campos -->
                   <div class="col-12 col-sm-9">
                     <div class="row q-col-gutter-sm">
-                       <div class="col-12">
+                      <div class="col-12">
                         <q-input
                           v-model="image.url"
                           label="URL da Imagem"
@@ -511,7 +485,7 @@
                           </template>
                         </q-input>
                       </div>
-                      
+
                       <div class="col-12 col-md-6">
                         <q-input
                           v-model="image.alt_text"
@@ -623,7 +597,7 @@ const formData = ref({
   city: '',
   state: '',
   whatsapp: '+5581998471385',
-  whatsapp_message: 'Olá! Tenho interesse no evento.',
+  whatsapp_message: '',
   share_url: '',
   price: null,
   price_installments: null,
@@ -711,7 +685,7 @@ function loadEventData() {
     city: event.city || '',
     state: event.state || '',
     whatsapp: event.whatsapp || '+5581998471385',
-    whatsapp_message: event.whatsapp_message || 'Olá! Tenho interesse no evento.',
+    whatsapp_message: event.whatsapp_message || '',
     share_url: event.share_url || '',
     price: event.price || null,
     price_installments: event.price_installments || null,
@@ -757,7 +731,7 @@ function resetForm() {
     city: '',
     state: '',
     whatsapp: '+5581998471385',
-    whatsapp_message: 'Olá! Tenho interesse no evento.',
+    whatsapp_message: '',
     share_url: '',
     price: null,
     price_installments: null,
@@ -846,9 +820,9 @@ async function handleSubmit() {
       const existingImages = eventData.images.filter((img) => img.id)
       const newImages = eventData.images.filter((img) => !img.id)
       // Identifica imagens removidas (estavam no original mas não estão no form)
-      const originalImageIds = props.event.event_images?.map(img => img.id) || []
-      const currentImageIds = existingImages.map(img => img.id)
-      const removeImageIds = originalImageIds.filter(id => !currentImageIds.includes(id))
+      const originalImageIds = props.event.event_images?.map((img) => img.id) || []
+      const currentImageIds = existingImages.map((img) => img.id)
+      const removeImageIds = originalImageIds.filter((id) => !currentImageIds.includes(id))
 
       eventData.images = existingImages // Imagens para atualizar (se necessário, a lógica de update pode precisar ser refinada no backend se houver update de campos de imagem existente)
       eventData.newImages = newImages
@@ -858,9 +832,9 @@ async function handleSubmit() {
       const existingDays = eventData.days.filter((day) => day.id)
       const newDays = eventData.days.filter((day) => !day.id)
       // Identifica dias removidos (estavam no original mas não estão no form)
-      const originalDayIds = props.event.event_days?.map(day => day.id) || []
-      const currentDayIds = existingDays.map(day => day.id)
-      const removeDayIds = originalDayIds.filter(id => !currentDayIds.includes(id))
+      const originalDayIds = props.event.event_days?.map((day) => day.id) || []
+      const currentDayIds = existingDays.map((day) => day.id)
+      const removeDayIds = originalDayIds.filter((id) => !currentDayIds.includes(id))
 
       eventData.days = existingDays
       eventData.newDays = newDays
