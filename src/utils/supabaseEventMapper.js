@@ -302,7 +302,7 @@ export function toEventDetailFromSb(row) {
     location: row.location || 'Local a definir',
     cityState: formatCityState(row.city, row.state),
     whatsapp: row.whatsapp || null,
-    whatsappMessage: row.whatsapp_message || 'Olá! Tenho interesse no evento.',
+    whatsappMessage: row.whatsapp_message || null,
     shareUrl: row.share_url || null,
     // Informações de preço
     ...priceInfo,

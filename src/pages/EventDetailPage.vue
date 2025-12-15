@@ -382,7 +382,13 @@ const openingWhatsapp = ref(false)
 
 const $q = useQuasar()
 
-const DEFAULT_WHATSAPP_MESSAGE = 'Olá! Tenho interesse no evento.'
+// Função para gerar mensagem padrão do WhatsApp com nome do evento
+function getDefaultWhatsAppMessage(eventTitle, hasRef = false) {
+  if (hasRef) {
+    return null // Será tratado pelo composable de influenciadora
+  }
+  return `Olá! Gostaria de finalizar a compra do ${eventTitle}`
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -526,12 +532,16 @@ function openWhatsapp(customMessageOrEvent) {
 
   // Verifica se há tracking de influenciadora
   let phone = event.value.whatsapp
-  let message = customMessage || event.value.whatsappMessage || DEFAULT_WHATSAPP_MESSAGE
+  // Mensagem: customizada > whatsappMessage do evento > mensagem padrão com nome do evento
+  let message =
+    customMessage ||
+    event.value.whatsappMessage ||
+    getDefaultWhatsAppMessage(event.value.title, hasInfluencer())
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
     phone = getInfluencerPhone()
-    // Se não foi passada mensagem customizada, tenta pegar a da influencer
+    // Se não foi passada mensagem customizada, usa mensagem da influencer com nome do evento
     if (!customMessage) {
       message = getWhatsAppMessage(event.value.title) || message
     }
