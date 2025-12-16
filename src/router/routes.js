@@ -260,6 +260,11 @@ const routes = [
         name: 'ana-clara',
         component: () => import('pages/AnaClaraPage.vue'),
       },
+      {
+        path: 'jurandir',
+        name: 'jurandir',
+        component: () => import('pages/JurandirPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
