@@ -171,8 +171,8 @@ const routes = [
         component: () => import('pages/LeitePage.vue'),
       },
       {
-        path: 'luisa-oliveira',
-        name: 'luisa-oliveira',
+        path: 'luiza-oliveira',
+        name: 'luiza-oliveira',
         component: () => import('pages/LuisaOliveiraPage.vue'),
       },
       {
@@ -264,6 +264,11 @@ const routes = [
         path: 'jurandir',
         name: 'jurandir',
         component: () => import('pages/JurandirPage.vue'),
+      },
+      {
+        path: 'luna',
+        name: 'luna',
+        component: () => import('pages/LunaPage.vue'),
       },
     ],
   },

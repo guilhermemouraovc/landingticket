@@ -30,7 +30,7 @@ const INFLUENCER_NAMES = {
   jao: 'Jão',
   'samuel-brito': 'Samuel Brito',
   'larissa-balta': 'Larissa Balta',
-  'luisa-oliveira': 'Luisa Oliveira',
+  'luiza-oliveira': 'Luiza Oliveira',
   'bianka-alcantara': 'Bianka Alcantara',
   'eduarda-teixeira': 'Eduarda Teixeira',
   'eduardo-franca': 'Eduardo França',
@@ -49,6 +49,7 @@ const INFLUENCER_NAMES = {
   'bruno-neves': 'Bruno Neves',
   'ana-clara': 'Ana Clara',
   jurandir: 'Jurandir',
+  luna: 'Luna',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -78,7 +79,7 @@ const INFLUENCER_GENDER = {
   Jão: 'pelo',
   'Samuel Brito': 'pelo',
   'Larissa Balta': 'pela',
-  'Luisa Oliveira': 'pela',
+  'Luiza Oliveira': 'pela',
   'Bianka Alcantara': 'pela',
   'Eduarda Teixeira': 'pela',
   'Eduardo França': 'pelo',
@@ -97,6 +98,7 @@ const INFLUENCER_GENDER = {
   'Bruno Neves': 'pelo',
   'Ana Clara': 'pela',
   Jurandir: 'pelo',
+  Luna: 'pelo',
 }
 
 export function useInfluencerTracking() {

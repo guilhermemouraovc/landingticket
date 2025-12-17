@@ -13,11 +13,10 @@ const router = useRouter()
 const { saveInfluencer } = useInfluencerTracking()
 
 onMounted(() => {
-  // Salva o tracking da influenciadora
-  saveInfluencer('luiza-oliveira')
+  // Salva o tracking do influenciador
+  saveInfluencer('luna')
 
   // Redireciona para a home
   router.replace('/')
 })
 </script>
-
