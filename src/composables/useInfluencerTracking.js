@@ -49,6 +49,7 @@ const INFLUENCER_NAMES = {
   'bruno-neves': 'Bruno Neves',
   'ana-clara': 'Ana Clara',
   jurandir: 'Jurandir',
+  luna: 'Luna',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -97,6 +98,7 @@ const INFLUENCER_GENDER = {
   'Bruno Neves': 'pelo',
   'Ana Clara': 'pela',
   Jurandir: 'pelo',
+  Luna: 'pelo',
 }
 
 export function useInfluencerTracking() {

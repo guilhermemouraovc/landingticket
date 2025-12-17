@@ -265,6 +265,11 @@ const routes = [
         name: 'jurandir',
         component: () => import('pages/JurandirPage.vue'),
       },
+      {
+        path: 'luna',
+        name: 'luna',
+        component: () => import('pages/LunaPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
