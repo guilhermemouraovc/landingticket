@@ -371,6 +371,11 @@ import BreadcrumbNav from 'src/components/BreadcrumbNav.vue'
 import RelatedEventsCarousel from 'src/components/RelatedEventsCarousel.vue'
 import BackButton from 'src/components/BackButton.vue'
 import { useQuasar } from 'quasar'
+import {
+  useSEO,
+  createEventStructuredData,
+  createBreadcrumbStructuredData,
+} from 'src/composables/useSEO'
 
 // Admin imports
 import { useAuth } from 'src/composables/useAuth'
@@ -482,12 +487,52 @@ async function loadEvent(slugParam) {
     if (eventData.days && eventData.days.length > 0) {
       selectedDay.value = eventData.days[0]
     }
+
+    // Atualiza SEO dinamicamente
+    updateEventSEO(eventData)
   } catch (err) {
     if (import.meta.env.DEV) {
       console.error('Falha ao carregar evento', err)
     }
     error.value = apiError.value || 'Não foi possível carregar os detalhes do evento.'
   }
+}
+
+// Função para atualizar SEO do evento
+function updateEventSEO(eventData) {
+  if (!eventData) return
+
+  const baseUrl = 'https://ticketpe.com.br'
+  const eventUrl = eventData.shareUrl || `${baseUrl}/event/${eventData.slug || eventData.id}`
+
+  // Extrai descrição (primeiros 160 caracteres)
+  const description = eventData.description
+    ? eventData.description.replace(/<[^>]*>/g, '').substring(0, 160) + '...'
+    : `Ingressos para ${eventData.title} em ${eventData.cityState || 'Pernambuco'}. Reserve já no Ticketpe!`
+
+  // Cria structured data do evento
+  const eventStructuredData = createEventStructuredData(eventData)
+
+  // Cria structured data de breadcrumbs
+  const breadcrumbStructuredData = createBreadcrumbStructuredData([
+    { label: 'Início', url: baseUrl },
+    { label: eventData.title, url: eventUrl },
+  ])
+
+  // Combina structured data
+  const allStructuredData = [eventStructuredData, breadcrumbStructuredData].filter(Boolean)
+
+  // Atualiza SEO
+  useSEO({
+    title: eventData.title,
+    description,
+    image: eventData.image || `${baseUrl}/icon-512.png`,
+    url: eventUrl,
+    type: 'website',
+    keywords: `eventos, ingressos, ${eventData.title}, ${eventData.city || 'Recife'}, Pernambuco, ${eventData.location || ''}`,
+    canonical: eventUrl,
+    structuredData: allStructuredData.length === 1 ? allStructuredData[0] : allStructuredData,
+  })
 }
 
 // Admin functions
