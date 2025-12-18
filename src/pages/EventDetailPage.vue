@@ -189,7 +189,7 @@
               </div>
 
               <!-- Botão de Comprar (Global da Seção) -->
-              <div class="row justify-center q-mt-lg">
+              <div class="row justify-center buy-btn-wrapper">
                 <q-btn
                   class="multi-day-buy-btn"
                   color="warning"
@@ -1091,6 +1091,11 @@ function getEventTags(eventData) {
   background-color: #c3ac02 !important;
 }
 
+/* Wrapper do botão de compra para múltiplos dias com espaçamento aumentado */
+.buy-btn-wrapper {
+  margin-top: 48px; /* Espaçamento maior entre ingressos e botão */
+}
+
 /* Botão de compra específico para múltiplos dias (sem margem negativa) */
 .multi-day-buy-btn {
   width: 572px;
@@ -1357,12 +1362,15 @@ function getEventTags(eventData) {
     justify-content: center;
   }
 
+  .buy-btn-wrapper {
+    margin-top: 40px; /* Espaçamento maior no mobile também */
+  }
+
   .multi-day-buy-btn {
     width: 100%;
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
-    margin-top: 25 px;
   }
 
   .buy-btn .q-btn__content,
