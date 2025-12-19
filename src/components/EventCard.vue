@@ -47,7 +47,10 @@
     </q-img>
 
     <!-- Corpo do card -->
-    <q-card-section class="event-card__body">
+    <q-card-section
+      class="event-card__body"
+      :class="{ 'event-card__body--no-price': !event.hasPrice && showPrice }"
+    >
       <!-- Título -->
       <div class="event-card__title text-weight-bold relative-position cursor-pointer">
         {{ event.title || 'Evento sem nome' }}
@@ -102,7 +105,10 @@
       </div>
 
       <!-- Meta informações (data e localização) -->
-      <div class="event-card__meta" :class="metaLayoutClass">
+      <div
+        class="event-card__meta"
+        :class="[metaLayoutClass, { 'event-card__meta--no-price': !event.hasPrice && showPrice }]"
+      >
         <!-- Data -->
         <div class="meta-item">
           <q-icon :name="dateIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
@@ -471,6 +477,22 @@ function handleClick(e) {
   }
 }
 
+/* Meta com fonte maior e espaçamento quando não há preço */
+.event-card__meta--no-price {
+  font-size: 16px;
+  margin-top: 8px;
+  justify-content: center;
+
+  .meta-icon {
+    font-size: 18px;
+  }
+}
+
+/* Body com padding extra quando não há preço */
+.event-card__body--no-price {
+  padding-top: 20px;
+}
+
 .meta-item {
   display: flex;
   align-items: center;
@@ -644,6 +666,20 @@ function handleClick(e) {
 
   .meta-item {
     flex-shrink: 0;
+  }
+
+  /* Estilos para cards sem preço no mobile */
+  .event-card__meta--no-price {
+    font-size: 14px;
+    margin-top: 6px;
+
+    .meta-icon {
+      font-size: 16px !important;
+    }
+  }
+
+  .event-card__body--no-price {
+    padding-top: 16px;
   }
 }
 </style>
