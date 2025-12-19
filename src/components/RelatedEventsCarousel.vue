@@ -88,6 +88,44 @@ const FADE_SHOW_AT = 24
 const FADE_HIDE_AT = 40
 
 /**
+ * Ordena eventos por prioridade e data
+ * Eventos com prioridade (display_priority não-null) aparecem primeiro, ordenados por prioridade crescente.
+ * Dentro de cada grupo de prioridade, ordena por data crescente.
+ * Eventos sem prioridade aparecem depois, ordenados apenas por data crescente.
+ */
+function sortEventsByPriorityAndDate(events) {
+  if (!events || events.length === 0) return events
+
+  return [...events].sort((a, b) => {
+    const aPriority = a.display_priority ?? null
+    const bPriority = b.display_priority ?? null
+    const aDate = a.start_date ? new Date(a.start_date).getTime() : Infinity
+    const bDate = b.start_date ? new Date(b.start_date).getTime() : Infinity
+
+    // Se ambos têm prioridade, ordena por prioridade primeiro, depois por data
+    if (aPriority !== null && bPriority !== null) {
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority
+      }
+      return aDate - bDate
+    }
+
+    // Se apenas 'a' tem prioridade, 'a' vem primeiro
+    if (aPriority !== null && bPriority === null) {
+      return -1
+    }
+
+    // Se apenas 'b' tem prioridade, 'b' vem primeiro
+    if (aPriority === null && bPriority !== null) {
+      return 1
+    }
+
+    // Se nenhum tem prioridade, ordena apenas por data
+    return aDate - bDate
+  })
+}
+
+/**
  * Mapeia variações de categoria para tag padrão
  */
 function getCategoryTag(tags) {
@@ -154,7 +192,6 @@ async function loadRelatedEvents() {
       .from('view_event_cards')
       .select('*')
       .in('id', eventIds)
-      .order('start_date', { ascending: true })
       .limit(12)
 
     if (eventsError) {
@@ -164,8 +201,10 @@ async function loadRelatedEvents() {
       throw eventsError
     }
 
-    // Mapeia os eventos para o formato da UI
-    events.value = (eventsData || []).map(toEventCardFromSb).slice(0, 6) // Limita a 6 eventos no carrossel
+    // Mapeia os eventos para o formato da UI e ordena por prioridade e data
+    const mappedEvents = (eventsData || []).map(toEventCardFromSb)
+    const sortedEvents = sortEventsByPriorityAndDate(mappedEvents)
+    events.value = sortedEvents.slice(0, 6) // Limita a 6 eventos no carrossel
   } catch (error) {
     if (import.meta.env.DEV) {
       console.error('❌ Erro ao carregar eventos relacionados:', error)

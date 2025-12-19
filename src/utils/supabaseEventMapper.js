@@ -119,10 +119,12 @@ export function toEventCardFromSb(row) {
     title: row.title,
     description: row.description,
     date: formatDateRange(row.start_date, row.end_date),
+    start_date: row.start_date, // Mantém para ordenação
     location: [row.location, row.city, row.state].filter(Boolean).join(' - '),
     cityState: formatCityStateSimple(row.city, row.state), // city - state apenas
     image: cardImage,
     link: { name: 'event-detail', params: { slug } }, // Usa slug ao invés de id
+    display_priority: row.display_priority || null, // Prioridade para ordenação
     // Informações de preço
     ...priceInfo,
   }

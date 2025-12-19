@@ -13,13 +13,15 @@ export function useAdminEvents() {
     error.value = null
     try {
       // Verifica se está autenticado
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (!session) {
         throw new Error('Usuário não autenticado. Faça login novamente.')
       }
 
       console.log('🔍 Tentando buscar eventos...')
-      
+
       // Primeiro, tenta uma query simples sem relacionamentos
       const { data: simpleData, error: simpleError } = await supabase
         .from('events')
@@ -37,7 +39,8 @@ export function useAdminEvents() {
       // Agora tenta a query completa com relacionamentos
       const { data, error: e } = await supabase
         .from('events')
-        .select(`
+        .select(
+          `
           *,
           event_tags (
             tag_id,
@@ -55,7 +58,8 @@ export function useAdminEvents() {
             order_index,
             image_type
           )
-        `)
+        `,
+        )
         .order('created_at', { ascending: false })
 
       if (e) {
@@ -63,7 +67,7 @@ export function useAdminEvents() {
         console.error('❌ Código:', e.code)
         console.error('❌ Detalhes:', e.details)
         console.error('❌ Hint:', e.hint)
-        
+
         // Se a query completa falhar, tenta sem relacionamentos
         console.log('⚠️ Tentando buscar sem relacionamentos...')
         const { data: fallbackData, error: fallbackError } = await supabase
@@ -78,7 +82,7 @@ export function useAdminEvents() {
         console.log('✅ Query sem relacionamentos funcionou!')
         return fallbackData || []
       }
-      
+
       console.log('✅ Query completa funcionou! Eventos:', data?.length || 0)
       return data || []
     } catch (err) {
@@ -104,7 +108,8 @@ export function useAdminEvents() {
     try {
       const { data, error: e } = await supabase
         .from('events')
-        .select(`
+        .select(
+          `
           *,
           event_tags (
             tag_id,
@@ -135,7 +140,8 @@ export function useAdminEvents() {
             ticket_url,
             is_active
           )
-        `)
+        `,
+        )
         .eq('id', id)
         .single()
 
@@ -177,6 +183,7 @@ export function useAdminEvents() {
         price_installments: eventData.price_installments || null,
         installment_value: eventData.installment_value || null,
         currency: eventData.currency || 'BRL',
+        display_priority: eventData.display_priority || null,
       }
 
       // Cria o evento
@@ -190,14 +197,12 @@ export function useAdminEvents() {
 
       // Adiciona tags se houver
       if (eventData.tagIds && eventData.tagIds.length > 0) {
-        const tagRelations = eventData.tagIds.map(tagId => ({
+        const tagRelations = eventData.tagIds.map((tagId) => ({
           event_id: event.id,
           tag_id: tagId,
         }))
 
-        const { error: e2 } = await supabase
-          .from('event_tags')
-          .insert(tagRelations)
+        const { error: e2 } = await supabase.from('event_tags').insert(tagRelations)
 
         if (e2) throw e2
       }
@@ -208,14 +213,12 @@ export function useAdminEvents() {
           event_id: event.id,
           url: img.url,
           alt_text: img.alt_text || eventData.title,
-          is_primary: img.is_primary || (index === 0),
+          is_primary: img.is_primary || index === 0,
           order_index: img.order_index || index,
           image_type: img.image_type || 'both',
         }))
 
-        const { error: e3 } = await supabase
-          .from('event_images')
-          .insert(imageRecords)
+        const { error: e3 } = await supabase.from('event_images').insert(imageRecords)
 
         if (e3) throw e3
       }
@@ -236,9 +239,7 @@ export function useAdminEvents() {
           is_active: day.is_active !== undefined ? day.is_active : true,
         }))
 
-        const { error: e4 } = await supabase
-          .from('event_days')
-          .insert(dayRecords)
+        const { error: e4 } = await supabase.from('event_days').insert(dayRecords)
 
         if (e4) throw e4
       }
@@ -286,34 +287,27 @@ export function useAdminEvents() {
         price_installments: eventData.price_installments || null,
         installment_value: eventData.installment_value || null,
         currency: eventData.currency || 'BRL',
+        display_priority: eventData.display_priority || null,
         updated_at: new Date().toISOString(),
       }
 
-      const { error: e1 } = await supabase
-        .from('events')
-        .update(eventPayload)
-        .eq('id', id)
+      const { error: e1 } = await supabase.from('events').update(eventPayload).eq('id', id)
 
       if (e1) throw e1
 
       // Remove todas as tags existentes
-      const { error: e2 } = await supabase
-        .from('event_tags')
-        .delete()
-        .eq('event_id', id)
+      const { error: e2 } = await supabase.from('event_tags').delete().eq('event_id', id)
 
       if (e2) throw e2
 
       // Adiciona as novas tags
       if (eventData.tagIds && eventData.tagIds.length > 0) {
-        const tagRelations = eventData.tagIds.map(tagId => ({
+        const tagRelations = eventData.tagIds.map((tagId) => ({
           event_id: id,
           tag_id: tagId,
         }))
 
-        const { error: e3 } = await supabase
-          .from('event_tags')
-          .insert(tagRelations)
+        const { error: e3 } = await supabase.from('event_tags').insert(tagRelations)
 
         if (e3) throw e3
       }
@@ -359,9 +353,7 @@ export function useAdminEvents() {
           image_type: img.image_type || 'both',
         }))
 
-        const { error: e6 } = await supabase
-          .from('event_images')
-          .insert(imageRecords)
+        const { error: e6 } = await supabase.from('event_images').insert(imageRecords)
 
         if (e6) throw e6
       }
@@ -418,9 +410,7 @@ export function useAdminEvents() {
           is_active: day.is_active !== undefined ? day.is_active : true,
         }))
 
-        const { error: e9 } = await supabase
-          .from('event_days')
-          .insert(dayRecords)
+        const { error: e9 } = await supabase.from('event_days').insert(dayRecords)
 
         if (e9) throw e9
       }
@@ -451,34 +441,22 @@ export function useAdminEvents() {
     error.value = null
     try {
       // Deleta dias do evento primeiro (devido a foreign key)
-      const { error: e0 } = await supabase
-        .from('event_days')
-        .delete()
-        .eq('event_id', id)
+      const { error: e0 } = await supabase.from('event_days').delete().eq('event_id', id)
 
       if (e0) throw e0
 
       // Deleta imagens primeiro (devido a foreign key)
-      const { error: e1 } = await supabase
-        .from('event_images')
-        .delete()
-        .eq('event_id', id)
+      const { error: e1 } = await supabase.from('event_images').delete().eq('event_id', id)
 
       if (e1) throw e1
 
       // Deleta tags
-      const { error: e2 } = await supabase
-        .from('event_tags')
-        .delete()
-        .eq('event_id', id)
+      const { error: e2 } = await supabase.from('event_tags').delete().eq('event_id', id)
 
       if (e2) throw e2
 
       // Deleta o evento
-      const { error: e3 } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id)
+      const { error: e3 } = await supabase.from('events').delete().eq('id', id)
 
       if (e3) throw e3
 
