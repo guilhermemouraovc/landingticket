@@ -63,6 +63,7 @@ import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb } from 'src/utils/supabaseEventMapper'
+import { sortEventsByPriorityAndDate } from 'src/utils/eventSorting'
 import EventCard from 'src/components/EventCard.vue'
 
 const props = defineProps({
@@ -154,7 +155,6 @@ async function loadRelatedEvents() {
       .from('view_event_cards')
       .select('*')
       .in('id', eventIds)
-      .order('start_date', { ascending: true })
       .limit(12)
 
     if (eventsError) {
@@ -164,8 +164,10 @@ async function loadRelatedEvents() {
       throw eventsError
     }
 
-    // Mapeia os eventos para o formato da UI
-    events.value = (eventsData || []).map(toEventCardFromSb).slice(0, 6) // Limita a 6 eventos no carrossel
+    // Mapeia os eventos para o formato da UI e ordena por prioridade e data
+    const mappedEvents = (eventsData || []).map(toEventCardFromSb)
+    const sortedEvents = sortEventsByPriorityAndDate(mappedEvents)
+    events.value = sortedEvents.slice(0, 6) // Limita a 6 eventos no carrossel
   } catch (error) {
     if (import.meta.env.DEV) {
       console.error('❌ Erro ao carregar eventos relacionados:', error)

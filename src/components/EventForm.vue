@@ -80,6 +80,23 @@
             />
           </div>
 
+          <div class="col-12 col-md-6">
+            <q-input
+              v-model.number="formData.display_priority"
+              label="Prioridade de Exibição"
+              outlined
+              type="number"
+              hint="Eventos com prioridade aparecem primeiro no carrossel (1, 2, 3...). Deixe vazio para ordenar apenas por data."
+              :rules="[
+                (val) => !val || (val >= 1 && val <= 999) || 'Prioridade deve ser entre 1 e 999',
+              ]"
+            >
+              <template v-slot:prepend>
+                <q-icon name="sort" />
+              </template>
+            </q-input>
+          </div>
+
           <div class="col-12">
             <q-input
               v-model="formData.additional_info"
@@ -604,6 +621,7 @@ const formData = ref({
   installment_value: null,
   currency: 'BRL',
   highlight: false,
+  display_priority: null,
   tagIds: [],
   images: [],
   days: [],
@@ -692,6 +710,7 @@ function loadEventData() {
     installment_value: event.installment_value || null,
     currency: event.currency || 'BRL',
     highlight: !!event.highlight,
+    display_priority: event.display_priority || null,
     tagIds: selectedTags,
     images:
       event.event_images?.map((img) => ({
@@ -738,6 +757,7 @@ function resetForm() {
     installment_value: null,
     currency: 'BRL',
     highlight: false,
+    display_priority: null,
     tagIds: [],
     images: [],
     days: [],

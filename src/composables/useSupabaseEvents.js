@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { supabase } from 'src/utils/supabase'
 import { toEventCardFromSb, toEventDetailFromSb } from 'src/utils/supabaseEventMapper'
 import { generateSlug } from 'src/utils/stringUtils'
+import { sortEventsByPriorityAndDate } from 'src/utils/eventSorting'
 
 export function useSupabaseEvents() {
   const loading = ref(false)
@@ -11,13 +12,10 @@ export function useSupabaseEvents() {
     loading.value = true
     error.value = null
     try {
-      const { data, error: e } = await supabase
-        .from('view_event_cards')
-        .select('*')
-        .order('start_date', { ascending: true })
-        .limit(limit)
+      const { data, error: e } = await supabase.from('view_event_cards').select('*').limit(limit)
       if (e) throw e
-      return (data || []).map(toEventCardFromSb)
+      const mappedEvents = (data || []).map(toEventCardFromSb)
+      return sortEventsByPriorityAndDate(mappedEvents)
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('Erro ao buscar eventos:', err)
@@ -48,11 +46,11 @@ export function useSupabaseEvents() {
         .from('view_event_cards')
         .select('*')
         .in('id', ids)
-        .order('start_date', { ascending: true })
         .limit(limit)
 
       if (e2) throw e2
-      return (data || []).map(toEventCardFromSb)
+      const mappedEvents = (data || []).map(toEventCardFromSb)
+      return sortEventsByPriorityAndDate(mappedEvents)
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('❌ Erro ao filtrar eventos:', err)
@@ -133,10 +131,10 @@ export function useSupabaseEvents() {
         .from('view_event_cards')
         .select('*')
         .or('highlight.eq.sim,highlight.eq.SIM,highlight.eq.true,highlight.eq.1')
-        .order('start_date', { ascending: true })
         .limit(limit)
       if (e) throw e
-      return (data || []).map(toEventCardFromSb)
+      const mappedEvents = (data || []).map(toEventCardFromSb)
+      return sortEventsByPriorityAndDate(mappedEvents)
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('Erro ao buscar eventos em destaque:', err)
@@ -159,16 +157,16 @@ export function useSupabaseEvents() {
     try {
       // Busca eventos com data de início >= hoje, ordenados por data crescente
       const today = new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
-      
+
       const { data, error: e } = await supabase
         .from('view_event_cards')
         .select('*')
         .gte('start_date', today) // start_date >= hoje
-        .order('start_date', { ascending: true })
         .limit(limit)
-      
+
       if (e) throw e
-      return (data || []).map(toEventCardFromSb)
+      const mappedEvents = (data || []).map(toEventCardFromSb)
+      return sortEventsByPriorityAndDate(mappedEvents)
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('Erro ao buscar eventos próximos:', err)
@@ -203,7 +201,7 @@ export function useSupabaseEvents() {
 
       // Para múltiplas tags, busca IDs de eventos para cada tag
       const eventIdsByTag = []
-      
+
       for (const tagName of tagNames) {
         const { data: tagRows, error: e1 } = await supabase
           .from('view_events_by_tag')
@@ -218,9 +216,9 @@ export function useSupabaseEvents() {
 
       // Encontra a interseção (eventos que têm TODAS as tags)
       let intersection = eventIdsByTag[0]
-      
+
       for (let i = 1; i < eventIdsByTag.length; i++) {
-        intersection = new Set([...intersection].filter(id => eventIdsByTag[i].has(id)))
+        intersection = new Set([...intersection].filter((id) => eventIdsByTag[i].has(id)))
       }
 
       const commonIds = Array.from(intersection)
@@ -232,11 +230,11 @@ export function useSupabaseEvents() {
         .from('view_event_cards')
         .select('*')
         .in('id', commonIds)
-        .order('start_date', { ascending: true })
         .limit(limit)
 
       if (e2) throw e2
-      return (data || []).map(toEventCardFromSb)
+      const mappedEvents = (data || []).map(toEventCardFromSb)
+      return sortEventsByPriorityAndDate(mappedEvents)
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('❌ Erro ao filtrar eventos por múltiplas tags:', err)
