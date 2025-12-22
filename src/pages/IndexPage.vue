@@ -241,6 +241,7 @@ import CategoryIcon from 'components/CategoryIcon.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useCategories } from 'src/composables/useCategories'
 import { DEFAULT_IMAGES } from 'src/constants/config'
+import { generateSlug } from 'src/utils/stringUtils'
 
 const $q = useQuasar()
 
@@ -341,6 +342,41 @@ function getSectionIdByLabel(label) {
     .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
     .trim()
     .replace(/\s+/g, '-') // Espaços viram hífens
+}
+
+const CARNAVAL_PINNED_SLUGS = ['carvalheira-na-ladeira']
+
+function getEventSlug(event) {
+  if (!event) return ''
+  return event.slug || (event.title ? generateSlug(event.title) : '')
+}
+
+function getPriorityIndex(event, prioritySlugs) {
+  const slug = getEventSlug(event)
+  for (let i = 0; i < prioritySlugs.length; i += 1) {
+    const target = prioritySlugs[i]
+    if (slug === target || slug.startsWith(`${target}-`)) {
+      return i
+    }
+  }
+  return -1
+}
+
+function prioritizeEvents(events, prioritySlugs) {
+  if (!events?.length || !prioritySlugs?.length) return events
+  const buckets = prioritySlugs.map(() => [])
+  const rest = []
+
+  for (const ev of events) {
+    const index = getPriorityIndex(ev, prioritySlugs)
+    if (index >= 0) {
+      buckets[index].push(ev)
+    } else {
+      rest.push(ev)
+    }
+  }
+
+  return [...buckets.flat(), ...rest]
 }
 
 // Helper para obter eventos de categorias fixas
@@ -544,7 +580,7 @@ async function loadCarnaval() {
       events = await fetchEventsByTagSupabase('carnavais', { limit: 100 })
     }
 
-    carnavalEvents.value = events
+    carnavalEvents.value = prioritizeEvents(events, CARNAVAL_PINNED_SLUGS)
   } catch {
     carnavalEvents.value = []
   }
