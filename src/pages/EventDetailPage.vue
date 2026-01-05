@@ -259,28 +259,6 @@
           </div>
         </q-card>
 
-        <!-- Letreiro de comunidade -->
-        <div class="community-marquee" aria-hidden="true">
-          <div class="community-marquee__inner">
-            <div class="community-marquee__track">
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-            </div>
-            <div class="community-marquee__track" aria-hidden="true">
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-              <span class="community-marquee__item">Participe da nossa comunidade!</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Card de Newsletter -->
         <div class="newsletter-card">
           <div class="newsletter-content">
@@ -816,51 +794,6 @@ function getEventTags(eventData) {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-}
-
-/* Letreiro animado acima da newsletter */
-.community-marquee {
-  position: relative;
-  width: 100vw;
-  left: 50%;
-  transform: translateX(-50%);
-  overflow: hidden;
-  margin: 32px 0 24px;
-  background: linear-gradient(90deg, #0ea5e9, #22d3ee);
-  border-radius: 0;
-  padding: 12px 0;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
-}
-
-.community-marquee__inner {
-  display: flex;
-  width: max-content;
-  animation: community-marquee 18s linear infinite;
-}
-
-.community-marquee__track {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  white-space: nowrap;
-  padding-right: 28px;
-}
-
-.community-marquee__item {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: #ffffff;
-}
-
-@keyframes community-marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
 }
 
 /* Hero grande com cantos arredondados e recorte */

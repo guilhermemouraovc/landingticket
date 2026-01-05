@@ -192,15 +192,6 @@
         />
 
         <EventSectionCarousel
-          section-id="reveillon"
-          title="Réveillon"
-          :items="reveillonEvents"
-          see-all-label="Ver Tudo"
-          :see-all-link="{ name: 'reveillon' }"
-          :default-image="DEFAULT_IMAGE"
-        />
-
-        <EventSectionCarousel
           section-id="carnaval"
           title="Carnaval"
           :items="carnavalEvents"
@@ -224,6 +215,15 @@
           :items="allEvents"
           see-all-label="Ver Tudo"
           :see-all-link="{ name: 'programacao-completa' }"
+          :default-image="DEFAULT_IMAGE"
+        />
+
+        <EventSectionCarousel
+          section-id="reveillon"
+          title="Réveillon"
+          :items="reveillonEvents"
+          see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'reveillon' }"
           :default-image="DEFAULT_IMAGE"
         />
       </template>
