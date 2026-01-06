@@ -123,8 +123,19 @@
               </div>
             </div>
 
+            <!-- Banner de Evento Expirado -->
+            <div v-if="isEventExpired" class="expired-event-banner q-mt-lg">
+              <div class="expired-banner-content">
+                <q-icon name="event_busy" size="32px" class="expired-icon" />
+                <div class="expired-text">
+                  <div class="expired-title">Este evento já aconteceu</div>
+                  <div class="expired-subtitle">Ingressos não estão mais disponíveis</div>
+                </div>
+              </div>
+            </div>
+
             <!-- Seção de Ingressos (Múltiplos Dias) -->
-            <div v-if="event.days && event.days.length > 0" class="tickets-section q-mt-xl">
+            <div v-if="event.days && event.days.length > 0 && !isEventExpired" class="tickets-section q-mt-xl">
               <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
 
               <div class="tickets-carousel-wrapper relative-position">
@@ -222,7 +233,7 @@
             </div>
 
             <!-- Seção de Preços (Único Dia) -->
-            <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
+            <div v-else-if="event.hasPrice && !isEventExpired" class="pricing-section q-mt-xl">
               <div class="pricing-info">
                 <!-- Parcelas (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
                 <div
@@ -252,7 +263,7 @@
 
             <!-- Botão de Comprar (Único Dia) -->
             <q-btn
-              v-if="!event.days || event.days.length === 0"
+              v-if="(!event.days || event.days.length === 0) && !isEventExpired"
               class="buy-btn"
               :color="isEventExpired ? 'grey-7' : 'warning'"
               text-color="black"
@@ -436,6 +447,51 @@ const ticketsContainer = ref(null)
 // Newsletter state
 const newsletterEmail = ref('')
 const newsletterLoading = ref(false)
+
+// Computed property para verificar se o evento já passou
+const isEventExpired = computed(() => {
+  if (!event.value) return false
+
+  // Se o evento tem múltiplos dias, verifica a data do último dia
+  if (event.value.days && event.value.days.length > 0) {
+    const lastDay = event.value.days[event.value.days.length - 1]
+    if (lastDay.date) {
+      const lastDate = new Date(lastDay.date + 'T23:59:59')
+      return lastDate < new Date()
+    }
+  }
+
+  // Se não tem dias, verifica pelo dateBadge ou tenta extrair da dateLabel
+  // Precisamos acessar os dados raw do evento
+  // Por enquanto, vamos verificar se há uma data de fim ou início
+  const eventDateStr = event.value.dateLabel
+  if (eventDateStr && eventDateStr !== 'Data a definir') {
+    // Tenta parsear a data do label
+    // Formato esperado: "quarta-feira, 31 de dezembro de 2025"
+    try {
+      const matches = eventDateStr.match(/(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})/)
+      if (matches) {
+        const monthNames = {
+          'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3,
+          'maio': 4, 'junho': 5, 'julho': 6, 'agosto': 7,
+          'setembro': 8, 'outubro': 9, 'novembro': 10, 'dezembro': 11
+        }
+        const day = parseInt(matches[1])
+        const month = monthNames[matches[2]]
+        const year = parseInt(matches[3])
+
+        if (month !== undefined) {
+          const eventDate = new Date(year, month, day, 23, 59, 59)
+          return eventDate < new Date()
+        }
+      }
+    } catch (e) {
+      console.error('Erro ao parsear data do evento:', e)
+    }
+  }
+
+  return false
+})
 
 function scrollTickets(direction) {
   if (!ticketsContainer.value) return
@@ -1046,6 +1102,44 @@ function getEventTags(eventData) {
   font-size: 0.9rem;
 }
 
+/* ==================== BANNER DE EVENTO EXPIRADO ==================== */
+.expired-event-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-top: 24px;
+}
+
+.expired-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.expired-icon {
+  color: #fca5a5;
+  flex-shrink: 0;
+}
+
+.expired-text {
+  flex: 1;
+}
+
+.expired-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fca5a5;
+  margin-bottom: 4px;
+}
+
+.expired-subtitle {
+  font-size: 14px;
+  color: #e5e7eb;
+  font-weight: 400;
+}
+
 /* ==================== SEÇÃO DE PREÇOS ==================== */
 .pricing-section {
   display: flex;
@@ -1336,6 +1430,28 @@ function getEventTags(eventData) {
 
   .meta-subtitle {
     font-size: 0.85rem;
+  }
+
+  .expired-event-banner {
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+
+  .expired-banner-content {
+    gap: 12px;
+  }
+
+  .expired-icon {
+    font-size: 24px;
+  }
+
+  .expired-title {
+    font-size: 16px;
+  }
+
+  .expired-subtitle {
+    font-size: 13px;
   }
 
   /* Responsividade para seção de preços */
