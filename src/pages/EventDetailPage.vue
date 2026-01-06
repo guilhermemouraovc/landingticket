@@ -448,51 +448,6 @@ const ticketsContainer = ref(null)
 const newsletterEmail = ref('')
 const newsletterLoading = ref(false)
 
-// Computed property para verificar se o evento já passou
-const isEventExpired = computed(() => {
-  if (!event.value) return false
-
-  // Se o evento tem múltiplos dias, verifica a data do último dia
-  if (event.value.days && event.value.days.length > 0) {
-    const lastDay = event.value.days[event.value.days.length - 1]
-    if (lastDay.date) {
-      const lastDate = new Date(lastDay.date + 'T23:59:59')
-      return lastDate < new Date()
-    }
-  }
-
-  // Se não tem dias, verifica pelo dateBadge ou tenta extrair da dateLabel
-  // Precisamos acessar os dados raw do evento
-  // Por enquanto, vamos verificar se há uma data de fim ou início
-  const eventDateStr = event.value.dateLabel
-  if (eventDateStr && eventDateStr !== 'Data a definir') {
-    // Tenta parsear a data do label
-    // Formato esperado: "quarta-feira, 31 de dezembro de 2025"
-    try {
-      const matches = eventDateStr.match(/(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})/)
-      if (matches) {
-        const monthNames = {
-          'janeiro': 0, 'fevereiro': 1, 'março': 2, 'abril': 3,
-          'maio': 4, 'junho': 5, 'julho': 6, 'agosto': 7,
-          'setembro': 8, 'outubro': 9, 'novembro': 10, 'dezembro': 11
-        }
-        const day = parseInt(matches[1])
-        const month = monthNames[matches[2]]
-        const year = parseInt(matches[3])
-
-        if (month !== undefined) {
-          const eventDate = new Date(year, month, day, 23, 59, 59)
-          return eventDate < new Date()
-        }
-      }
-    } catch (e) {
-      console.error('Erro ao parsear data do evento:', e)
-    }
-  }
-
-  return false
-})
-
 function scrollTickets(direction) {
   if (!ticketsContainer.value) return
   const scrollAmount = 300
