@@ -1988,8 +1988,9 @@ function getEventTags(eventData) {
 }
 
 /* ==================== EVENTO EXPIRADO ==================== */
+/* Banner da imagem hero com 30% de opacidade */
 .event-hero--expired {
-  opacity: 0.4;
+  opacity: 0.3;
 }
 
 .expired-overlay {
@@ -2025,12 +2026,19 @@ function getEventTags(eventData) {
   text-align: center;
 }
 
+/* Botão com 40% de opacidade */
 .expired-btn {
   min-width: 200px;
   height: 52px;
   border-radius: 10px !important;
   font-size: 16px;
   font-weight: 600;
+  opacity: 0.4;
+}
+
+/* Card de evento expirado com 40% de opacidade */
+.event-expired .event-card {
+  opacity: 0.4;
 }
 
 @media (max-width: 599px) {
