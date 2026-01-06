@@ -4,7 +4,7 @@ const INFLUENCER_STORAGE_KEY = 'landingticket_influencer'
 const INFLUENCER_PHONE = '5581998471385'
 
 // Mapeamento de slugs para nomes formatados e gênero
-const INFLUENCER_NAMES = {
+export const INFLUENCER_NAMES = {
   'camila-carvalho': 'Camila Carvalho',
   'julia-souto': 'Julia Souto',
   'joao-clericuzzi': 'João Clericuzzi',
@@ -100,6 +100,9 @@ const INFLUENCER_GENDER = {
   Jurandir: 'pelo',
   Luna: 'pelo',
 }
+
+// Set of valid influencer slugs for route validation
+export const INFLUENCER_SLUGS = new Set(Object.keys(INFLUENCER_NAMES))
 
 export function useInfluencerTracking() {
   const influencerName = ref(null)
