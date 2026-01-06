@@ -306,6 +306,9 @@ export function toEventDetailFromSb(row) {
     whatsapp: row.whatsapp || null,
     whatsappMessage: row.whatsapp_message || null,
     shareUrl: row.share_url || null,
+    // Datas raw para verificação de expiração
+    start_date: row.start_date,
+    end_date: row.end_date,
     // Informações de preço
     ...priceInfo,
     days, // Lista de dias formatada
