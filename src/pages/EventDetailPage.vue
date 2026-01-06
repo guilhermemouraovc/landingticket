@@ -123,20 +123,9 @@
               </div>
             </div>
 
-            <!-- Banner de Evento Expirado -->
-            <div v-if="isEventExpired" class="expired-event-banner q-mt-lg">
-              <div class="expired-banner-content">
-                <q-icon name="event_busy" size="32px" class="expired-icon" />
-                <div class="expired-text">
-                  <div class="expired-title">Este evento já aconteceu</div>
-                  <div class="expired-subtitle">Ingressos não estão mais disponíveis</div>
-                </div>
-              </div>
-            </div>
-
             <!-- Seção de Ingressos (Múltiplos Dias) -->
-            <div v-if="event.days && event.days.length > 0 && !isEventExpired" class="tickets-section q-mt-xl">
-              <div class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
+            <div v-if="event.days && event.days.length > 0" class="tickets-section q-mt-xl">
+              <div v-if="!isEventExpired" class="text-h5 text-white text-weight-bold q-mb-lg">Ingressos Disponíveis</div>
 
               <div class="tickets-carousel-wrapper relative-position">
                 <!-- Botão Anterior -->
@@ -220,20 +209,22 @@
               <div class="row justify-center buy-btn-wrapper">
                 <q-btn
                   class="multi-day-buy-btn"
-                  :color="isEventExpired ? 'grey-7' : 'warning'"
+                  :class="{ 'btn-expired': isEventExpired }"
+                  color="warning"
                   text-color="black"
                   :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
+                  :disable="isEventExpired"
                   :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
-                  @click="isEventExpired ? goHome() : openWhatsapp()"
+                  @click="openWhatsapp()"
                 />
               </div>
             </div>
 
             <!-- Seção de Preços (Único Dia) -->
-            <div v-else-if="event.hasPrice && !isEventExpired" class="pricing-section q-mt-xl">
+            <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
                 <!-- Parcelas (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
                 <div
@@ -263,16 +254,18 @@
 
             <!-- Botão de Comprar (Único Dia) -->
             <q-btn
-              v-if="(!event.days || event.days.length === 0) && !isEventExpired"
+              v-if="!event.days || event.days.length === 0"
               class="buy-btn"
-              :color="isEventExpired ? 'grey-7' : 'warning'"
+              :class="{ 'btn-expired': isEventExpired }"
+              color="warning"
               text-color="black"
               :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
+              :disable="isEventExpired"
               :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
-              @click="isEventExpired ? goHome() : openWhatsapp()"
+              @click="openWhatsapp()"
             />
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
@@ -2003,7 +1996,6 @@ function getEventTags(eventData) {
   align-items: center;
   justify-content: center;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.3);
   border-radius: 24px;
 }
 
@@ -2013,9 +2005,6 @@ function getEventTags(eventData) {
   align-items: center;
   gap: 16px;
   padding: 32px;
-  background: rgba(42, 52, 71, 0.9);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
 }
 
 .expired-text {
@@ -2024,9 +2013,10 @@ function getEventTags(eventData) {
   font-weight: 700;
   color: #ffffff;
   text-align: center;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* Botão com 40% de opacidade */
+/* Botão branco com texto preto e 40% de opacidade */
 .expired-btn {
   min-width: 200px;
   height: 52px;
@@ -2034,11 +2024,18 @@ function getEventTags(eventData) {
   font-size: 16px;
   font-weight: 600;
   opacity: 0.4;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* Card de evento expirado com 40% de opacidade */
 .event-expired .event-card {
   opacity: 0.4;
+}
+
+/* Botão de compra expirado com 40% de opacidade */
+.btn-expired {
+  opacity: 0.4 !important;
 }
 
 @media (max-width: 599px) {
