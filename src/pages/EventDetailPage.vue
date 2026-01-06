@@ -38,18 +38,35 @@
       </div>
 
       <div v-else-if="event">
-        <div class="event-hero-wrap">
+        <div class="event-hero-wrap" :class="{ 'event-expired': isEventExpired }">
           <q-img
             :src="event.image"
             :alt="`Imagem destacada do evento ${event.title}`"
             class="event-hero"
+            :class="{ 'event-hero--expired': isEventExpired }"
             :ratio="1120 / 309"
             fit="cover"
             spinner-color="white"
             loading="eager"
           />
+          <!-- Overlay para evento expirado -->
+          <div v-if="isEventExpired" class="expired-overlay">
+            <div class="expired-content">
+              <div class="expired-text">Este evento já passou</div>
+              <q-btn
+                unelevated
+                rounded
+                color="warning"
+                text-color="black"
+                label="Voltar"
+                class="expired-btn"
+                @click="goHome"
+              />
+            </div>
+          </div>
           <!-- Botão de share mobile (dentro da imagem) -->
           <q-btn
+            v-if="!isEventExpired"
             unelevated
             rounded
             color="white"
@@ -192,14 +209,14 @@
               <div class="row justify-center buy-btn-wrapper">
                 <q-btn
                   class="multi-day-buy-btn"
-                  color="warning"
+                  :color="isEventExpired ? 'grey-7' : 'warning'"
                   text-color="black"
-                  label="Comprar"
+                  :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
-                  aria-label="Comprar ingresso via WhatsApp"
-                  @click="openWhatsapp()"
+                  :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+                  @click="isEventExpired ? goHome() : openWhatsapp()"
                 />
               </div>
             </div>
@@ -237,14 +254,14 @@
             <q-btn
               v-if="!event.days || event.days.length === 0"
               class="buy-btn"
-              color="warning"
+              :color="isEventExpired ? 'grey-7' : 'warning'"
               text-color="black"
-              label="Comprar"
+              :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
-              aria-label="Comprar ingresso via WhatsApp"
-              @click="openWhatsapp()"
+              :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+              @click="isEventExpired ? goHome() : openWhatsapp()"
             />
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
@@ -308,7 +325,7 @@
 
     <!-- Botão Flutuante de Compra -->
     <transition name="floating-bar">
-      <div v-if="event" class="floating-buy-bar">
+      <div v-if="event && !isEventExpired" class="floating-buy-bar">
         <div class="floating-buy-content">
           <div class="floating-buy-info">
             <div class="floating-buy-title">{{ event.title }}</div>
@@ -324,14 +341,14 @@
           </div>
           <q-btn
             class="floating-buy-btn"
-            color="warning"
+            :color="isEventExpired ? 'grey-7' : 'warning'"
             text-color="black"
-            label="Comprar"
+            :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
             unelevated
             no-caps
             :loading="openingWhatsapp"
-            aria-label="Comprar ingresso via WhatsApp"
-            @click="openWhatsapp()"
+            :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+            @click="isEventExpired ? goHome() : openWhatsapp()"
           />
         </div>
       </div>
@@ -363,7 +380,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useInfluencerTracking } from 'src/composables/useInfluencerTracking'
@@ -752,6 +769,39 @@ async function subscribeNewsletter() {
     newsletterLoading.value = false
   }
 }
+
+// Função para verificar se o evento já passou
+const isEventExpired = computed(() => {
+  if (!event.value) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  // Se o evento tem dias, verifica o último dia
+  if (event.value.days && event.value.days.length > 0) {
+    const lastDay = event.value.days[event.value.days.length - 1]
+    if (lastDay.date) {
+      const lastDayDate = new Date(lastDay.date)
+      lastDayDate.setHours(0, 0, 0, 0)
+      return lastDayDate < today
+    }
+  }
+
+  // Se não tem dias, usa end_date ou start_date
+  if (event.value.end_date) {
+    const endDate = new Date(event.value.end_date)
+    endDate.setHours(0, 0, 0, 0)
+    return endDate < today
+  }
+
+  if (event.value.start_date) {
+    const startDate = new Date(event.value.start_date)
+    startDate.setHours(0, 0, 0, 0)
+    return startDate < today
+  }
+
+  return false
+})
 
 // Função para extrair tags do evento
 function getEventTags(eventData) {
@@ -1863,6 +1913,68 @@ function getEventTags(eventData) {
   .floating-buy-btn {
     min-width: 100px;
     height: 40px;
+  }
+}
+
+/* ==================== EVENTO EXPIRADO ==================== */
+.event-hero--expired {
+  opacity: 0.4;
+}
+
+.expired-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+}
+
+.expired-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  background: rgba(42, 52, 71, 0.9);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.expired-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+}
+
+.expired-btn {
+  min-width: 200px;
+  height: 52px;
+  border-radius: 10px !important;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 599px) {
+  .expired-text {
+    font-size: 24px;
+  }
+
+  .expired-btn {
+    min-width: 150px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .expired-content {
+    padding: 24px;
   }
 }
 </style>
