@@ -192,6 +192,15 @@
         />
 
         <EventSectionCarousel
+          section-id="previas-carnaval"
+          title="Prévias de Carnaval"
+          :items="previasCarnavalEvents"
+          see-all-label="Ver Tudo"
+          :see-all-link="{ name: 'programacao-completa' }"
+          :default-image="DEFAULT_IMAGE"
+        />
+
+        <EventSectionCarousel
           section-id="carnaval"
           title="Carnaval"
           :items="carnavalEvents"
@@ -266,6 +275,7 @@ const featured = ref([])
 
 // seções adicionais
 const upcomingEvents = ref([])
+const previasCarnavalEvents = ref([])
 const reveillonEvents = ref([])
 const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
@@ -467,6 +477,7 @@ onMounted(async () => {
   // Carrega carrosséis em paralelo
   await Promise.all([
     loadUpcomingEvents(),
+    loadPreviasCarnaval(),
     loadReveillon(),
     loadCarnaval(),
     loadFestivais(),
@@ -503,6 +514,39 @@ async function loadUpcomingEvents() {
     upcomingEvents.value = await fetchUpcomingEventsSupabase({ limit: 100 })
   } catch {
     upcomingEvents.value = []
+  }
+}
+
+async function loadPreviasCarnaval() {
+  try {
+    // Busca o nome correto da tag a partir das categorias carregadas
+    let tagName = 'Prévias de Carnaval' // Nome padrão
+
+    if (categories.value) {
+      const previasCategory = categories.value.find(
+        (c) =>
+          c.label === 'Prévias de Carnaval' ||
+          c.slug === 'previas-carnaval',
+      )
+      if (previasCategory?.tagName) {
+        tagName = previasCategory.tagName
+      }
+    }
+
+    // Tenta diferentes variações para compatibilidade
+    let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
+
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('Prévias de Carnaval', { limit: 100 })
+    }
+
+    if (!events.length) {
+      events = await fetchEventsByTagSupabase('previas-carnaval', { limit: 100 })
+    }
+
+    previasCarnavalEvents.value = events
+  } catch {
+    previasCarnavalEvents.value = []
   }
 }
 
