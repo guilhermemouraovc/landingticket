@@ -2,7 +2,14 @@
   <section class="video-banner-section">
     <div class="video-banner-wrap">
       <div class="video-banner">
-        <video autoplay muted loop playsinline class="banner-video">
+        <video
+          ref="videoElement"
+          muted
+          loop
+          playsinline
+          preload="auto"
+          class="banner-video"
+        >
           <source :src="videoSrc" type="video/webm" />
           Your browser does not support the video tag.
         </video>
@@ -12,7 +19,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 
 const props = defineProps({
   video: {
@@ -25,8 +32,44 @@ const props = defineProps({
   },
 })
 
+const videoElement = ref(null)
+
 const videoSrc = computed(() => {
   return props.video
+})
+
+onMounted(() => {
+  if (videoElement.value) {
+    // Attempt to play the video
+    const playPromise = videoElement.value.play()
+
+    if (playPromise !== undefined) {
+      playPromise
+        .catch((error) => {
+          // Autoplay was prevented. iOS and some browsers require user interaction
+          // Listen for user interaction to start playback
+          const startPlayback = () => {
+            videoElement.value.play().catch(() => {
+              // Silently fail if play fails
+            })
+            document.removeEventListener('touchstart', startPlayback)
+            document.removeEventListener('click', startPlayback)
+          }
+
+          // Add event listeners for user interaction
+          document.addEventListener('touchstart', startPlayback, { once: true })
+          document.addEventListener('click', startPlayback, { once: true })
+        })
+    }
+
+    // Ensure video continues looping even if it stalls
+    videoElement.value.addEventListener('ended', () => {
+      videoElement.value.currentTime = 0
+      videoElement.value.play().catch(() => {
+        // Silently fail if play fails
+      })
+    })
+  }
 })
 </script>
 
