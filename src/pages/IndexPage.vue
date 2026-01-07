@@ -142,11 +142,8 @@
       </div>
     </section>
 
-    <!-- BANNER CARD -->
-    <BannerCard
-      image="/semjuros_margemcorreta.png"
-      cta-link="/programacao?q=Carvalheira na Ladeira"
-    />
+    <!-- VIDEO BANNER -->
+    <VideoBanner video="/banner_ticketpe.webm" />
 
     <section class="event-groups">
       <!-- Skeletons para carrosséis -->
@@ -245,7 +242,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import EventSectionCarousel from 'components/EventSectionCarousel.vue'
 import SkeletonLoader from 'components/SkeletonLoader.vue'
-import BannerCard from 'components/BannerCard.vue'
+import VideoBanner from 'components/VideoBanner.vue'
 import CategoryIcon from 'components/CategoryIcon.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useCategories } from 'src/composables/useCategories'
@@ -524,9 +521,7 @@ async function loadPreviasCarnaval() {
 
     if (categories.value) {
       const previasCategory = categories.value.find(
-        (c) =>
-          c.label === 'Prévias de Carnaval' ||
-          c.slug === 'previas-carnaval',
+        (c) => c.label === 'Prévias de Carnaval' || c.slug === 'previas-carnaval',
       )
       if (previasCategory?.tagName) {
         tagName = previasCategory.tagName
