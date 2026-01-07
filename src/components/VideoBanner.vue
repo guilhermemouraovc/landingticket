@@ -45,7 +45,7 @@ onMounted(() => {
 
     if (playPromise !== undefined) {
       playPromise
-        .catch((error) => {
+        .catch(() => {
           // Autoplay was prevented. iOS and some browsers require user interaction
           // Listen for user interaction to start playback
           const startPlayback = () => {
