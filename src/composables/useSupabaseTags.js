@@ -31,6 +31,7 @@ export function useSupabaseTags() {
     const iconMap = {
       carnaval: { type: 'phosphor', name: 'confetti' },
       carnavais: { type: 'phosphor', name: 'confetti' },
+      'previas-carnaval': { type: 'phosphor', name: 'confetti' },
       reveillon: { type: 'phosphor', name: 'cheers' },
       reveillons: { type: 'phosphor', name: 'cheers' },
       festivais: 'park',
@@ -56,6 +57,10 @@ export function useSupabaseTags() {
       calourada: 'school',
     }
 
+    const labelMap = {
+      'previas-carnaval': 'Prévias de Carnaval',
+    }
+
     return tags.map((t) => {
       const slug = (t.slug || '').toLowerCase()
       const iconConfig = iconMap[slug] || 'sell'
@@ -66,7 +71,7 @@ export function useSupabaseTags() {
 
       return {
         id: String(t.slug || t.id), // Garante que id seja sempre string
-        label: t.name, // Usa o nome diretamente do Supabase, sem transformação
+        label: labelMap[slug] || t.name, // Usa label customizado se existir, senão usa o nome do banco
         icon: icon,
         tagName: t.name,
         slug: t.slug,
