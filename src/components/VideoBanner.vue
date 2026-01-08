@@ -1,7 +1,12 @@
 <template>
   <section class="video-banner-section">
     <div class="video-banner-wrap">
-      <a :href="link" class="video-banner">
+      <a
+        :href="link"
+        :aria-label="ariaLabel"
+        v-bind="linkAttributes"
+        class="video-banner"
+      >
         <video
           ref="videoElement"
           muted
@@ -34,12 +39,32 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  ariaLabel: {
+    type: String,
+    default: 'Clique para acessar o grupo do WhatsApp',
+  },
 })
 
 const videoElement = ref(null)
 
 const videoSrc = computed(() => {
   return props.video
+})
+
+// Determine if link is external (starts with http/https)
+const isExternalLink = computed(() => {
+  return props.link.startsWith('http://') || props.link.startsWith('https://')
+})
+
+// Compute anchor attributes based on link type
+const linkAttributes = computed(() => {
+  if (isExternalLink.value) {
+    return {
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    }
+  }
+  return {}
 })
 
 onMounted(() => {

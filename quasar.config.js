@@ -131,6 +131,7 @@ export default defineConfig((/* ctx */) => {
       // (gets superseded if process.env.PORT is specified at runtime)
 
       middlewares: [
+        'influencer-meta-tags', // Inject dynamic meta tags for influencer routes
         'render', // keep this as last one
       ],
 
