@@ -1,7 +1,7 @@
 <template>
   <section class="video-banner-section">
     <div class="video-banner-wrap">
-      <div class="video-banner">
+      <a :href="link" class="video-banner">
         <video
           ref="videoElement"
           muted
@@ -13,7 +13,7 @@
           <source :src="videoSrc" type="video/webm" />
           Your browser does not support the video tag.
         </video>
-      </div>
+      </a>
     </div>
   </section>
 </template>
@@ -23,6 +23,10 @@ import { computed, ref, onMounted } from 'vue'
 
 const props = defineProps({
   video: {
+    type: String,
+    required: true,
+  },
+  link: {
     type: String,
     required: true,
   },
@@ -90,6 +94,7 @@ onMounted(() => {
 }
 
 .video-banner {
+  display: block;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -97,6 +102,8 @@ onMounted(() => {
   max-width: 100%;
   background-color: #000;
   aspect-ratio: 1920 / 200;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .banner-video {
@@ -121,6 +128,7 @@ onMounted(() => {
   .video-banner {
     max-width: 100%;
     aspect-ratio: 1920 / 200;
+    border-radius: 8px;
   }
 
   .banner-video {
