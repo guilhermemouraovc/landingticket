@@ -143,7 +143,7 @@
     </section>
 
     <!-- VIDEO BANNER -->
-    <VideoBanner video="/banner_ticketpe.webm" />
+    <VideoBanner video="/banner_ticketpe.webm" link="https://chat.whatsapp.com/HLtVXbX4PbO1RVW317mLlB" />
 
     <section class="event-groups">
       <!-- Skeletons para carrosséis -->
