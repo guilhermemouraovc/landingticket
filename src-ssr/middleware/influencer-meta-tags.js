@@ -13,7 +13,10 @@ const INFLUENCER_SLUGS = new Set(Object.keys(INFLUENCER_NAMES))
 export default function (ssrContext) {
   // Hook para processar a resposta HTML antes de enviar ao cliente/bot
   ssrContext.onSend.push((context) => {
-    const slug = context.req.url.split('/')[1] // Extrai o slug da URL
+    // Extract the path component, removing query strings and fragments
+    // Handles URLs like: /julia-souto?fbclid=123 or /julia-souto#section
+    const path = context.req.url.split('?')[0].split('#')[0]
+    const slug = path.split('/')[1]
 
     // Verifica se é uma rota válida de influenciador
     if (slug && INFLUENCER_SLUGS.has(slug) && context.res.getHeader('content-type')?.includes('text/html')) {

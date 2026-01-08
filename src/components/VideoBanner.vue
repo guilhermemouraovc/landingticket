@@ -4,7 +4,8 @@
       <a
         :href="link"
         :aria-label="ariaLabel"
-        v-bind="linkAttributes"
+        :target="isExternalLink ? '_blank' : undefined"
+        :rel="isExternalLink ? 'noopener noreferrer' : undefined"
         class="video-banner"
       >
         <video
@@ -54,17 +55,6 @@ const videoSrc = computed(() => {
 // Determine if link is external (starts with http/https)
 const isExternalLink = computed(() => {
   return props.link.startsWith('http://') || props.link.startsWith('https://')
-})
-
-// Compute anchor attributes based on link type
-const linkAttributes = computed(() => {
-  if (isExternalLink.value) {
-    return {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    }
-  }
-  return {}
 })
 
 onMounted(() => {
@@ -129,6 +119,15 @@ onMounted(() => {
   aspect-ratio: 1920 / 200;
   text-decoration: none;
   cursor: pointer;
+  /* Prevent any hover effects and transitions */
+  transition: none;
+}
+
+.video-banner:hover {
+  /* Explicitly disable hover effects */
+  opacity: 1;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .banner-video {
