@@ -119,6 +119,15 @@ onMounted(() => {
   aspect-ratio: 1920 / 200;
   text-decoration: none;
   cursor: pointer;
+  /* Prevent any hover effects and transitions */
+  transition: none;
+}
+
+.video-banner:hover {
+  /* Explicitly disable hover effects */
+  opacity: 1;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .banner-video {
