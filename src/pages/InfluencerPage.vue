@@ -67,17 +67,18 @@ onMounted(() => {
   if (slug && INFLUENCER_SLUGS.has(slug)) {
     const influencerName = INFLUENCER_NAMES[slug]
 
-    // Set meta tags
+    // Set meta tags on client-side for initial page load
+    // Note: Meta tags are injected server-side by SSR middleware for bot crawling
+    // Client-side update provides SEO for subsequent navigation
     setMetaTags(influencerName, slug)
 
-    // Save influencer tracking
+    // Save influencer tracking in localStorage
     saveInfluencer(slug)
 
-    // Small delay to ensure meta tags are set before redirect
-    // Facebook/Instagram bots need time to read the tags
-    setTimeout(() => {
-      router.replace('/')
-    }, 100)
+    // Redirect immediately to home page
+    // Bots (Facebook/Instagram) will see meta tags injected by SSR middleware (src-ssr/middleware/influencer-meta-tags.js)
+    // before this redirect executes since they fetch server-side HTML
+    router.replace('/')
   } else {
     // Invalid slug, redirect to 404
     router.replace('/404')
