@@ -4,7 +4,8 @@
       <a
         :href="link"
         :aria-label="ariaLabel"
-        v-bind="linkAttributes"
+        :target="isExternalLink ? '_blank' : undefined"
+        :rel="isExternalLink ? 'noopener noreferrer' : undefined"
         class="video-banner"
       >
         <video
@@ -54,17 +55,6 @@ const videoSrc = computed(() => {
 // Determine if link is external (starts with http/https)
 const isExternalLink = computed(() => {
   return props.link.startsWith('http://') || props.link.startsWith('https://')
-})
-
-// Compute anchor attributes based on link type
-const linkAttributes = computed(() => {
-  if (isExternalLink.value) {
-    return {
-      target: '_blank',
-      rel: 'noopener noreferrer',
-    }
-  }
-  return {}
 })
 
 onMounted(() => {
