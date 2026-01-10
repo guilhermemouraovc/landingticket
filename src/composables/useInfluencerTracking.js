@@ -52,6 +52,7 @@ export const INFLUENCER_NAMES = {
   'ana-clara': 'Ana Clara',
   jurandir: 'Jurandir',
   luna: 'Luna',
+  mafe: 'Mafe',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -103,6 +104,7 @@ const INFLUENCER_GENDER = {
   'Ana Clara': 'pela',
   Jurandir: 'pelo',
   Luna: 'pelo',
+  Mafe: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
