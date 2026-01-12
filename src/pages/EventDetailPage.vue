@@ -631,9 +631,9 @@ function shareEvent() {
   if (!event.value || typeof window === 'undefined') return
 
   const shareUrl = event.value.shareUrl || window.location.href
+  // Usa apenas title e url para evitar que apps de compartilhamento mostrem HTML ou texto longo
   const shareData = {
     title: event.value.title,
-    text: event.value.description,
     url: shareUrl,
   }
 
