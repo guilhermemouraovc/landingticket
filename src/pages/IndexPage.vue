@@ -193,7 +193,7 @@
           title="Prévias de Carnaval"
           :items="previasCarnavalEvents"
           see-all-label="Ver Tudo"
-          :see-all-link="{ name: 'programacao-completa' }"
+          :see-all-link="{ name: 'previas-carnaval' }"
           :default-image="DEFAULT_IMAGE"
         />
 

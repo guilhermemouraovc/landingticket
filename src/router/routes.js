@@ -49,6 +49,11 @@ const routes = [
         name: 'embaixadores',
         component: () => import('pages/EmbaixadoresPage.vue'),
       },
+      {
+        path: 'previas-carnaval',
+        name: 'previas-carnaval',
+        component: () => import('pages/PreviasPage.vue'),
+      },
       // Dynamic influencer route - handles all influencer tracking pages
       {
         path: ':slug',
