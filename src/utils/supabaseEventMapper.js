@@ -125,6 +125,7 @@ export function toEventCardFromSb(row) {
     image: cardImage,
     link: { name: 'event-detail', params: { slug } }, // Usa slug ao invés de id
     display_priority: row.display_priority || null, // Prioridade para ordenação
+    showLastTickets: row.show_last_tickets || false, // Badge "Últimos ingressos!"
     // Informações de preço
     ...priceInfo,
   }

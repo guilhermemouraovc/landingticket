@@ -39,7 +39,12 @@
                   :ratio="16 / 9"
                   spinner-color="white"
                   loading="lazy"
-                />
+                >
+                  <!-- Badge "Últimos ingressos!" -->
+                  <div v-if="ev.showLastTickets" class="featured-badge">
+                    Últimos ingressos!
+                  </div>
+                </q-img>
 
                 <!-- Painel -->
                 <div class="featured-panel">
@@ -1461,6 +1466,32 @@ async function filterEventsByCategories(categoryLabels) {
 
   .empty-category-subtitle {
     font-size: 0.9rem;
+  }
+}
+
+/* ==================== BADGE "ÚLTIMOS INGRESSOS" NO DESTAQUE ==================== */
+.featured-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #45c0e7;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile: badge menor */
+@media (max-width: 599px) {
+  .featured-badge {
+    top: 12px;
+    left: 12px;
+    font-size: 14px;
+    padding: 8px 16px;
   }
 }
 </style>
