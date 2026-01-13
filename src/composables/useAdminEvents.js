@@ -184,6 +184,7 @@ export function useAdminEvents() {
         installment_value: eventData.installment_value || null,
         currency: eventData.currency || 'BRL',
         display_priority: eventData.display_priority || null,
+        show_last_tickets: eventData.show_last_tickets || false,
       }
 
       // Cria o evento
@@ -288,6 +289,7 @@ export function useAdminEvents() {
         installment_value: eventData.installment_value || null,
         currency: eventData.currency || 'BRL',
         display_priority: eventData.display_priority || null,
+        show_last_tickets: eventData.show_last_tickets || false,
         updated_at: new Date().toISOString(),
       }
 

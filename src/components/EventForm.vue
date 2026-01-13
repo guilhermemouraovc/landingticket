@@ -80,6 +80,16 @@
             />
           </div>
 
+          <div class="col-12">
+            <q-toggle
+              v-model="formData.show_last_tickets"
+              label="Exibir etiqueta 'Últimos ingressos!'"
+              color="info"
+              icon="local_fire_department"
+              class="q-mb-md"
+            />
+          </div>
+
           <div class="col-12 col-md-6">
             <q-input
               v-model.number="formData.display_priority"
@@ -621,6 +631,7 @@ const formData = ref({
   installment_value: null,
   currency: 'BRL',
   highlight: false,
+  show_last_tickets: false,
   display_priority: null,
   tagIds: [],
   images: [],
@@ -710,6 +721,7 @@ function loadEventData() {
     installment_value: event.installment_value || null,
     currency: event.currency || 'BRL',
     highlight: !!event.highlight,
+    show_last_tickets: !!event.show_last_tickets,
     display_priority: event.display_priority || null,
     tagIds: selectedTags,
     images:
@@ -757,6 +769,7 @@ function resetForm() {
     installment_value: null,
     currency: 'BRL',
     highlight: false,
+    show_last_tickets: false,
     display_priority: null,
     tagIds: [],
     images: [],

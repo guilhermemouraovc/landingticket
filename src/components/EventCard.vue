@@ -22,6 +22,11 @@
       spinner-color="white"
       :loading="lazyLoad ? 'lazy' : 'eager'"
     >
+      <!-- Badge "Últimos ingressos!" -->
+      <div v-if="event.showLastTickets" class="event-card__badge">
+        Últimos ingressos!
+      </div>
+
       <!-- Slot para badges/overlays na imagem -->
       <slot name="image-overlay">
         <div
@@ -338,6 +343,22 @@ function handleClick(e) {
 </script>
 
 <style scoped lang="scss">
+/* ==================== BADGE "ÚLTIMOS INGRESSOS" ==================== */
+.event-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #45c0e7;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 /* ==================== BASE ==================== */
 .event-card {
   display: flex;
