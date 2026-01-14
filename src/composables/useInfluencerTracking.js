@@ -53,6 +53,8 @@ export const INFLUENCER_NAMES = {
   jurandir: 'Jurandir',
   luna: 'Luna',
   'medicina-fps-21': 'Turma FPS 21',
+  mafe: 'Mafe',
+  karla: 'Karla',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -105,6 +107,8 @@ const INFLUENCER_GENDER = {
   Jurandir: 'pelo',
   Luna: 'pelo',
   'Turma FPS 21': 'pela',
+  Mafe: 'pela',
+  Karla: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
