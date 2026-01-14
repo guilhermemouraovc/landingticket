@@ -22,6 +22,15 @@
             flat
             no-caps
             color="white"
+            icon="bar_chart"
+            label="Métricas"
+            class="admin-btn admin-btn--ghost"
+            :to="{ name: 'admin-metrics' }"
+          />
+          <q-btn
+            flat
+            no-caps
+            color="white"
             icon="home"
             label="Voltar ao Site"
             class="admin-btn admin-btn--ghost"
