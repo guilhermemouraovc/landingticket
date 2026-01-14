@@ -74,6 +74,12 @@ const routes = [
     component: () => import('pages/AdminPage.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/melanciamaluca/metricas',
+    name: 'admin-metrics',
+    component: () => import('pages/MetricsDashboardPage.vue'),
+    meta: { requiresAuth: true },
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
