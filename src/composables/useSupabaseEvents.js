@@ -31,14 +31,22 @@ export function useSupabaseEvents() {
     loading.value = true
     error.value = null
     try {
+      // Busca event_ids mantendo a ordem de priority_in_tag da view
       const { data: tagRows, error: e1 } = await supabase
         .from('view_events_by_tag')
-        .select('event_id')
+        .select('event_id, priority_in_tag')
         .eq('tag_name', tagName)
-        .limit(1000) // Aumentar limite da view também
+        .order('priority_in_tag', { ascending: true })
+        .limit(1000)
 
       if (e1) throw e1
       const ids = (tagRows || []).map((r) => r.event_id)
+
+      // Cria um mapa de prioridades para preservar ordem após buscar detalhes
+      const priorityMap = new Map()
+      tagRows?.forEach((row, index) => {
+        priorityMap.set(row.event_id, { priority: row.priority_in_tag, index })
+      })
 
       if (!ids.length) return []
 
@@ -50,7 +58,19 @@ export function useSupabaseEvents() {
 
       if (e2) throw e2
       const mappedEvents = (data || []).map(toEventCardFromSb)
-      return sortEventsByPriorityAndDate(mappedEvents)
+
+      // Ordena pelos eventos mantendo a ordem de priority_in_tag
+      return mappedEvents.sort((a, b) => {
+        const aPrio = priorityMap.get(a.id)
+        const bPrio = priorityMap.get(b.id)
+
+        if (aPrio && bPrio) {
+          return aPrio.index - bPrio.index
+        }
+
+        // Fallback para ordenação padrão se não encontrar prioridade
+        return sortEventsByPriorityAndDate([a, b])[0]?.id === a.id ? -1 : 1
+      })
     } catch (err) {
       if (import.meta.env.DEV) {
         console.error('❌ Erro ao filtrar eventos:', err)
