@@ -55,6 +55,7 @@ export const INFLUENCER_NAMES = {
   'medicina-fps-21': 'Turma FPS 21',
   mafe: 'Mafe',
   karla: 'Karla',
+  ondetempe: 'Onde Tem PE',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -109,6 +110,7 @@ const INFLUENCER_GENDER = {
   'Turma FPS 21': 'pela',
   Mafe: 'pela',
   Karla: 'pela',
+  'Onde Tem PE': 'pela',
 }
 
 // Set of valid influencer slugs for route validation
