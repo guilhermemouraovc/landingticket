@@ -55,7 +55,7 @@ export const INFLUENCER_NAMES = {
   'medicina-fps-21': 'Turma FPS 21',
   mafe: 'Mafe',
   karla: 'Karla',
-  ondetempe: 'Onde Tem PE',
+  ondetempe: 'página Onde Tem PE',
 }
 
 // Mapeamento de gênero para usar o artigo correto
