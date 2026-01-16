@@ -1,12 +1,14 @@
 /**
- * Ordena eventos por prioridade e data
+ * Sorts events by display priority and start date.
  *
- * Eventos com prioridade (display_priority não-null) aparecem primeiro, ordenados por prioridade crescente.
- * Dentro de cada grupo de prioridade, ordena por data crescente.
- * Eventos sem prioridade aparecem depois, ordenados apenas por data crescente.
+ * Events with a non-null `display_priority` appear before events without priority; among those,
+ * events are ordered by ascending `display_priority`. Within the same priority (or when both events
+ * lack priority), events are ordered by ascending `start_date`. Events missing `start_date` are
+ * treated as occurring after dated events. The function returns the input unchanged if it is
+ * falsy or an empty array and otherwise returns a new, shallow-copied array sorted as described.
  *
- * @param {Array} events - Lista de eventos a ordenar
- * @returns {Array} Eventos ordenados por prioridade e data
+ * @param {Array} events - Array of event objects to sort. Each event may include `display_priority` and `start_date`.
+ * @returns {Array} A new array of events sorted by priority and date, or the original input if it was falsy or empty.
  */
 export function sortEventsByPriorityAndDate(events) {
   if (!events || events.length === 0) return events
@@ -37,14 +39,11 @@ export function sortEventsByPriorityAndDate(events) {
 }
 
 /**
- * Ordena eventos por prioridade dentro de uma tag específica
+ * Sorts events by the priority value stored in a specified tag, using start_date as a tiebreaker.
  *
- * Usa priority_in_tag do objeto de tags do evento para ordenar.
- * Se um evento tem múltiplas tags, usa a prioridade da tag especificada.
- *
- * @param {Array} events - Lista de eventos a ordenar
- * @param {string} tagName - Nome da tag para usar como referência de prioridade
- * @returns {Array} Eventos ordenados por priority_in_tag
+ * @param {Array} events - Array of event objects to sort.
+ * @param {string} tagName - Tag name whose `priority_in_tag` value determines ordering.
+ * @returns {Array} A new array of events sorted by `priority_in_tag` (lower numbers come first). Events that lack the specified tag or have no tags are treated with priority `999`. If priorities are equal, events are ordered by `start_date` ascending; events without a date are placed after dated events.
  */
 export function sortEventsByTagPriority(events, tagName) {
   if (!events || events.length === 0) return events
