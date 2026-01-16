@@ -56,7 +56,7 @@ export const INFLUENCER_NAMES = {
   mafe: 'Mafe',
   karla: 'Karla',
   ondetempe: 'página Onde Tem PE',
-  'eduarda-figueiredo': 'Eduarda Figueiredo',
+  'eduarda-figueredo': 'Eduarda Figueredo',
 }
 
 // Mapeamento de gênero para usar o artigo correto
