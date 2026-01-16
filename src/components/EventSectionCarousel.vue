@@ -399,7 +399,7 @@ onUnmounted(() => {
   scrollbar-width: none;
   --fade: 28px; /* largura do fade */
   scroll-padding-right: 200px;
-  padding-top: 9px;
+  padding-top: 40px;
   padding-bottom: 13px;
 }
 

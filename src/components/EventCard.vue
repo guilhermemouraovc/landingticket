@@ -1,31 +1,32 @@
 <template>
-  <q-card
-    class="event-card"
-    :class="[`event-card--${variant}`, { 'event-card--clickable': clickable && !adminMode }]"
-    flat
-    :clickable="clickable && !adminMode"
-    v-ripple="clickable && !adminMode"
-    @click="handleClick"
-    @touchstart.passive="handleTouchStart"
-    @touchmove.passive="handleTouchMove"
-    role="button"
-    :tabindex="clickable && !adminMode ? 0 : -1"
-    :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
-  >
-    <!-- Imagem do evento -->
-    <q-img
-      :src="event.image || defaultImage"
-      :alt="`Imagem do evento ${event.title || 'Sem nome'}`"
-      class="event-card__image"
-      :height="imageHeight"
-      ratio="16/9"
-      spinner-color="white"
-      :loading="lazyLoad ? 'lazy' : 'eager'"
-    >
-      <!-- Badge "Últimos ingressos!" -->
-      <div v-if="event.showLastTickets" class="event-card__badge">Últimos ingressos!</div>
+  <div class="event-card-wrapper">
+    <!-- Badge "Últimos ingressos!" - ACIMA DO CARD -->
+    <div v-if="event.showLastTickets" class="event-card__badge">Últimos ingressos!</div>
 
-      <!-- Slot para badges/overlays na imagem -->
+    <q-card
+      class="event-card"
+      :class="[`event-card--${variant}`, { 'event-card--clickable': clickable && !adminMode }]"
+      flat
+      :clickable="clickable && !adminMode"
+      v-ripple="clickable && !adminMode"
+      @click="handleClick"
+      @touchstart.passive="handleTouchStart"
+      @touchmove.passive="handleTouchMove"
+      role="button"
+      :tabindex="clickable && !adminMode ? 0 : -1"
+      :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
+    >
+      <!-- Imagem do evento -->
+      <q-img
+        :src="event.image || defaultImage"
+        :alt="`Imagem do evento ${event.title || 'Sem nome'}`"
+        class="event-card__image"
+        :height="imageHeight"
+        ratio="16/9"
+        spinner-color="white"
+        :loading="lazyLoad ? 'lazy' : 'eager'"
+      >
+        <!-- Slot para badges/overlays na imagem -->
       <slot name="image-overlay">
         <div
           v-if="adminMode"
@@ -179,6 +180,7 @@
       <slot name="footer"></slot>
     </q-card-section>
   </q-card>
+  </div>
 </template>
 
 <script setup>
@@ -337,20 +339,29 @@ function handleClick(e) {
 </script>
 
 <style scoped lang="scss">
+/* ==================== WRAPPER ==================== */
+.event-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ==================== BADGE "ÚLTIMOS INGRESSOS" ==================== */
 .event-card__badge {
   position: absolute;
-  top: 12px;
+  top: -36px;
   left: 12px;
   background: #45c0e7;
   color: #ffffff;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
-  font-size: 14px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  z-index: 5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  z-index: 10;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  text-transform: none;
+  white-space: nowrap;
 }
 
 /* ==================== BASE ==================== */
@@ -390,12 +401,20 @@ function handleClick(e) {
 /* ==================== VARIANTES ==================== */
 
 /* Carousel variant - largura fixa */
-.event-card--carousel {
+.event-card-wrapper:has(.event-card--carousel) {
   flex: 0 0 320px;
   width: 320px;
 }
 
+.event-card--carousel {
+  width: 100%;
+}
+
 /* Grid variant - largura flexível */
+.event-card-wrapper:has(.event-card--grid) {
+  width: 100%;
+}
+
 .event-card--grid {
   width: 100%;
 }
@@ -588,9 +607,13 @@ function handleClick(e) {
 
 /* Tablet (até 768px) */
 @media (max-width: 768px) {
-  .event-card--carousel {
+  .event-card-wrapper:has(.event-card--carousel) {
     flex: 0 0 280px;
     width: 280px;
+  }
+
+  .event-card--carousel {
+    width: 100%;
   }
 
   .event-card__body {
@@ -618,9 +641,13 @@ function handleClick(e) {
 
 /* Mobile (até 599px - breakpoint sm do Quasar) */
 @media (max-width: 599px) {
-  .event-card--carousel {
+  .event-card-wrapper:has(.event-card--carousel) {
     flex: 0 0 280px;
     width: 280px;
+  }
+
+  .event-card--carousel {
+    width: 100%;
   }
 
   .event-card__body {

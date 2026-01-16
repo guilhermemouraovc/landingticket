@@ -13,8 +13,10 @@
           muted
           loop
           playsinline
+          webkit-playsinline
           preload="auto"
           class="banner-video"
+          @ended="handleVideoEnded"
         >
           <source :src="videoSrc" type="video/webm" />
           Your browser does not support the video tag.
@@ -57,36 +59,64 @@ const isExternalLink = computed(() => {
   return props.link.startsWith('http://') || props.link.startsWith('https://')
 })
 
+// Handler para quando o vídeo termina (forçar loop no iOS)
+const handleVideoEnded = () => {
+  if (videoElement.value) {
+    videoElement.value.currentTime = 0
+    videoElement.value.play().catch((error) => {
+      console.warn('Erro ao reiniciar vídeo:', error)
+    })
+  }
+}
+
+// Função para iniciar o vídeo
+const startVideo = () => {
+  if (!videoElement.value) return
+
+  const playPromise = videoElement.value.play()
+
+  if (playPromise !== undefined) {
+    playPromise.catch((error) => {
+      console.warn('Autoplay bloqueado, aguardando interação do usuário:', error)
+
+      // Autoplay was prevented. iOS and some browsers require user interaction
+      const startPlayback = () => {
+        if (videoElement.value) {
+          videoElement.value.play().catch((err) => {
+            console.warn('Erro ao iniciar vídeo após interação:', err)
+          })
+        }
+        document.removeEventListener('touchstart', startPlayback)
+        document.removeEventListener('click', startPlayback)
+      }
+
+      // Add event listeners for user interaction
+      document.addEventListener('touchstart', startPlayback, { once: true })
+      document.addEventListener('click', startPlayback, { once: true })
+    })
+  }
+}
+
 onMounted(() => {
   if (videoElement.value) {
-    // Attempt to play the video
-    const playPromise = videoElement.value.play()
+    // Força muted para garantir autoplay no iOS
+    videoElement.value.muted = true
 
-    if (playPromise !== undefined) {
-      playPromise
-        .catch(() => {
-          // Autoplay was prevented. iOS and some browsers require user interaction
-          // Listen for user interaction to start playback
-          const startPlayback = () => {
-            videoElement.value.play().catch(() => {
-              // Silently fail if play fails
-            })
-            document.removeEventListener('touchstart', startPlayback)
-            document.removeEventListener('click', startPlayback)
-          }
+    // Tenta iniciar o vídeo
+    startVideo()
 
-          // Add event listeners for user interaction
-          document.addEventListener('touchstart', startPlayback, { once: true })
-          document.addEventListener('click', startPlayback, { once: true })
+    // Fallback: se o vídeo pausar inesperadamente, tenta retomar
+    videoElement.value.addEventListener('pause', () => {
+      if (videoElement.value && !videoElement.value.ended) {
+        videoElement.value.play().catch(() => {
+          // Silently fail
         })
-    }
+      }
+    })
 
-    // Ensure video continues looping even if it stalls
-    videoElement.value.addEventListener('ended', () => {
-      videoElement.value.currentTime = 0
-      videoElement.value.play().catch(() => {
-        // Silently fail if play fails
-      })
+    // Fallback adicional para garantir loop no iOS
+    videoElement.value.addEventListener('loadedmetadata', () => {
+      startVideo()
     })
   }
 })
