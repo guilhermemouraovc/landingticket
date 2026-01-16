@@ -524,6 +524,54 @@ export function useAdminEvents() {
     }
   }
 
+  // Atualiza a ordem de eventos dentro de uma tag (para drag-and-drop no carrossel)
+  async function updateTagPriorities(tagId, eventIds) {
+    loading.value = true
+    error.value = null
+    try {
+      // 1. Remove todas as relações antigas desta tag
+      const { error: deleteError } = await supabase
+        .from('event_tags')
+        .delete()
+        .eq('tag_id', tagId)
+
+      if (deleteError) throw deleteError
+
+      // 2. Recria com novas prioridades baseadas na ordem do array
+      const newRelations = eventIds.map((eventId, index) => ({
+        event_id: eventId,
+        tag_id: tagId,
+        priority_in_tag: index + 1, // 1, 2, 3, 4...
+      }))
+
+      const { error: insertError } = await supabase
+        .from('event_tags')
+        .insert(newRelations)
+
+      if (insertError) throw insertError
+
+      $q.notify({
+        type: 'positive',
+        message: 'Ordem atualizada com sucesso!',
+        position: 'top',
+        timeout: 2000,
+      })
+
+      return true
+    } catch (err) {
+      error.value = err.message || 'Erro ao atualizar ordem dos eventos'
+      $q.notify({
+        type: 'negative',
+        message: error.value,
+        position: 'top',
+      })
+      console.error('Erro ao atualizar prioridades de tag:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
@@ -533,5 +581,6 @@ export function useAdminEvents() {
     updateEvent,
     patchEvent,
     deleteEvent,
+    updateTagPriorities,
   }
 }

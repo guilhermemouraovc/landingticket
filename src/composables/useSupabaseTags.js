@@ -70,7 +70,7 @@ export function useSupabaseTags() {
       const icon = typeof iconConfig === 'object' ? iconConfig : iconConfig
 
       return {
-        id: String(t.slug || t.id), // Garante que id seja sempre string
+        id: t.id, // Usa o UUID do banco de dados para drag-and-drop
         label: labelMap[slug] || t.name, // Usa label customizado se existir, senão usa o nome do banco
         icon: icon,
         tagName: t.name,
