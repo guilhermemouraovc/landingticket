@@ -175,7 +175,7 @@
         </div>
       </div>
       <!-- Spacer para manter consistência visual quando sem preço -->
-      <div v-else-if="showPrice && !isStacked" class="event-card__price-spacer"></div>
+      <div v-else-if="showPrice" class="event-card__price-spacer"></div>
 
       <!-- Slot para conteúdo adicional -->
       <slot name="footer"></slot>
@@ -538,10 +538,12 @@ function handleClick(e) {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0; /* Impede que a seção de preços seja comprimida */
 }
 
 .event-card__price-spacer {
-  height: 50px; /* Altura aproximada da seção de preços para manter alinhamento */
+  height: 62px; /* Altura da seção de preços: 29px (price-full) + 8px (gap) + 25px (installment) */
+  flex-shrink: 0; /* Impede que o spacer seja comprimido */
 }
 
 .price-full {
