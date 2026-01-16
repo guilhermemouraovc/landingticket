@@ -2,6 +2,14 @@ import { ref } from 'vue'
 import { supabase } from 'src/utils/supabase'
 import { useQuasar } from 'quasar'
 
+/**
+ * Provide admin-focused utilities for managing events, exposing reactive state and CRUD operations.
+ *
+ * The returned API includes a reactive `loading` flag and `error` holder, and functions to fetch all events,
+ * fetch a single event by id, create, update, patch (partial update), and delete events. Each operation
+ * updates `loading`/`error` and shows user notifications on success or failure.
+ *
+ * @returns {{loading: import('vue').Ref<boolean>, error: import('vue').Ref<string|null>, fetchAllEvents: function(): Promise<Array<object>>, fetchEventById: function(id: string): Promise<object>, createEvent: function(eventData: object): Promise<object>, updateEvent: function(id: string, eventData: object): Promise<boolean>, patchEvent: function(id: string, fields: object): Promise<boolean>, deleteEvent: function(id: string): Promise<boolean>}} An object containing reactive state (`loading`, `error`) and CRUD methods for admin event management.
 export function useAdminEvents() {
   const $q = useQuasar()
   const loading = ref(false)
