@@ -200,6 +200,9 @@
           see-all-label="Ver Tudo"
           :see-all-link="{ name: 'previas-carnaval' }"
           :default-image="DEFAULT_IMAGE"
+          :editable="isAdmin"
+          :tag-id="previasCarnavalTagId"
+          :tag-name="previasCarnavalTagName"
         />
 
         <EventSectionCarousel
@@ -209,6 +212,9 @@
           see-all-label="Ver Tudo"
           :see-all-link="{ name: 'carnaval' }"
           :default-image="DEFAULT_IMAGE"
+          :editable="isAdmin"
+          :tag-id="carnavalTagId"
+          :tag-name="carnavalTagName"
         />
 
         <EventSectionCarousel
@@ -218,6 +224,9 @@
           see-all-label="Ver Tudo"
           :see-all-link="{ name: 'festivais' }"
           :default-image="DEFAULT_IMAGE"
+          :editable="isAdmin"
+          :tag-id="festivaisTagId"
+          :tag-name="festivaisTagName"
         />
 
         <EventSectionCarousel
@@ -236,6 +245,9 @@
           see-all-label="Ver Tudo"
           :see-all-link="{ name: 'reveillon' }"
           :default-image="DEFAULT_IMAGE"
+          :editable="isAdmin"
+          :tag-id="reveillonTagId"
+          :tag-name="reveillonTagName"
         />
       </template>
     </section>
@@ -251,6 +263,7 @@ import VideoBanner from 'components/VideoBanner.vue'
 import CategoryIcon from 'components/CategoryIcon.vue'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useCategories } from 'src/composables/useCategories'
+import { useAuth } from 'src/composables/useAuth'
 import { DEFAULT_IMAGES } from 'src/constants/config'
 import { generateSlug } from 'src/utils/stringUtils'
 
@@ -271,6 +284,9 @@ const {
 // Composable para gerenciar categorias (com cache)
 const { categories, loadCategories } = useCategories()
 
+// Composable para autenticação e admin
+const { isAdmin } = useAuth()
+
 // refs que alimentam o carrossel hero
 const activeSlide = ref(null)
 const featured = ref([])
@@ -283,6 +299,16 @@ const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
 const allEvents = ref([])
 const autoplayInterval = ref(3000) // em milissegundos
+
+// Tag IDs e nomes para drag-and-drop (admin edição de ordem)
+const previasCarnavalTagId = ref(null)
+const previasCarnavalTagName = ref(null)
+const carnavalTagId = ref(null)
+const carnavalTagName = ref(null)
+const festivaisTagId = ref(null)
+const festivaisTagName = ref(null)
+const reveillonTagId = ref(null)
+const reveillonTagName = ref(null)
 
 // Estados de loading
 const loadingFeatured = ref(true)
@@ -523,6 +549,7 @@ async function loadPreviasCarnaval() {
   try {
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Prévias de Carnaval' // Nome padrão
+    let tagId = null
 
     if (categories.value) {
       const previasCategory = categories.value.find(
@@ -530,6 +557,9 @@ async function loadPreviasCarnaval() {
       )
       if (previasCategory?.tagName) {
         tagName = previasCategory.tagName
+      }
+      if (previasCategory?.id) {
+        tagId = previasCategory.id
       }
     }
 
@@ -545,6 +575,8 @@ async function loadPreviasCarnaval() {
     }
 
     previasCarnavalEvents.value = events
+    previasCarnavalTagName.value = tagName
+    previasCarnavalTagId.value = tagId
   } catch {
     previasCarnavalEvents.value = []
   }
@@ -554,6 +586,7 @@ async function loadReveillon() {
   try {
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Reveillons' // Nome padrão atualizado
+    let tagId = null
 
     if (categories.value) {
       const reveillonCategory = categories.value.find(
@@ -566,6 +599,9 @@ async function loadReveillon() {
       )
       if (reveillonCategory?.tagName) {
         tagName = reveillonCategory.tagName
+      }
+      if (reveillonCategory?.id) {
+        tagId = reveillonCategory.id
       }
     }
 
@@ -585,6 +621,8 @@ async function loadReveillon() {
     }
 
     reveillonEvents.value = events
+    reveillonTagName.value = tagName
+    reveillonTagId.value = tagId
   } catch {
     reveillonEvents.value = []
   }
@@ -594,6 +632,7 @@ async function loadCarnaval() {
   try {
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Carnaval' // Nome padrão atualizado
+    let tagId = null
 
     if (categories.value) {
       const carnavalCategory = categories.value.find(
@@ -606,6 +645,9 @@ async function loadCarnaval() {
       )
       if (carnavalCategory?.tagName) {
         tagName = carnavalCategory.tagName
+      }
+      if (carnavalCategory?.id) {
+        tagId = carnavalCategory.id
       }
     }
 
@@ -625,6 +667,8 @@ async function loadCarnaval() {
     }
 
     carnavalEvents.value = prioritizeEvents(events, CARNAVAL_PINNED_SLUGS)
+    carnavalTagName.value = tagName
+    carnavalTagId.value = tagId
   } catch {
     carnavalEvents.value = []
   }
@@ -634,6 +678,7 @@ async function loadFestivais() {
   try {
     // Busca o nome correto da tag a partir das categorias carregadas
     let tagName = 'Festivais' // Nome padrão atualizado
+    let tagId = null
 
     if (categories.value) {
       const festivaisCategory = categories.value.find(
@@ -641,6 +686,9 @@ async function loadFestivais() {
       )
       if (festivaisCategory?.tagName) {
         tagName = festivaisCategory.tagName
+      }
+      if (festivaisCategory?.id) {
+        tagId = festivaisCategory.id
       }
     }
 
@@ -656,6 +704,8 @@ async function loadFestivais() {
     }
 
     saoJoaoEvents.value = events
+    festivaisTagName.value = tagName
+    festivaisTagId.value = tagId
   } catch {
     saoJoaoEvents.value = []
   }

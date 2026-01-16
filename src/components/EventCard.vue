@@ -23,9 +23,7 @@
       :loading="lazyLoad ? 'lazy' : 'eager'"
     >
       <!-- Badge "Últimos ingressos!" -->
-      <div v-if="event.showLastTickets" class="event-card__badge">
-        Últimos ingressos!
-      </div>
+      <div v-if="event.showLastTickets" class="event-card__badge">Últimos ingressos!</div>
 
       <!-- Slot para badges/overlays na imagem -->
       <slot name="image-overlay">
@@ -175,7 +173,7 @@
         </div>
       </div>
       <!-- Spacer para manter consistência visual quando sem preço -->
-      <div v-else-if="showPrice && !isStacked" class="event-card__price-spacer"></div>
+      <div v-else-if="showPrice" class="event-card__price-spacer"></div>
 
       <!-- Slot para conteúdo adicional -->
       <slot name="footer"></slot>
@@ -291,10 +289,6 @@ const metaLayoutClass = computed(() => {
     return 'meta-layout--stacked'
   }
   return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
-})
-
-const isStacked = computed(() => {
-  return !props.event.hasPrice && props.showPrice && props.variant !== 'grid'
 })
 
 const truncatedDescription = computed(() => {
@@ -538,10 +532,12 @@ function handleClick(e) {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0; /* Impede que a seção de preços seja comprimida */
 }
 
 .event-card__price-spacer {
-  height: 50px; /* Altura aproximada da seção de preços para manter alinhamento */
+  height: 2px; /* Altura da seção de preços para manter cards alinhados */
+  flex-shrink: 0; /* Impede que o spacer seja comprimido */
 }
 
 .price-full {

@@ -524,6 +524,72 @@ export function useAdminEvents() {
     }
   }
 
+  // Atualiza a ordem de eventos dentro de uma tag (para drag-and-drop no carrossel)
+  // Implementação atômica: insere primeiro, depois remove relações antigas
+  async function updateTagPriorities(tagId, eventIds) {
+    loading.value = true
+    error.value = null
+
+    // Guarda contra remoção acidental de todas as relações
+    if (!eventIds || eventIds.length === 0) {
+      error.value = 'Nenhum evento foi fornecido para atualizar a ordem'
+      $q.notify({
+        type: 'warning',
+        message: 'Operação cancelada: lista de eventos vazia',
+        position: 'top',
+      })
+      loading.value = false
+      return false
+    }
+
+    try {
+      // 1. Prepara novas relações com prioridades
+      const newRelations = eventIds.map((eventId, index) => ({
+        event_id: eventId,
+        tag_id: tagId,
+        priority_in_tag: index + 1, // 1, 2, 3, 4...
+      }))
+
+      // 2. Insere/atualiza as novas relações com upsert
+      // Supabase upsert usa a constraint de unique (event_id, tag_id)
+      const { error: upsertError } = await supabase
+        .from('event_tags')
+        .upsert(newRelations, { onConflict: 'event_id,tag_id' })
+
+      if (upsertError) throw upsertError
+
+      // 3. Remove relações antigas que não estão na nova lista
+      // Isso garante que eventos removidos da categoria sejam limpos
+      const { error: deleteError } = await supabase
+        .from('event_tags')
+        .delete()
+        .eq('tag_id', tagId)
+        .not('event_id', 'in', `(${eventIds.join(',')})`)
+
+      if (deleteError) throw deleteError
+
+      $q.notify({
+        type: 'positive',
+        message: 'Ordem atualizada com sucesso!',
+        position: 'top',
+        timeout: 2000,
+      })
+
+      return true
+    } catch (err) {
+      error.value = err.message || 'Erro ao atualizar ordem dos eventos'
+      $q.notify({
+        type: 'negative',
+        message: error.value,
+        position: 'top',
+      })
+      console.error('Erro ao atualizar prioridades de tag:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     error,
@@ -533,5 +599,6 @@ export function useAdminEvents() {
     updateEvent,
     patchEvent,
     deleteEvent,
+    updateTagPriorities,
   }
 }

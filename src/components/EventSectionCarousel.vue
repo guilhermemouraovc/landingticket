@@ -20,7 +20,16 @@
       </div>
 
       <div class="header-actions">
-        <!-- Removido o botão Ver Tudo daqui -->
+        <!-- Botão Editar (apenas para admin) -->
+        <q-btn
+          v-if="isAdmin && editable && tagId && tagName"
+          :label="isEditMode ? 'Salvar' : 'Editar'"
+          :color="isEditMode ? 'positive' : 'warning'"
+          size="sm"
+          class="edit-btn"
+          @click="async () => { isEditMode ? await exitEditMode() : await enterEditMode() }"
+          aria-label="Ativar modo de edição do carrossel"
+        />
 
         <div class="nav-buttons" role="group" aria-label="Controles de navegação do carrossel">
           <button
@@ -49,29 +58,52 @@
       ref="viewport"
       @scroll="updateScrollState"
       :class="{
-        'fade-right': showRightFade,
-        'fade-left': showLeftFade,
+        'fade-right': showRightFade && !isEditMode,
+        'fade-left': showLeftFade && !isEditMode,
       }"
     >
-      <div class="cards-row">
-        <EventCard
-          v-for="card in items"
+      <div
+        ref="cardsRow"
+        class="cards-row"
+        :class="{ 'cards-row--edit-mode': isEditMode }"
+      >
+        <div
+          v-for="card in displayedEvents"
           :key="card.id"
-          :event="card"
-          variant="carousel"
-          image-height="200px"
-          :default-image="defaultImage"
-          @click="openCard(card)"
-        />
+          :data-event-id="card.id"
+          class="card-wrapper"
+          :class="{ 'card-wrapper--dragging': isEditMode }"
+        >
+          <!-- Handle para drag (apenas no modo edição) -->
+          <div v-if="isEditMode" class="drag-handle" title="Arraste para reordenar">⠿</div>
+
+          <EventCard
+            :event="card"
+            variant="carousel"
+            image-height="200px"
+            :default-image="defaultImage"
+            @click="openCard(card)"
+            :style="{ pointerEvents: isEditMode ? 'none' : 'auto' }"
+          />
+        </div>
       </div>
     </div>
   </section>
 </template>
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import Sortable from 'sortablejs'
 import EventCard from './EventCard.vue'
+import { useAuth } from 'src/composables/useAuth'
+import { useAdminEvents } from 'src/composables/useAdminEvents'
+import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
+
 const router = useRouter()
+const { isAdmin } = useAuth()
+const { updateTagPriorities } = useAdminEvents()
+const { fetchEventsByTag } = useSupabaseEvents()
+
 function openCard(card) {
   const to = card?.link
   if (to) router.push(to)
@@ -84,9 +116,28 @@ const props = defineProps({
   seeAllLink: { type: [String, Object], default: null },
   defaultImage: { type: String, default: 'https://via.placeholder.com/400x200?text=Evento' },
   sectionId: { type: String, default: null },
+  editable: { type: Boolean, default: false },
+  tagId: { type: String, default: null, required: false },
+  tagName: { type: String, default: null, required: false },
 })
 
+// Validação: se editable é true, tagId e tagName devem estar presentes
+if (props.editable && (!props.tagId || !props.tagName)) {
+  console.warn(
+    `EventSectionCarousel: editable é true para "${props.title}" mas tagId ou tagName estão faltando. ` +
+      'Modo de edição será desabilitado.',
+  )
+}
+
+// Refs para edição e drag-and-drop
 const viewport = ref(null)
+const cardsRow = ref(null)
+const isEditMode = ref(false)
+const allEventsForEdit = ref([])
+const sortableInstance = ref(null)
+const debounceTimer = ref(null)
+
+// Refs existentes
 const scrollStep = 344
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
@@ -97,6 +148,12 @@ const FADE_HIDE_AT = 40
 
 const hasCards = computed(() => props.items.length > 0)
 const hasScrolled = ref(false)
+
+// Determina qual lista de eventos exibir
+const displayedEvents = computed(() => {
+  return isEditMode.value ? allEventsForEdit.value : props.items
+})
+
 function updateScrollState() {
   const el = viewport.value
   if (!el) return
@@ -126,9 +183,115 @@ function scroll(offset) {
   el.scrollBy({ left: offset, behavior: 'smooth' })
 }
 
+// Funções para edição e drag-and-drop
+async function enterEditMode() {
+  if (!props.tagId || !props.tagName) {
+    console.error('tagId e tagName são necessários para ativar modo de edição')
+    return
+  }
+
+  isEditMode.value = true
+
+  try {
+    // Busca TODOS os eventos da categoria sem limite
+    const events = await fetchEventsByTag(props.tagName, { limit: 1000 })
+    allEventsForEdit.value = events || []
+
+    await nextTick()
+    initSortable()
+  } catch (err) {
+    console.error('Erro ao carregar eventos para edição:', err)
+    isEditMode.value = false
+  }
+}
+
+function initSortable() {
+  if (!cardsRow.value) return
+
+  // Destroi instância anterior se existir
+  if (sortableInstance.value) {
+    sortableInstance.value.destroy()
+  }
+
+  sortableInstance.value = new Sortable(cardsRow.value, {
+    animation: 150,
+    ghostClass: 'card-ghost',
+    dragClass: 'card-dragging',
+    handle: '.drag-handle',
+    onEnd: handleDragEnd,
+  })
+}
+
+function handleDragEnd() {
+  // Limpa timer anterior se houver
+  if (debounceTimer.value) {
+    clearTimeout(debounceTimer.value)
+  }
+
+  // Aguarda 500ms antes de salvar (debounce)
+  debounceTimer.value = setTimeout(() => {
+    saveEventOrder()
+  }, 500)
+}
+
+async function saveEventOrder() {
+  if (!cardsRow.value || !props.tagId) return
+
+  try {
+    // Coleta os IDs na nova ordem
+    const children = Array.from(cardsRow.value.children)
+    const newOrder = children.map((el) => el.dataset.eventId)
+
+    // Sincroniza estado local com novo ordem do DOM
+    // Isso evita revert visual se a página renderizar novamente
+    if (newOrder.length > 0) {
+      const orderMap = new Map(newOrder.map((id, idx) => [id, idx]))
+      allEventsForEdit.value = allEventsForEdit.value.sort((a, b) => {
+        const aIdx = orderMap.get(a.id) ?? 999
+        const bIdx = orderMap.get(b.id) ?? 999
+        return aIdx - bIdx
+      })
+    }
+
+    // Salva no banco de dados
+    await updateTagPriorities(props.tagId, newOrder)
+  } catch (err) {
+    console.error('Erro ao salvar ordem:', err)
+  }
+}
+
+async function exitEditMode() {
+  // Se houver debounce pendente, salva synchronously antes de sair
+  if (debounceTimer.value) {
+    clearTimeout(debounceTimer.value)
+    debounceTimer.value = null
+
+    try {
+      // Aguarda o salvamento das mudanças pendentes
+      await saveEventOrder()
+    } catch (err) {
+      console.error('Erro ao salvar ordem ao sair do modo de edição:', err)
+      // Continua o exit mesmo se houver erro
+    }
+  }
+
+  isEditMode.value = false
+  allEventsForEdit.value = []
+
+  // Destroi instância de Sortable após salvar
+  if (sortableInstance.value) {
+    sortableInstance.value.destroy()
+    sortableInstance.value = null
+  }
+}
+
+// Watchers
 watch(
   () => props.items,
   async () => {
+    // Não atualiza scroll state em modo edição
+    if (isEditMode.value) return
+
     await nextTick()
     updateScrollState()
   },
@@ -137,6 +300,17 @@ watch(
 onMounted(() => {
   if (!hasCards.value) return
   nextTick().then(updateScrollState)
+})
+
+// Cleanup ao desmontar
+onUnmounted(() => {
+  if (sortableInstance.value) {
+    sortableInstance.value.destroy()
+  }
+
+  if (debounceTimer.value) {
+    clearTimeout(debounceTimer.value)
+  }
 })
 </script>
 
@@ -332,5 +506,65 @@ onMounted(() => {
 .see-all:focus-visible {
   outline: 2px solid #35c7ee;
   outline-offset: 2px;
+}
+
+/* ==================== DRAG-AND-DROP STYLES ==================== */
+.card-wrapper {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.card-wrapper--dragging {
+  cursor: grab;
+}
+
+.card-wrapper--dragging:active {
+  cursor: grabbing;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  cursor: grab;
+  font-size: 20px;
+  color: #35c7ee;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  padding: 4px 8px;
+  user-select: none;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.drag-handle:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.card-ghost {
+  opacity: 0.4;
+  border: 2px dashed #35c7ee;
+  border-radius: 8px;
+}
+
+.card-dragging {
+  opacity: 0.5;
+}
+
+.cards-row--edit-mode {
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+
+.edit-btn {
+  font-weight: 600;
+  padding: 6px 16px !important;
 }
 </style>
