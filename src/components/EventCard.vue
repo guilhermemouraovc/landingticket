@@ -538,7 +538,7 @@ function handleClick(e) {
 }
 
 .event-card__price-spacer {
-  height: 62px; /* Altura da seção de preços: 29px (price-full) + 8px (gap) + 25px (installment) */
+  height: 48px; /* Altura da seção de preços para manter cards alinhados */
   flex-shrink: 0; /* Impede que o spacer seja comprimido */
 }
 
