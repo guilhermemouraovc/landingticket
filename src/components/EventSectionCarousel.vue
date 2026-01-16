@@ -27,7 +27,7 @@
           :color="isEditMode ? 'positive' : 'warning'"
           size="sm"
           class="edit-btn"
-          @click="isEditMode ? exitEditMode() : enterEditMode()"
+          @click="async () => { isEditMode ? await exitEditMode() : await enterEditMode() }"
           aria-label="Ativar modo de edição do carrossel"
         />
 
@@ -241,19 +241,28 @@ async function saveEventOrder() {
   }
 }
 
-function exitEditMode() {
+async function exitEditMode() {
+  // Se houver debounce pendente, salva synchronously antes de sair
+  if (debounceTimer.value) {
+    clearTimeout(debounceTimer.value)
+    debounceTimer.value = null
+
+    try {
+      // Aguarda o salvamento das mudanças pendentes
+      await saveEventOrder()
+    } catch (err) {
+      console.error('Erro ao salvar ordem ao sair do modo de edição:', err)
+      // Continua o exit mesmo se houver erro
+    }
+  }
+
   isEditMode.value = false
   allEventsForEdit.value = []
 
-  // Destroi instância de Sortable
+  // Destroi instância de Sortable após salvar
   if (sortableInstance.value) {
     sortableInstance.value.destroy()
     sortableInstance.value = null
-  }
-
-  // Limpa debounce se houver
-  if (debounceTimer.value) {
-    clearTimeout(debounceTimer.value)
   }
 }
 
