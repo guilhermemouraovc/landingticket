@@ -23,9 +23,7 @@
       :loading="lazyLoad ? 'lazy' : 'eager'"
     >
       <!-- Badge "Últimos ingressos!" -->
-      <div v-if="event.showLastTickets" class="event-card__badge">
-        Últimos ingressos!
-      </div>
+      <div v-if="event.showLastTickets" class="event-card__badge">Últimos ingressos!</div>
 
       <!-- Slot para badges/overlays na imagem -->
       <slot name="image-overlay">
@@ -538,7 +536,7 @@ function handleClick(e) {
 }
 
 .event-card__price-spacer {
-  height: 48px; /* Altura da seção de preços para manter cards alinhados */
+  height: 2px; /* Altura da seção de preços para manter cards alinhados */
   flex-shrink: 0; /* Impede que o spacer seja comprimido */
 }
 
