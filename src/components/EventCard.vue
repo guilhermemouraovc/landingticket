@@ -293,10 +293,6 @@ const metaLayoutClass = computed(() => {
   return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
 })
 
-const isStacked = computed(() => {
-  return !props.event.hasPrice && props.showPrice && props.variant !== 'grid'
-})
-
 const truncatedDescription = computed(() => {
   if (!props.event.description) return ''
   const desc = props.event.description
