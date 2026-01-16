@@ -56,6 +56,7 @@ export const INFLUENCER_NAMES = {
   mafe: 'Mafe',
   karla: 'Karla',
   ondetempe: 'página Onde Tem PE',
+  'eduarda-figueiredo': 'Eduarda Figueiredo',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -111,6 +112,7 @@ const INFLUENCER_GENDER = {
   Mafe: 'pela',
   Karla: 'pela',
   'Onde Tem PE': 'pela',
+  'Eduarda Figueiredo': 'pela',
 }
 
 // Set of valid influencer slugs for route validation
