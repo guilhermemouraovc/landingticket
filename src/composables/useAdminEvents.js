@@ -44,6 +44,7 @@ export function useAdminEvents() {
           *,
           event_tags (
             tag_id,
+            priority_in_tag,
             tags (
               id,
               name,
@@ -113,6 +114,7 @@ export function useAdminEvents() {
           *,
           event_tags (
             tag_id,
+            priority_in_tag,
             tags (
               id,
               name,
@@ -198,9 +200,11 @@ export function useAdminEvents() {
 
       // Adiciona tags se houver
       if (eventData.tagIds && eventData.tagIds.length > 0) {
-        const tagRelations = eventData.tagIds.map((tagId) => ({
+        // Suporta tanto string IDs quanto objetos com prioridade
+        const tagRelations = eventData.tagIds.map((tag) => ({
           event_id: event.id,
-          tag_id: tagId,
+          tag_id: typeof tag === 'string' ? tag : tag.id,
+          priority_in_tag: typeof tag === 'string' ? null : (tag.priority_in_tag || null),
         }))
 
         const { error: e2 } = await supabase.from('event_tags').insert(tagRelations)
@@ -304,9 +308,11 @@ export function useAdminEvents() {
 
       // Adiciona as novas tags
       if (eventData.tagIds && eventData.tagIds.length > 0) {
-        const tagRelations = eventData.tagIds.map((tagId) => ({
+        // Suporta tanto string IDs quanto objetos com prioridade
+        const tagRelations = eventData.tagIds.map((tag) => ({
           event_id: id,
-          tag_id: tagId,
+          tag_id: typeof tag === 'string' ? tag : tag.id,
+          priority_in_tag: typeof tag === 'string' ? null : (tag.priority_in_tag || null),
         }))
 
         const { error: e3 } = await supabase.from('event_tags').insert(tagRelations)

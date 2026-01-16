@@ -16,6 +16,7 @@
         <q-tab name="data_local" icon="event" label="Data e Local" />
         <q-tab name="precos" icon="payments" label="Valores" />
         <q-tab name="imagens" icon="image" label="Imagens" />
+        <q-tab name="prioridades" icon="rank" label="Prioridades por Tag" />
         <q-tab name="dias" icon="calendar_today" label="Múltiplos Dias" />
       </q-tabs>
 
@@ -562,6 +563,67 @@
           </div>
         </div>
       </q-tab-panel>
+
+      <!-- Aba Prioridades por Tag -->
+      <q-tab-panel name="prioridades" class="q-pa-md">
+        <div class="text-subtitle1 text-primary q-mb-lg">
+          Defina a prioridade de exibição para cada tag
+        </div>
+
+        <div v-if="formData.tagIds.length === 0" class="text-center q-pa-lg text-grey">
+          <q-icon name="label_important" size="4em" />
+          <div class="q-mt-sm">Nenhuma tag selecionada</div>
+          <div class="text-caption q-mt-xs">
+            Selecione tags na aba "Geral" para gerenciar prioridades
+          </div>
+        </div>
+
+        <div v-else class="row q-col-gutter-md">
+          <div v-for="tag in formData.tagIds" :key="tag.id" class="col-12 col-md-6">
+            <q-card bordered flat class="bg-grey-1">
+              <q-card-section>
+                <div class="text-subtitle2 text-primary q-mb-md">{{ tag.name }}</div>
+
+                <q-input
+                  :model-value="getTagPriority(tag.id)"
+                  @update:model-value="setTagPriority(tag.id, $event)"
+                  label="Prioridade nesta tag"
+                  outlined
+                  type="number"
+                  min="1"
+                  max="999"
+                  hint="Deixe vazio para não usar ordem customizada. Número menor = maior prioridade"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="rank" />
+                  </template>
+                </q-input>
+
+                <div class="text-caption text-grey q-mt-sm">
+                  <strong>Exemplo:</strong> Se "Festival do Recife" aparece no Carnaval e em Festivais:
+                  <br />- Prioridade no Carnaval: 5 (aparece em 5º lugar)
+                  <br />- Prioridade em Festivais: 1 (aparece em 1º lugar)
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </q-tab-panel>
+
+      <!-- Aba Múltiplos Dias -->
+      <q-tab-panel name="dias">
+        <div class="row items-center justify-between q-mb-md wrap q-gap-md">
+          <div class="text-subtitle1 text-primary">Dias do Evento</div>
+          <q-btn
+            color="primary"
+            icon="add"
+            label="Adicionar Dia"
+            @click="addDayField"
+            unelevated
+            :size="$q.screen.lt.sm ? 'sm' : 'md'"
+          />
+        </div>
+      </q-tab-panel>
     </q-tab-panels>
 
     <!-- Botões de Ação Fixos -->
@@ -634,6 +696,7 @@ const formData = ref({
   show_last_tickets: false,
   display_priority: null,
   tagIds: [],
+  tagPriorities: {}, // Mapa de tagId -> priority_in_tag
   images: [],
   days: [],
 })
@@ -704,6 +767,14 @@ function loadEventData() {
       ?.map((et) => tagOptions.value.find((t) => t.id === et.tag_id))
       .filter(Boolean) || []
 
+  // Carrega prioridades por tag
+  const tagPriorities = {}
+  event.event_tags?.forEach((et) => {
+    if (et.priority_in_tag !== null && et.priority_in_tag !== undefined) {
+      tagPriorities[et.tag_id] = et.priority_in_tag
+    }
+  })
+
   formData.value = {
     title: event.title || '',
     description: event.description || '',
@@ -724,6 +795,7 @@ function loadEventData() {
     show_last_tickets: !!event.show_last_tickets,
     display_priority: event.display_priority || null,
     tagIds: selectedTags,
+    tagPriorities,
     images:
       event.event_images?.map((img) => ({
         id: img.id,
@@ -772,9 +844,22 @@ function resetForm() {
     show_last_tickets: false,
     display_priority: null,
     tagIds: [],
+    tagPriorities: {},
     images: [],
     days: [],
   }
+}
+
+function getTagPriority(tagId) {
+  return formData.value.tagPriorities[tagId] || null
+}
+
+function setTagPriority(tagId, value) {
+  const numValue = value ? parseInt(value) : null
+  if (numValue !== null && (numValue < 1 || numValue > 999)) {
+    return
+  }
+  formData.value.tagPriorities[tagId] = numValue
 }
 
 function formatDateTimeLocal(dateString) {
@@ -838,6 +923,12 @@ function removeDayField(index) {
 
 async function handleSubmit() {
   try {
+    // Prepara os IDs de tags com suas prioridades
+    const tagIds = formData.value.tagIds.map((tag) => ({
+      id: tag.id,
+      priority_in_tag: formData.value.tagPriorities[tag.id] || null,
+    }))
+
     const eventData = {
       ...formData.value,
       start_date: formData.value.start_date
@@ -845,7 +936,7 @@ async function handleSubmit() {
         : null,
       end_date: formData.value.end_date ? new Date(formData.value.end_date).toISOString() : null,
       highlight: formData.value.highlight ? 'sim' : null,
-      tagIds: formData.value.tagIds.map((tag) => tag.id),
+      tagIds,
     }
 
     // Separa imagens novas das existentes
