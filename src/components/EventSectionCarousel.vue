@@ -22,7 +22,7 @@
       <div class="header-actions">
         <!-- Botão Editar (apenas para admin) -->
         <q-btn
-          v-if="isAdmin && editable"
+          v-if="isAdmin && editable && tagId && tagName"
           :label="isEditMode ? 'Salvar' : 'Editar'"
           :color="isEditMode ? 'positive' : 'warning'"
           size="sm"
@@ -117,9 +117,17 @@ const props = defineProps({
   defaultImage: { type: String, default: 'https://via.placeholder.com/400x200?text=Evento' },
   sectionId: { type: String, default: null },
   editable: { type: Boolean, default: false },
-  tagId: { type: String, default: null },
-  tagName: { type: String, default: null },
+  tagId: { type: String, default: null, required: false },
+  tagName: { type: String, default: null, required: false },
 })
+
+// Validação: se editable é true, tagId e tagName devem estar presentes
+if (props.editable && (!props.tagId || !props.tagName)) {
+  console.warn(
+    `EventSectionCarousel: editable é true para "${props.title}" mas tagId ou tagName estão faltando. ` +
+      'Modo de edição será desabilitado.',
+  )
+}
 
 // Refs para edição e drag-and-drop
 const viewport = ref(null)
@@ -233,6 +241,17 @@ async function saveEventOrder() {
     // Coleta os IDs na nova ordem
     const children = Array.from(cardsRow.value.children)
     const newOrder = children.map((el) => el.dataset.eventId)
+
+    // Sincroniza estado local com novo ordem do DOM
+    // Isso evita revert visual se a página renderizar novamente
+    if (newOrder.length > 0) {
+      const orderMap = new Map(newOrder.map((id, idx) => [id, idx]))
+      allEventsForEdit.value = allEventsForEdit.value.sort((a, b) => {
+        const aIdx = orderMap.get(a.id) ?? 999
+        const bIdx = orderMap.get(b.id) ?? 999
+        return aIdx - bIdx
+      })
+    }
 
     // Salva no banco de dados
     await updateTagPriorities(props.tagId, newOrder)
