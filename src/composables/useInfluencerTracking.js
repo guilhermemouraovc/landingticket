@@ -57,6 +57,7 @@ export const INFLUENCER_NAMES = {
   karla: 'Karla',
   ondetempe: 'página Onde Tem PE',
   'eduarda-figueredo': 'Eduarda Figueredo',
+  'fernanda-houly': 'Fernanda Houly',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -113,6 +114,7 @@ const INFLUENCER_GENDER = {
   Karla: 'pela',
   'Onde Tem PE': 'pela',
   'Eduarda Figueiredo': 'pela',
+  'Fernanda Houly': 'pela',
 }
 
 // Set of valid influencer slugs for route validation
