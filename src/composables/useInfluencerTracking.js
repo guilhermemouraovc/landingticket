@@ -59,6 +59,7 @@ export const INFLUENCER_NAMES = {
   'eduarda-figueredo': 'Eduarda Figueredo',
   'fernanda-houly': 'Fernanda Houly',
   ggnutri: 'página GGNutri',
+  raufa: 'Raufa',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -117,6 +118,7 @@ const INFLUENCER_GENDER = {
   'Eduarda Figueiredo': 'pela',
   'Fernanda Houly': 'pela',
   'GGNutri': 'pela',
+  Raufa: 'pelo',
 }
 
 // Set of valid influencer slugs for route validation
