@@ -122,7 +122,7 @@ const INFLUENCER_GENDER = {
   'GGNutri': 'pela',
   Raufa: 'pelo',
   'Leandro Camara': 'pelo',
-  Godoy: 'pelo',
+  Godoy: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
