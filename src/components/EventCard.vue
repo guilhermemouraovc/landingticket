@@ -27,159 +27,162 @@
         :loading="lazyLoad ? 'lazy' : 'eager'"
       >
         <!-- Slot para badges/overlays na imagem -->
-      <slot name="image-overlay">
-        <div
-          v-if="adminMode"
-          class="absolute-top-right q-pa-sm row q-gutter-sm no-wrap"
-          style="z-index: 10"
-        >
-          <q-btn
-            round
-            dense
-            color="white"
-            text-color="primary"
-            icon="edit"
-            @click.stop="$emit('edit', event)"
+        <slot name="image-overlay">
+          <div
+            v-if="adminMode"
+            class="absolute-top-right q-pa-sm row q-gutter-sm no-wrap"
+            style="z-index: 10"
           >
-            <q-tooltip>Editar Completo</q-tooltip>
-          </q-btn>
-          <q-btn round dense color="negative" icon="delete" @click.stop="$emit('delete', event)">
-            <q-tooltip>Deletar</q-tooltip>
-          </q-btn>
-        </div>
-      </slot>
-    </q-img>
+            <q-btn
+              round
+              dense
+              color="white"
+              text-color="primary"
+              icon="edit"
+              @click.stop="$emit('edit', event)"
+            >
+              <q-tooltip>Editar Completo</q-tooltip>
+            </q-btn>
+            <q-btn round dense color="negative" icon="delete" @click.stop="$emit('delete', event)">
+              <q-tooltip>Deletar</q-tooltip>
+            </q-btn>
+          </div>
+        </slot>
+      </q-img>
 
-    <!-- Corpo do card -->
-    <q-card-section
-      class="event-card__body"
-      :class="{ 'event-card__body--no-price': !event.hasPrice && showPrice }"
-    >
-      <!-- Título -->
-      <div class="event-card__title text-weight-bold relative-position cursor-pointer">
-        {{ event.title || 'Evento sem nome' }}
-        <q-popup-edit
-          v-if="adminMode"
-          :model-value="event.title"
-          @save="(val) => emit('patch', { id: event.id, title: val })"
-          v-slot="scope"
-          label-set="Salvar"
-          label-cancel="Cancelar"
-          buttons
-        >
-          <q-input
-            v-model="scope.value"
-            dense
-            autofocus
-            counter
-            @keyup.enter="scope.set"
-            label="Título"
-          />
-        </q-popup-edit>
-        <q-tooltip v-if="adminMode" anchor="top middle" self="bottom middle"
-          >Clique para editar título</q-tooltip
-        >
-      </div>
-
-      <!-- Descrição (opcional) -->
-      <div
-        v-if="showDescription && event.description"
-        class="event-card__description relative-position cursor-pointer"
+      <!-- Corpo do card -->
+      <q-card-section
+        class="event-card__body"
+        :class="{ 'event-card__body--no-price': !event.hasPrice && showPrice }"
       >
-        {{ truncatedDescription }}
-        <q-popup-edit
-          v-if="adminMode"
-          :model-value="event.description"
-          @save="(val) => emit('patch', { id: event.id, description: val })"
-          v-slot="scope"
-          label-set="Salvar"
-          label-cancel="Cancelar"
-          buttons
-        >
-          <q-input
-            v-model="scope.value"
-            dense
-            autofocus
-            type="textarea"
-            rows="3"
-            label="Descrição"
-          />
-        </q-popup-edit>
-        <q-tooltip v-if="adminMode">Clique para editar descrição</q-tooltip>
-      </div>
-
-      <!-- Meta informações (data e localização) -->
-      <div
-        class="event-card__meta"
-        :class="[metaLayoutClass, { 'event-card__meta--no-price': !event.hasPrice && showPrice }]"
-      >
-        <!-- Data -->
-        <div class="meta-item">
-          <q-icon :name="dateIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
-          <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
-        </div>
-
-        <!-- Localização (city - state) -->
-        <div class="meta-item">
-          <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
-          <span>{{ event.cityState || event.location || 'Local a definir' }}</span>
-        </div>
-      </div>
-
-      <!-- Seção de Preços -->
-      <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
-        <!-- Preço À Vista -->
-        <div
-          v-if="event.fullPrice"
-          class="price-full relative-position cursor-pointer"
-          :class="{ 'price-full--no-installments': !event.shouldShowInstallments }"
-        >
-          {{ event.formattedFullPrice }}
+        <!-- Título -->
+        <div class="event-card__title text-weight-bold relative-position cursor-pointer">
+          {{ event.title || 'Evento sem nome' }}
           <q-popup-edit
             v-if="adminMode"
-            :model-value="event.fullPrice"
-            @save="(val) => emit('patch', { id: event.id, price: Number(val) })"
+            :model-value="event.title"
+            @save="(val) => emit('patch', { id: event.id, title: val })"
             v-slot="scope"
             label-set="Salvar"
             label-cancel="Cancelar"
             buttons
           >
             <q-input
-              v-model.number="scope.value"
+              v-model="scope.value"
               dense
               autofocus
-              type="number"
-              step="0.01"
+              counter
               @keyup.enter="scope.set"
-              prefix="R$"
-              label="Preço"
+              label="Título"
             />
           </q-popup-edit>
-          <q-tooltip v-if="adminMode">Clique para editar preço</q-tooltip>
+          <q-tooltip v-if="adminMode" anchor="top middle" self="bottom middle"
+            >Clique para editar título</q-tooltip
+          >
         </div>
 
-        <!-- Preço Parcelado (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
+        <!-- Descrição (opcional) -->
         <div
-          v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
-          class="price-installment"
+          v-if="showDescription && event.description"
+          class="event-card__description relative-position cursor-pointer"
         >
-          <span class="installment-label">{{ event.installments }}x de</span>
-          <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
-          <span class="installment-info">sem juros</span>
+          {{ truncatedDescription }}
+          <q-popup-edit
+            v-if="adminMode"
+            :model-value="event.description"
+            @save="(val) => emit('patch', { id: event.id, description: val })"
+            v-slot="scope"
+            label-set="Salvar"
+            label-cancel="Cancelar"
+            buttons
+          >
+            <q-input
+              v-model="scope.value"
+              dense
+              autofocus
+              type="textarea"
+              rows="3"
+              label="Descrição"
+            />
+          </q-popup-edit>
+          <q-tooltip v-if="adminMode">Clique para editar descrição</q-tooltip>
         </div>
 
-        <!-- Mensagem alternativa quando não há parcelas -->
-        <div v-else-if="event.hasPrice && !event.shouldShowInstallments" class="price-installment">
-          <span class="installment-info">No pix ou no cartão</span>
-        </div>
-      </div>
-      <!-- Spacer para manter consistência visual quando sem preço -->
-      <div v-else-if="showPrice" class="event-card__price-spacer"></div>
+        <!-- Meta informações (data e localização) -->
+        <div
+          class="event-card__meta"
+          :class="[metaLayoutClass, { 'event-card__meta--no-price': !event.hasPrice && showPrice }]"
+        >
+          <!-- Data -->
+          <div class="meta-item">
+            <q-icon :name="dateIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
+            <span :class="{ 'meta-highlight': highlightDate }">{{ event.date }}</span>
+          </div>
 
-      <!-- Slot para conteúdo adicional -->
-      <slot name="footer"></slot>
-    </q-card-section>
-  </q-card>
+          <!-- Localização (city - state) -->
+          <div class="meta-item">
+            <q-icon :name="locationIcon" :size="iconSize" class="meta-icon" aria-hidden="true" />
+            <span>{{ event.cityState || event.location || 'Local a definir' }}</span>
+          </div>
+        </div>
+
+        <!-- Seção de Preços -->
+        <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
+          <!-- Preço À Vista -->
+          <div
+            v-if="event.fullPrice"
+            class="price-full relative-position cursor-pointer"
+            :class="{ 'price-full--no-installments': !event.shouldShowInstallments }"
+          >
+            {{ event.formattedFullPrice }}
+            <q-popup-edit
+              v-if="adminMode"
+              :model-value="event.fullPrice"
+              @save="(val) => emit('patch', { id: event.id, price: Number(val) })"
+              v-slot="scope"
+              label-set="Salvar"
+              label-cancel="Cancelar"
+              buttons
+            >
+              <q-input
+                v-model.number="scope.value"
+                dense
+                autofocus
+                type="number"
+                step="0.01"
+                @keyup.enter="scope.set"
+                prefix="R$"
+                label="Preço"
+              />
+            </q-popup-edit>
+            <q-tooltip v-if="adminMode">Clique para editar preço</q-tooltip>
+          </div>
+
+          <!-- Preço Parcelado (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
+          <div
+            v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
+            class="price-installment"
+          >
+            <span class="installment-label">{{ event.installments }}x de</span>
+            <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
+            <span class="installment-info">sem juros</span>
+          </div>
+
+          <!-- Mensagem alternativa quando não há parcelas -->
+          <div
+            v-else-if="event.hasPrice && !event.shouldShowInstallments"
+            class="price-installment"
+          >
+            <span class="installment-info">No pix ou no cartão</span>
+          </div>
+        </div>
+        <!-- Spacer para manter consistência visual quando sem preço -->
+        <div v-else-if="showPrice" class="event-card__price-spacer"></div>
+
+        <!-- Slot para conteúdo adicional -->
+        <slot name="footer"></slot>
+      </q-card-section>
+    </q-card>
   </div>
 </template>
 
@@ -349,19 +352,32 @@ function handleClick(e) {
 /* ==================== BADGE "ÚLTIMOS INGRESSOS" ==================== */
 .event-card__badge {
   position: absolute;
-  top: -36px;
-  left: 12px;
-  background: #45c0e7;
+  top: -33px;
+  left: 18px;
+  background-image: url('/Vector.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   color: #ffffff;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: 13px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  z-index: 10;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  padding: 8px 16px;
+  min-width: 160px;
+  text-align: center;
+  z-index: 1;
+
   text-transform: none;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.event-card--clickable:hover .event-card__badge,
+.event-card--clickable:focus-within .event-card__badge {
+  transform: translateY(-4px);
 }
 
 /* ==================== BASE ==================== */
@@ -384,13 +400,6 @@ function handleClick(e) {
 }
 
 /* Hover apenas em dispositivos não-touch (desktop) */
-@media (hover: hover) and (pointer: fine) {
-  .event-card--clickable:hover,
-  .event-card--clickable:focus-within {
-    transform: translateY(-4px);
-    box-shadow: 0 24px 40px -12px rgba(15, 23, 42, 0.36);
-  }
-}
 
 /* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
 .event-card:focus-visible {
