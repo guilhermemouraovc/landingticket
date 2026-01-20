@@ -91,6 +91,7 @@ export const INFLUENCER_NAMES = {
   'leandro-camara': 'Leandro Camara',
   godoy: 'Godoy',
   larah: 'Larah',
+  Centralanittarecife: 'página Central Anitta Recife',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -181,6 +182,8 @@ const INFLUENCER_GENDER = {
   'Leandro Camara': 'pelo',
   Godoy: 'pela',
   Larah: 'pela',
+  'Central Anitta Recife': 'pela', 
+  
 }
 
 // Set of valid influencer slugs for route validation
