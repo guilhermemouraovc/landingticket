@@ -62,6 +62,7 @@ export const INFLUENCER_NAMES = {
   raufa: 'Raufa',
   'leandro-camara': 'Leandro Camara',
   godoy: 'Godoy',
+  larah: 'Larah',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -123,6 +124,7 @@ const INFLUENCER_GENDER = {
   Raufa: 'pelo',
   'Leandro Camara': 'pelo',
   Godoy: 'pela',
+  Larah: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
