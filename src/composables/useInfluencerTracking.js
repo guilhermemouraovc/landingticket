@@ -92,6 +92,7 @@ export const INFLUENCER_NAMES = {
   godoy: 'Godoy',
   larah: 'Larah',
   Centralanittarecife: 'página Central Anitta Recife',
+  nanda: 'Nanda',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -183,6 +184,7 @@ const INFLUENCER_GENDER = {
   Godoy: 'pela',
   Larah: 'pela',
   'Central Anitta Recife': 'pela', 
+  Nanda: 'pela',
   
 }
 
