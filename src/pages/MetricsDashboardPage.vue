@@ -69,7 +69,7 @@
             <div class="day-available">{{ formatNumber(day.disponiveis) }}</div>
             <div class="day-sold">{{ formatNumber(day.vendidoGeral) }} vendidos</div>
 
-            <div v-if="day.lote1 || day.lote2 || day.lote3" class="lotes-por-dia">
+            <div v-if="day.lote1 || day.lote2 || day.lote3 || day.lote4" class="lotes-por-dia">
               <div v-if="day.lote1" class="lote-dia-item">
                 <span class="lote-dia-nome">Lote 1</span>
                 <div class="lote-dia-status">
@@ -97,6 +97,16 @@
                   <span class="meta">/ {{ day.lote3.meta }}</span>
                   <span :class="['badge', day.lote3.atingiuMeta ? 'atingiu' : 'falta']">
                     {{ day.lote3.atingiuMeta ? 'OK' : `-${day.lote3.restante}` }}
+                  </span>
+                </div>
+              </div>
+              <div v-if="day.lote4" class="lote-dia-item">
+                <span class="lote-dia-nome">Lote 4</span>
+                <div class="lote-dia-status">
+                  <span class="vendido">{{ day.lote4.vendido }}</span>
+                  <span class="meta">/ {{ day.lote4.meta }}</span>
+                  <span :class="['badge', day.lote4.atingiuMeta ? 'atingiu' : 'falta']">
+                    {{ day.lote4.atingiuMeta ? 'OK' : `-${day.lote4.restante}` }}
                   </span>
                 </div>
               </div>
