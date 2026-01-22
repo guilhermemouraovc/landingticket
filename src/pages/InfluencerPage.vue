@@ -38,6 +38,9 @@ function setMetaTags(influencerName, slug) {
     tag.setAttribute('content', content)
   }
 
+  // Prevent indexing of influencer tracking pages
+  setMeta('robots', 'noindex, nofollow', false)
+
   // Set Open Graph tags
   setMeta('og:title', `Descubra os melhores eventos em Pernambuco - Recomendado pela ${influencerName}`)
   setMeta('og:description', `Compre ingressos para eventos incríveis em Pernambuco através da recomendação de ${influencerName}. Acesso exclusivo e ofertas especiais no Ticketpe!`)

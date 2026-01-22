@@ -5,6 +5,8 @@ User-agent: *
 Allow: /
 
 # Bloquear páginas de tracking de influenciadores (não relevantes para SEO)
+# NOTA: Todas as páginas de influenciador têm meta tag "noindex, nofollow" automaticamente
+# As entradas abaixo são exemplos principais, mas a meta tag noindex é aplicada a todos os 92+ influenciadores
 Disallow: /camila-carvalho
 Disallow: /julia-souto
 Disallow: /joao-clericuzzi
@@ -15,6 +17,14 @@ Disallow: /cadu-alencar
 Disallow: /tallita-manta
 Disallow: /hypepe
 Disallow: /mariana-almeida
+Disallow: /godoy
+Disallow: /medicina-fps-21
+Disallow: /medicina-fps-22
+Disallow: /medicina-fps-23
+Disallow: /medicina-nassau-21
+Disallow: /medicina-unicap-21
+Disallow: /medicina-ufpe-21
+Disallow: /medicina-upe-21
 
 # Sitemap (será criado em breve)
 Sitemap: https://ticketpe.com.br/sitemap.xml

@@ -27,6 +27,7 @@ export default function (ssrContext) {
       // HTML das meta tags dinâmicas a serem injetadas
       const metaTags = `
     <title>Ticketpe - Compartilhado por ${influencerName}</title>
+    <meta name="robots" content="noindex, nofollow" />
     <meta property="og:title" content="Descubra os melhores eventos em Pernambuco - Recomendado pela ${influencerName}" />
     <meta property="og:description" content="Compre ingressos para eventos incríveis em Pernambuco através da recomendação de ${influencerName}. Acesso exclusivo e ofertas especiais no Ticketpe!" />
     <meta property="og:url" content="${influencerUrl}" />
