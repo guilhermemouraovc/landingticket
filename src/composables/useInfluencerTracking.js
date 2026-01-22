@@ -175,7 +175,7 @@ const INFLUENCER_GENDER = {
   'Onde Tem PE': 'pela',
   'Eduarda Figueiredo': 'pela',
   'Fernanda Houly': 'pela',
-  'GGNutri': 'pela',
+  GGNutri: 'pela',
   Raufa: 'pelo',
   'Leandro Camara': 'pelo',
   Godoy: 'pelo',
