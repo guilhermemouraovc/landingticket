@@ -377,7 +377,7 @@
             <img
               src="/logo.svg"
               alt="TicketPE - Eventos em Pernambuco"
-              style="width: 220px"
+              style="width: 280px"
               loading="lazy"
             />
           </router-link>
@@ -419,6 +419,7 @@
           <div class="footer-column">
             <div class="footer-title">Links Úteis</div>
             <router-link to="/programacao" class="footer-link">Programação Completa</router-link>
+            <router-link to="/quem-somos" class="footer-link">Quem Somos</router-link>
             <router-link to="/embaixadores" class="footer-link">Seja um Embaixador</router-link>
           </div>
 
@@ -438,7 +439,9 @@
 
         <q-separator dark class="q-mt-lg" />
 
-        <div class="footer-copyright">© 2025 ticketpe. Todos os direitos reservados.</div>
+        <div class="footer-copyright">
+          © 2026 Ticketpe, inscrito no CNPJ 58.884.757/0001-47. Todos os direitos reservados.
+        </div>
       </div>
     </footer>
   </q-layout>
@@ -1612,6 +1615,16 @@ a.footer-link:hover {
   color: #d1d5db;
   text-align: left;
   margin-top: 16px;
+  padding-top: 26px;
+  padding-bottom: 26px;
+}
+
+.footer .q-separator {
+  background-color: rgba(250, 253, 255, 0.2) !important;
+}
+
+.footer-top {
+  margin-bottom: 32px !important;
 }
 
 /* Telas grandes */

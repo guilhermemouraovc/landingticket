@@ -60,6 +60,12 @@ const routes = [
         name: 'influencer',
         component: () => import('pages/InfluencerPage.vue'),
       },
+
+      {
+        path: 'quem-somos',
+        name: 'quem-somos',
+        component: () => import('pages/AboutUsPage.vue'),
+      },
     ],
   },
   // Rotas de autenticação e admin (sem layout principal)
