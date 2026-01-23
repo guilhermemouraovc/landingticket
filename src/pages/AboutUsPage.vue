@@ -30,10 +30,10 @@
           </p>
 
           <p>
-            Nosso crescimento foi impulsionado pela parceria com a <strong>Heppi</strong>, empresa com mais de 8 anos
-            de atuação no setor de eventos e soluções financeiras. Através dessa união, estruturamos
-            um ecossistema completo com especialistas, tecnologia própria e uma cultura baseada em
-            transparência, inovação e resultados.
+            Nosso crescimento foi impulsionado pela parceria com a <strong>Heppi</strong>, empresa
+            com mais de 8 anos de atuação no setor de eventos e soluções financeiras. Através dessa
+            união, estruturamos um ecossistema completo com especialistas, tecnologia própria e uma
+            cultura baseada em transparência, inovação e resultados.
           </p>
 
           <p>
