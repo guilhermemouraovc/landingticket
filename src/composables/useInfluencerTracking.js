@@ -94,6 +94,7 @@ export const INFLUENCER_NAMES = {
   Centralanittarecife: 'página Central Anitta Recife',
   nanda: 'Nanda',
   anittafortal: 'página Anitta Fortal',
+  anittasergipe: 'página Anitta Sergipe',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -187,6 +188,7 @@ const INFLUENCER_GENDER = {
   'Central Anitta Recife': 'pela', 
   Nanda: 'pela',
   'Anitta Fortal': 'pela',
+  'Anitta Sergipe': 'pela',
   
 }
 
