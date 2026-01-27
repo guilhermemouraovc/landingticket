@@ -424,8 +424,27 @@
           </div>
 
           <div class="footer-column">
+            <div class="footer-title">Compra Segura</div>
+            <div class="payment-methods">
+              <div class="payment-method">
+                <img src="/BOLETO.svg" alt="Boleto" class="payment-icon" />
+              </div>
+              <div class="payment-method">
+                <img src="/VISA.svg" alt="Visa" class="payment-icon" />
+              </div>
+              <div class="payment-method">
+                <img src="/Mastercard.svg" alt="Mastercard" class="payment-icon" />
+              </div>
+              <div class="payment-method">
+                <img src="/PIX.svg" alt="PIX" class="payment-icon" />
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-column">
             <div class="footer-title">Contato</div>
             <div class="footer-link">ajuda@ticketpe.com.br</div>
+            <div class="footer-link">81 99847-1385</div>
           </div>
 
           <div class="footer-column">
@@ -1567,7 +1586,7 @@ body {
 
 .footer-links {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 40px;
 }
 
@@ -1695,5 +1714,52 @@ a.footer-link:hover {
   outline: 2px solid #35c7ee;
   outline-offset: 2px;
   border-radius: 50%;
+}
+
+/* ================= COMPRA SEGURA ================= */
+.payment-methods {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.payment-icon {
+  width: 35px;
+  height: 23px;
+  object-fit: contain;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.payment-method:hover .payment-icon {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .footer-links {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-methods {
+    gap: 10px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .footer-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 </style>
