@@ -95,6 +95,7 @@ export const INFLUENCER_NAMES = {
   nanda: 'Nanda',
   anittafortal: 'página Anitta Fortal',
   anittasergipe: 'página Anitta Sergipe',
+  ray: 'Ray',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -189,7 +190,7 @@ const INFLUENCER_GENDER = {
   Nanda: 'pela',
   'Anitta Fortal': 'pela',
   'Anitta Sergipe': 'pela',
-  
+  Ray: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
