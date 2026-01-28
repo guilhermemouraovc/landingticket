@@ -97,6 +97,7 @@ export const INFLUENCER_NAMES = {
   anittasergipe: 'página Anitta Sergipe',
   ray: 'Ray',
   ary: 'Ary',
+  lana: 'Lana',
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -193,6 +194,7 @@ const INFLUENCER_GENDER = {
   'Anitta Sergipe': 'pela',
   Ray: 'pela',
   Ary: 'pelo',
+  Lana: 'pela',
 }
 
 // Set of valid influencer slugs for route validation
