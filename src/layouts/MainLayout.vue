@@ -439,6 +439,15 @@
                 <img src="/PIX.svg" alt="PIX" class="payment-icon" />
               </div>
             </div>
+            <div class="reclame-aqui-seal">
+              <img
+                src="/reclameaquiselo 1.png"
+                alt="Reclame Aqui - Selo RA1000"
+                class="reclame-aqui-icon"
+                width="114"
+                height="84"
+              />
+            </div>
           </div>
 
           <div class="footer-column">
@@ -1742,6 +1751,25 @@ a.footer-link:hover {
 
 .payment-method:hover .payment-icon {
   opacity: 1;
+  filter: brightness(1.1);
+}
+
+/* Selo Reclame Aqui */
+.reclame-aqui-seal {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.reclame-aqui-icon {
+  width: 114px;
+  height: 84px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.reclame-aqui-icon:hover {
+  transform: scale(1.05);
   filter: brightness(1.1);
 }
 
