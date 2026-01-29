@@ -98,6 +98,8 @@ export const INFLUENCER_NAMES = {
   ray: 'Ray',
   ary: 'Ary',
   lana: 'Lana',
+  'bruna-souza': 'Bruna Souza',
+
 }
 
 // Mapeamento de gênero para usar o artigo correto
@@ -195,6 +197,7 @@ const INFLUENCER_GENDER = {
   Ray: 'pela',
   Ary: 'pelo',
   Lana: 'pela',
+  'Bruna Souza': 'pela',
 }
 
 // Set of valid influencer slugs for route validation
