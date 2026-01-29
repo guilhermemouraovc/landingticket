@@ -235,7 +235,7 @@
                 </div>
                 <!-- Texto alternativo quando não há parcelas -->
                 <div v-if="!event.shouldShowInstallments" class="payment-info">
-                  No PIX ou no cartão
+                  no PIX
                 </div>
               </div>
             </div>
