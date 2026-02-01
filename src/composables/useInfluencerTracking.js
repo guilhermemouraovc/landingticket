@@ -99,6 +99,7 @@ export const INFLUENCER_NAMES = {
   ary: 'Ary',
   lana: 'Lana',
   'bruna-souza': 'Bruna Souza',
+  'dougfranca' : 'Doug França',
 
 }
 
@@ -198,6 +199,7 @@ const INFLUENCER_GENDER = {
   Ary: 'pelo',
   Lana: 'pela',
   'Bruna Souza': 'pela',
+  'Doug França': 'pelo',
 }
 
 // Set of valid influencer slugs for route validation
