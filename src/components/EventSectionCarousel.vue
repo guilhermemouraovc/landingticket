@@ -444,37 +444,37 @@ onUnmounted(() => {
 
   .section-header {
     margin-bottom: 16px;
+    padding-left: 16px; /* padding para o header */
+    padding-right: 16px;
   }
 
   .section-title {
     font-size: 1.15rem;
   }
 
-  /* Remove o fade/transparência e permite cards estourarem o padding */
-  .event-section {
-    margin-left: -16px; /* estoura o padding do container pai pela esquerda */
-    margin-right: -30px; /* estoura o padding do container pai pela direita */
-    padding-left: 16px; /* mantém o alinhamento do header */
-  }
-
-  .section-header {
-    margin-bottom: 16px;
-    padding-right: 16px; /* compensa o estouro */
-  }
-
+  /* Remove fade no mobile e permite scroll livre */
   .cards-viewport {
-    --fade: 24px; /* fade no mobile */
+    --fade: 0px; /* remove fade completamente */
     scroll-padding-right: 0;
-    margin: 0; /* sem margin */
-    padding-left: 0; /* sem padding esquerdo */
-    padding-right: 0; /* sem padding direito */
+    margin: 0;
+    padding-left: 16px; /* primeiro card com espaço da borda */
+    padding-right: 0;
+    padding-top: 40px;
+    padding-bottom: 13px;
+  }
+
+  /* Remove fade masks no mobile */
+  .cards-viewport.fade-right,
+  .cards-viewport.fade-left,
+  .cards-viewport.fade-left.fade-right {
+    mask-image: none;
   }
 
   .cards-row {
-    --peek: 0px; /* remove o peek, cards vão até a borda */
+    --peek: 16px; /* pequeno peek do próximo card */
     gap: 16px;
-    padding-left: 0; /* primeiro card cola na borda */
-    padding-right: 16px; /* apenas o espaço do último card até a borda */
+    padding-left: 0;
+    padding-right: 16px; /* espaço final após o último card */
   }
 
   /* Esconde os botões de navegação no mobile */

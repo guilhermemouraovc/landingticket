@@ -849,7 +849,7 @@ async function filterEventsByCategories(categoryLabels) {
 /* Mobile */
 @media (max-width: 599px) {
   .event-groups {
-    padding: 0 16px;
+    padding: 0; /* Remove padding para permitir carrosséis estourarem */
     margin-bottom: 80px;
   }
 }
