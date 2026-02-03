@@ -41,9 +41,7 @@
                   loading="lazy"
                 >
                   <!-- Badge "Últimos ingressos!" -->
-                  <div v-if="ev.showLastTickets" class="featured-badge">
-                    Últimos ingressos!
-                  </div>
+                  <div v-if="ev.showLastTickets" class="featured-badge">Últimos ingressos!</div>
                 </q-img>
 
                 <!-- Painel -->
@@ -148,7 +146,10 @@
     </section>
 
     <!-- VIDEO BANNER -->
-    <VideoBanner video="/banner_ticketpe.webm" link="https://chat.whatsapp.com/HLtVXbX4PbO1RVW317mLlB" />
+    <VideoBanner
+      video="/banner_ticketpe.webm"
+      link="https://chat.whatsapp.com/HLtVXbX4PbO1RVW317mLlB"
+    />
 
     <section class="event-groups">
       <!-- Skeletons para carrosséis -->
