@@ -163,77 +163,23 @@
         <span class="whatsapp-tooltip">Fale conosco!</span>
     </a>
     
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full bg-brand-header border-b border-gray-700 z-50" style="border-radius: 0;">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <img src="logo.svg" alt="Ticketpe" style="width: 220px; height: auto;">
-                </div>
-                
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#eventos" class="hover:text-brutal-yellow transition">Eventos</a>
-                    <a href="#como-funciona" class="hover:text-brutal-yellow transition">Como Funciona</a>
-                    <a href="#depoimentos" class="hover:text-brutal-yellow transition">Depoimentos</a>
-                    <a href="#faq" class="hover:text-brutal-yellow transition">FAQ</a>
-                </div>
-                
-                <!-- CTA Buttons -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="https://www.ticketpe.com.br" target="_blank" class="px-4 py-2 brutal-border rounded-lg hover:bg-brutal-yellow hover:text-brand-dark transition">
-                        Entrar
-                    </a>
-                    <a href="https://wa.me/5581998471385?text=Gostaria%20de%20receber%20o%20cat%C3%A1logo%20de%20eventos%20da%20Ticketpe" target="_blank" class="px-6 py-2 bg-brutal-yellow text-brand-dark font-bold brutal-border rounded-lg shadow-brutal hover:translate-x-1 hover:translate-y-1 transition">
-                        Explorar Eventos
-                    </a>
-                </div>
-                
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden" id="mobileMenuBtn">
-                    <div class="space-y-1">
-                        <div class="w-6 h-1 bg-brutal-white"></div>
-                        <div class="w-6 h-1 bg-brutal-white"></div>
-                        <div class="w-6 h-1 bg-brutal-white"></div>
-                    </div>
-                </button>
-            </div>
+    <!-- Ticker Banner -->
+    <div class="bg-brand-cyan text-brand-dark overflow-hidden" style="border-radius: 0;">
+        <div class="flex ticker whitespace-nowrap py-2">
+            <span class="px-8 font-bold">✓ Ingressos sem taxa</span>
+            <span class="px-8 font-bold">✓ Parcele em até 12x sem juros</span>
+            <span class="px-8 font-bold">✓ Comunidade com +10 mil pessoas</span>
+            <span class="px-8 font-bold">✓ +100 grupos de vendas no WhatsApp</span>
+            <span class="px-8 font-bold">✓ Presente em 15 estados</span>
+            <!-- Duplicate for seamless loop -->
+            <span class="px-8 font-bold">✓ Ingressos sem taxa</span>
+            <span class="px-8 font-bold">✓ Parcele em até 12x sem juros</span>
+            <span class="px-8 font-bold">✓ Comunidade com +10 mil pessoas</span>
+            <span class="px-8 font-bold">✓ +100 grupos de vendas no WhatsApp</span>
+            <span class="px-8 font-bold">✓ Presente em 15 estados</span>
         </div>
-        
-        <!-- Mobile Menu -->
-        <div class="hidden md:hidden bg-brand-darker brutal-border-t" id="mobileMenu">
-            <div class="container mx-auto px-4 py-4 space-y-4">
-                <a href="#eventos" class="block hover:text-brutal-yellow transition">Eventos</a>
-                <a href="#como-funciona" class="block hover:text-brutal-yellow transition">Como Funciona</a>
-                <a href="#depoimentos" class="block hover:text-brutal-yellow transition">Depoimentos</a>
-                <a href="#faq" class="block hover:text-brutal-yellow transition">FAQ</a>
-                <a href="https://www.ticketpe.com.br" target="_blank" class="block w-full px-4 py-2 brutal-border rounded-lg hover:bg-brutal-yellow hover:text-brand-dark transition text-center">
-                    Entrar
-                </a>
-            </div>
-        </div>
-        <!-- Ticker Banner (inside nav so it stays fixed) -->
-        <div class="bg-brand-cyan text-brand-dark overflow-hidden" style="border-radius: 0;">
-            <div class="flex ticker whitespace-nowrap py-2">
-                <span class="px-8 font-bold">✓ Ingressos sem taxa</span>
-                <span class="px-8 font-bold">✓ Parcele em até 12x sem juros</span>
-                <span class="px-8 font-bold">✓ Comunidade com +10 mil pessoas</span>
-                <span class="px-8 font-bold">✓ +100 grupos de vendas no WhatsApp</span>
-                <span class="px-8 font-bold">✓ Presente em 15 estados</span>
-                <!-- Duplicate for seamless loop -->
-                <span class="px-8 font-bold">✓ Ingressos sem taxa</span>
-                <span class="px-8 font-bold">✓ Parcele em até 12x sem juros</span>
-                <span class="px-8 font-bold">✓ Comunidade com +10 mil pessoas</span>
-                <span class="px-8 font-bold">✓ +100 grupos de vendas no WhatsApp</span>
-                <span class="px-8 font-bold">✓ Presente em 15 estados</span>
-            </div>
-        </div>
-    </nav>
+    </div>
 
-    <!-- Spacer for fixed nav + ticker -->
-    <div class="h-40"></div>
-    
     <!-- Hero Section -->
     <section class="container mx-auto px-4 py-20">
         <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -257,7 +203,7 @@
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="https://wa.me/5581998471385?text=Gostaria%20de%20receber%20o%20cat%C3%A1logo%20de%20eventos%20da%20Ticketpe" target="_blank" class="px-8 py-4 bg-brutal-yellow text-brand-dark font-bold text-lg rounded-lg shadow-brutal hover:translate-x-1 hover:translate-y-1 transition text-center">
-                        Explorar Eventos
+                        Garantir Carva
                     </a>
                     <a href="#como-funciona" class="px-8 py-4 border-2 border-gray-500 rounded-lg hover:bg-brutal-yellow hover:text-brand-dark hover:border-brutal-yellow font-bold text-lg transition text-center">
                         Como Funciona
