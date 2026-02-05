@@ -89,10 +89,11 @@ const bannerRatio = computed(() => {
 </script>
 
 <style scoped>
+/* ==================== BRUTAL BANNER CARD ==================== */
 .banner-card-section {
   background-color: #2a3447;
-  padding: 20px 0;
-  overflow: hidden; /* Previne overflow horizontal */
+  padding: 24px 0;
+  overflow: hidden;
 }
 
 .banner-card-wrap {
@@ -101,39 +102,41 @@ const bannerRatio = computed(() => {
   margin: 0 auto;
   padding: 0 80px;
   box-sizing: border-box;
-  background-color: #2a3447; /* Garante que o wrap também tenha o background correto */
+  background-color: #2a3447;
 }
 
 .banner-card {
-  border-radius: 16px;
+  border-radius: 0 !important;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  width: 100%; /* Garante que o card não ultrapasse o container */
-  max-width: 100%; /* Previne overflow */
-  background-color: #2a3447 !important; /* Remove o background branco padrão do q-card */
-  cursor: default; /* Indica que não é clicável */
+  border: 3px solid #1a1a1a;
+  box-shadow: 8px 8px 0px #1a1a1a;
+  width: 100%;
+  max-width: 100%;
+  background-color: #2a3447 !important;
+  cursor: default;
+  transition: all 0.15s ease;
 }
-
-/* Banner não é mais clicável - estilos de hover removidos */
 
 .banner-img {
   width: 100%;
-  max-width: 100%; /* Previne que a imagem ultrapasse */
+  max-width: 100%;
   min-height: 200px;
-  display: block; /* Remove espaços inline */
+  display: block;
 }
 
 .banner-img :deep(.q-img__container) {
   width: 100% !important;
   max-width: 100% !important;
+  border-radius: 0 !important;
 }
 
 .banner-img :deep(img) {
   width: 100%;
   max-width: 100%;
   height: auto;
-  object-fit: cover; /* Ajusta a imagem mantendo proporção */
+  object-fit: cover;
   display: block;
+  border-radius: 0 !important;
 }
 
 .banner-overlay {
@@ -144,8 +147,8 @@ const bannerRatio = computed(() => {
   height: 100%;
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
     rgba(0, 0, 0, 0.1) 100%
   );
   display: flex;
@@ -159,46 +162,64 @@ const bannerRatio = computed(() => {
 
 .banner-title {
   font-family: 'Poppins', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 42px;
-  color: white;
+  color: #fafafa;
   margin: 0 0 16px 0;
-  line-height: 1.2;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -1px;
 }
 
 .banner-subtitle {
   font-family: 'Poppins', sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 18px;
-  color: white;
+  color: #fafafa;
   margin: 0 0 24px 0;
   line-height: 1.5;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .banner-cta {
-  height: 48px;
-  min-width: 160px;
-  border-radius: 8px;
+  height: 52px;
+  min-width: 180px;
+  border-radius: 0 !important;
+  font-family: 'Poppins', sans-serif;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 3px solid #1a1a1a !important;
+  box-shadow: 4px 4px 0px #1a1a1a;
+  transition: all 0.15s ease;
 }
 
+.banner-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
+}
+
+.banner-cta:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
+}
+
+/* ==================== RESPONSIVE - BRUTAL ==================== */
 /* Mobile */
 @media (max-width: 599px) {
   .banner-card-section {
-    padding: 10px 0;
-    overflow: hidden; /* Previne overflow no mobile */
+    padding: 16px 0;
+    overflow: hidden;
   }
 
   .banner-card-wrap {
     padding: 0 16px;
-    max-width: 100%; /* Garante que não ultrapasse a viewport */
+    max-width: 100%;
   }
 
   .banner-card {
-    max-width: 100%; /* Garante que o card não ultrapasse */
+    max-width: 100%;
+    box-shadow: 5px 5px 0px #1a1a1a;
   }
 
   .banner-img {
@@ -218,7 +239,7 @@ const bannerRatio = computed(() => {
     width: 100%;
     max-width: 100%;
     height: auto;
-    object-fit: contain; /* No mobile, usa contain para mostrar a imagem inteira */
+    object-fit: contain;
     display: block;
   }
 
@@ -228,7 +249,7 @@ const bannerRatio = computed(() => {
       to bottom,
       rgba(0, 0, 0, 0.1) 0%,
       rgba(0, 0, 0, 0.7) 60%,
-      rgba(0, 0, 0, 0.8) 100%
+      rgba(0, 0, 0, 0.85) 100%
     );
     align-items: flex-end;
     padding-bottom: 30px;
@@ -241,7 +262,7 @@ const bannerRatio = computed(() => {
 
   .banner-title {
     font-size: 22px;
-    word-wrap: break-word; /* Quebra palavras longas */
+    word-wrap: break-word;
     overflow-wrap: break-word;
   }
 
@@ -253,15 +274,16 @@ const bannerRatio = computed(() => {
 
   .banner-cta {
     width: 100%;
-    height: 44px;
+    height: 48px;
     font-size: 14px;
+    box-shadow: 3px 3px 0px #1a1a1a;
   }
 }
 
 /* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
   .banner-card-section {
-    overflow: hidden; /* Previne overflow no tablet */
+    overflow: hidden;
   }
 
   .banner-card-wrap {
@@ -271,6 +293,7 @@ const bannerRatio = computed(() => {
 
   .banner-card {
     max-width: 100%;
+    box-shadow: 6px 6px 0px #1a1a1a;
   }
 
   .banner-img {
@@ -304,7 +327,7 @@ const bannerRatio = computed(() => {
 /* Desktop médio */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .banner-card-section {
-    overflow: hidden; /* Previne overflow no desktop médio */
+    overflow: hidden;
   }
 
   .banner-card-wrap {
@@ -344,14 +367,14 @@ const bannerRatio = computed(() => {
   }
 }
 
-/* Desktop grande - ajuste para telas muito largas */
+/* Desktop grande */
 @media (min-width: 1440px) {
   .banner-card-section {
     overflow: hidden;
   }
 
   .banner-card-wrap {
-    max-width: 1760px; /* Mantém o max-width original mas com proteção */
+    max-width: 1760px;
   }
 
   .banner-img :deep(img) {

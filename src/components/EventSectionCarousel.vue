@@ -315,80 +315,114 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* ==================== BRUTAL EVENT SECTION CAROUSEL ==================== */
 .event-section {
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
-  color: white;
+  margin-bottom: 24px;
+  color: #fafafa;
 }
 
 .section-info {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .section-title {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: #fafafa;
 }
 
 .section-divider {
-  color: white;
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin: 0 2px;
+  color: #FFE500;
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin: 0 4px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .see-all {
-  margin-top: 4px;
-  padding: 0;
+  margin-top: 0;
+  padding: 8px 16px !important;
   min-width: auto;
-  font-weight: 600;
-  color: #9ca3af;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #1a1a1a !important;
+  background: #FFE500 !important;
+  border: 3px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0px #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: all 0.15s ease !important;
+}
+
+.see-all:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #1a1a1a;
+}
+
+.see-all:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 }
 
 .nav-btn {
-  width: 44px;
-  height: 44px;
-  background: transparent;
-  border: none;
+  width: 48px;
+  height: 48px;
+  background: #fafafa;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  box-shadow: 4px 4px 0px #1a1a1a;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.15s ease;
   padding: 0;
 }
 
 .nav-btn:hover:not(:disabled) {
-  opacity: 0.7;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
+  background: #FFE500;
+}
+
+.nav-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .nav-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: #e0e0e0;
 }
 
 .nav-btn img {
-  width: 44px;
-  height: 44px;
+  width: 28px;
+  height: 28px;
   display: block;
 }
 
@@ -397,10 +431,10 @@ onUnmounted(() => {
   overflow-y: visible;
   position: relative;
   scrollbar-width: none;
-  --fade: 28px; /* largura do fade */
+  --fade: 28px;
   scroll-padding-right: 200px;
   padding-top: 40px;
-  padding-bottom: 13px;
+  padding-bottom: 16px;
 }
 
 .cards-viewport::-webkit-scrollbar {
@@ -439,25 +473,35 @@ onUnmounted(() => {
   padding-right: var(--peek);
 }
 
+/* ==================== RESPONSIVE - BRUTAL ==================== */
 /* Mobile */
 @media (max-width: 599px) {
   .event-section {
-    margin-top: 20px;
+    margin-top: 24px;
   }
 
   .section-header {
     margin-bottom: 16px;
-    padding-left: 16px; /* padding para o header */
+    padding-left: 16px;
     padding-right: 16px;
   }
 
   .section-title {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
   }
 
-  /* Remove fade no mobile e permite scroll livre */
+  .section-divider {
+    font-size: 1.1rem;
+  }
+
+  .see-all {
+    padding: 6px 12px !important;
+    font-size: 11px;
+    box-shadow: 2px 2px 0px #1a1a1a;
+  }
+
   .cards-viewport {
-    --fade: 0px; /* remove fade completamente */
+    --fade: 0px;
     scroll-padding-right: 0;
     margin: 0;
     margin-left: -16px;
@@ -468,7 +512,6 @@ onUnmounted(() => {
     padding-bottom: 13px;
   }
 
-  /* Remove fade masks no mobile */
   .cards-viewport.fade-right,
   .cards-viewport.fade-left,
   .cards-viewport.fade-left.fade-right {
@@ -476,8 +519,8 @@ onUnmounted(() => {
   }
 
   .cards-row {
-    --peek: 16px; /* pequeno peek do próximo card */
-    --card-width: 251px;
+    --peek: 16px;
+    --card-width: 280px;
     --card-height: 300px;
     --card-image-height: 140px;
     gap: 16px;
@@ -485,7 +528,6 @@ onUnmounted(() => {
     padding-right: 0;
   }
 
-  /* Esconde os botões de navegação no mobile */
   .nav-buttons {
     display: none;
   }
@@ -502,24 +544,34 @@ onUnmounted(() => {
     --peek: calc(var(--card-width) * 0.5);
     gap: 20px;
   }
+
+  .nav-btn {
+    width: 44px;
+    height: 44px;
+    box-shadow: 3px 3px 0px #1a1a1a;
+  }
+
+  .nav-btn img {
+    width: 24px;
+    height: 24px;
+  }
 }
 
-/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+/* ==================== ACESSIBILIDADE - BRUTAL FOCUS ==================== */
 .nav-btn:focus-visible {
-  outline: 2px solid #35c7ee;
+  outline: 3px solid #FFE500;
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .see-all:focus-visible {
-  outline: 2px solid #35c7ee;
+  outline: 3px solid #35c7ee;
   outline-offset: 2px;
 }
 
-/* ==================== DRAG-AND-DROP STYLES ==================== */
+/* ==================== DRAG-AND-DROP STYLES - BRUTAL ==================== */
 .card-wrapper {
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .card-wrapper--dragging {
@@ -532,38 +584,43 @@ onUnmounted(() => {
 
 .drag-handle {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 12px;
+  left: 12px;
   z-index: 10;
   cursor: grab;
   font-size: 20px;
-  color: #35c7ee;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 4px;
-  padding: 4px 8px;
+  color: #1a1a1a;
+  background: #FFE500;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  box-shadow: 3px 3px 0px #1a1a1a;
+  padding: 6px 10px;
   user-select: none;
-  font-weight: bold;
-  transition: all 0.2s ease;
+  font-weight: 800;
+  transition: all 0.15s ease;
 }
 
 .drag-handle:hover {
-  background: rgba(0, 0, 0, 0.9);
-  color: #ffffff;
-  transform: scale(1.1);
+  background: #fafafa;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #1a1a1a;
 }
 
 .drag-handle:active {
   cursor: grabbing;
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .card-ghost {
-  opacity: 0.4;
-  border: 2px dashed #35c7ee;
-  border-radius: 8px;
+  opacity: 0.5;
+  border: 3px dashed #FFE500 !important;
+  border-radius: 0 !important;
 }
 
 .card-dragging {
-  opacity: 0.5;
+  opacity: 0.6;
+  transform: rotate(2deg);
 }
 
 .cards-row--edit-mode {
@@ -572,7 +629,23 @@ onUnmounted(() => {
 }
 
 .edit-btn {
-  font-weight: 600;
-  padding: 6px 16px !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  padding: 8px 20px !important;
+  border: 3px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0px #1a1a1a;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+.edit-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #1a1a1a;
+}
+
+.edit-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 </style>

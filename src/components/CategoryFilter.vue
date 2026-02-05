@@ -114,32 +114,37 @@ function clearCategories() {
 </script>
 
 <style scoped>
+/* ==================== BRUTAL CATEGORY FILTER ==================== */
 .category-filter {
-  padding: 16px 0;
+  padding: 20px 0;
 }
 
 .filter-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 20px;
   padding: 0 4px;
 }
 
 .filter-header__icon {
-  color: #35c7ee;
+  color: #FFE500;
+  font-size: 22px;
 }
 
 .filter-header__title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
 }
 
 .category-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   justify-content: flex-start;
   align-items: flex-start;
 }
@@ -147,7 +152,7 @@ function clearCategories() {
 .category-chip-content {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .category-chip-icon {
@@ -163,40 +168,31 @@ function clearCategories() {
 }
 
 .category-chip {
-  font-weight: 500;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
   outline: none !important;
-  border: none !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  border: 3px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0px #1a1a1a;
   position: relative;
-}
-
-/* Borda branca grossa usando pseudo-elemento para mascarar stroke cinza */
-.category-chip :deep(.q-chip--colored) {
-  border: none !important;
-  position: relative;
-}
-
-.category-chip :deep(.q-chip--colored::before) {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  background: white;
-  border-radius: inherit;
-  z-index: -1;
-  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .category-chip :deep(.q-chip) {
+  border-radius: 0 !important;
+}
+
+.category-chip :deep(.q-chip--colored) {
   border: none !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
+  position: relative;
+  border-radius: 0 !important;
+}
+
+.category-chip :deep(.q-chip--colored::before) {
+  display: none !important;
 }
 
 .category-chip :deep(.q-chip__content) {
@@ -211,51 +207,71 @@ function clearCategories() {
 }
 
 .category-chip:not(.q-chip--colored) {
-  border: none !important;
-  border-color: transparent !important;
+  border: 3px solid #1a1a1a !important;
 }
 
-/* Remove qualquer borda do Quasar aplicada por cores */
 .category-chip :deep(.q-chip--selected),
 .category-chip :deep(.q-chip--clickable) {
   border: none !important;
   border-color: transparent !important;
   box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
-/* Remove stroke de elementos SVG internos se houver */
 .category-chip :deep(svg),
 .category-chip :deep(path) {
   stroke: none !important;
 }
 
 .category-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #1a1a1a;
+}
+
+.category-chip:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .category-chip--selected {
-  font-weight: 600;
+  font-weight: 800;
+  box-shadow: 4px 4px 0px #1a1a1a;
 }
 
 .category-chip--selected :deep(.q-chip) {
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .filter-actions {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 3px solid #1a1a1a;
 }
 
-/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+.filter-actions .q-btn {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 2px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: 2px 2px 0px #1a1a1a;
+  transition: all 0.15s ease;
+}
+
+.filter-actions .q-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #1a1a1a;
+}
+
+/* ==================== ACESSIBILIDADE - BRUTAL FOCUS ==================== */
 .category-chip:focus-visible {
-  outline: 2px solid #35c7ee;
+  outline: 3px solid #FFE500;
   outline-offset: 2px;
 }
 
 .q-btn:focus-visible {
-  outline: 2px solid #35c7ee;
+  outline: 3px solid #FFE500;
   outline-offset: 2px;
 }
 </style>

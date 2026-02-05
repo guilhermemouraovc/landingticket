@@ -840,6 +840,20 @@ async function filterEventsByCategories(categoryLabels) {
 </script>
 
 <style scoped>
+/* ==================== BRUTAL DESIGN SYSTEM ==================== */
+/* Cores brutalistas */
+:root {
+  --brutal-yellow: #FFE500;
+  --brutal-black: #1a1a1a;
+  --brutal-white: #fafafa;
+  --brand-cyan: #35c7ee;
+  --brand-blue: #008ec1;
+  --brand-dark: #2a3447;
+  --brand-darker: #1a202c;
+  --brutal-purple: #d446e4;
+}
+
+/* ==================== LAYOUT BASE ==================== */
 .event-groups {
   padding: 0 80px;
   max-width: 80%;
@@ -847,42 +861,42 @@ async function filterEventsByCategories(categoryLabels) {
   margin-bottom: 100px;
 }
 
-/* Mobile */
 @media (max-width: 599px) {
   .event-groups {
-    padding: 0; /* Remove padding para permitir carrosséis estourarem */
+    padding: 0 16px;
+    max-width: 100%;
     margin-bottom: 80px;
   }
 }
 
-/* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
   .event-groups {
     padding: 0 40px;
   }
 }
-/* fundo */
+
+/* Fundo brutalista */
 .bg-landing {
   background-color: #2a3447;
 }
 
-/* ================= CARROSSEL ================= */
+/* ==================== CARROSSEL HERO - BRUTAL ==================== */
 .destaque {
   background-color: #2a3447;
   padding: 40px 0;
 }
 
-/* Mobile: menos padding vertical */
 @media (max-width: 599px) {
   .destaque {
     padding: 24px 0;
   }
 }
+
 .featured-carousel {
   background: transparent !important;
+  position: relative;
 }
 
-/* Esconde os controles nativos do Quasar carousel */
 .featured-carousel :deep(.q-carousel__control) {
   display: none;
 }
@@ -901,7 +915,6 @@ async function filterEventsByCategories(categoryLabels) {
   box-sizing: border-box;
 }
 
-/* Mobile */
 @media (max-width: 599px) {
   .featured-wrap {
     padding: 0 16px;
@@ -917,7 +930,6 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
-/* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
   .featured-wrap {
     padding: 0 40px;
@@ -925,25 +937,27 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
+/* Grid do featured - BRUTAL */
 .featured-grid {
   display: grid;
   grid-template-columns: 60% 40%;
   height: 100%;
-  background: transparent; /* Removido fundo branco para evitar borda pixelada */
-  border-radius: 32px;
+  background: transparent;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transform: translateZ(0); /* Força GPU para melhor recorte */
+  box-shadow: 8px 8px 0px #1a1a1a;
+  transform: translateZ(0);
 }
 
-/* Mobile: layout em coluna (imagem em cima, info embaixo) com altura fixa */
 @media (max-width: 599px) {
   .featured-grid {
     grid-template-columns: 1fr;
     grid-template-rows: 358px auto;
     height: auto;
     min-height: 568px;
-    border-radius: 24px;
+    border-radius: 0;
+    box-shadow: 6px 6px 0px #1a1a1a;
   }
 
   .featured-grid--clickable {
@@ -951,16 +965,17 @@ async function filterEventsByCategories(categoryLabels) {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
 }
+
+/* Imagem - BRUTAL */
 .featured-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0; /* REMOVIDO RADIUS: Deixa o pai (.featured-grid) cortar via overflow: hidden */
+  border-radius: 0;
   display: block;
   flex-shrink: 0;
   background-color: transparent !important;
 
-  /* Força o q-img a NÃO ter border-radius */
   :deep(.q-img__container) {
     border-radius: 0;
     background-color: transparent !important;
@@ -974,69 +989,64 @@ async function filterEventsByCategories(categoryLabels) {
   :deep(img) {
     border-radius: 0;
     display: block;
-    transform: scale(1.01); /* Leve aumento para garantir cobertura total do container */
+    transform: scale(1.01);
     backface-visibility: hidden;
   }
 }
 
-/* Mobile: imagem com altura fixa */
 @media (max-width: 599px) {
   .featured-img {
     height: 358px !important;
     border-radius: 0;
   }
 
-  /* Mobile: remove radius */
-  .featured-img :deep(.q-img__container) {
-    border-radius: 0;
-  }
-
-  .featured-img :deep(.q-img__image) {
-    border-radius: 0;
-  }
-
+  .featured-img :deep(.q-img__container),
+  .featured-img :deep(.q-img__image),
   .featured-img :deep(img) {
     border-radius: 0;
-    transform: scale(1.01);
   }
-}
-.featured-panel {
-  background: #fff;
-  color: #1f2937;
-  display: flex;
-  border-radius: 0 32px 32px 0; /* Radius apenas do lado direito no desktop */
 }
 
-/* Mobile: painel com radius apenas embaixo */
+/* Painel de info - BRUTAL */
+.featured-panel {
+  background: #fafafa;
+  color: #1a1a1a;
+  display: flex;
+  border-radius: 0;
+  border-left: 3px solid #1a1a1a;
+}
+
 @media (max-width: 599px) {
   .featured-panel {
-    border-radius: 0 0 24px 24px;
+    border-radius: 0;
+    border-left: none;
+    border-top: 3px solid #1a1a1a;
   }
 }
+
 .featured-panel,
 .featured-panel * {
-  color: #1f2937 !important;
+  color: #1a1a1a !important;
 }
+
 .panel-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
   padding: 40px;
   width: 100%;
   min-height: 100%;
 }
 
-/* Mobile: padding ajustado e layout vertical com altura mínima fixa */
 @media (max-width: 599px) {
   .panel-inner {
-    padding: 8px 20px 24px 20px; /* Reduzido padding-top de 12px para 8px */
-    gap: 6px; /* Reduzido gap de 12px para 6px */
+    padding: 16px 20px 24px 20px;
+    gap: 8px;
     justify-content: flex-start;
     min-height: 210px;
   }
 
-  /* Reduz espaçamento entre título e elementos abaixo */
   .panel-inner .event-title {
     margin-top: 6px !important;
     margin-bottom: -27px !important;
@@ -1046,6 +1056,7 @@ async function filterEventsByCategories(categoryLabels) {
     margin-top: -5px !important;
   }
 }
+
 .featured-description {
   color: #4b5563;
   max-height: 84px;
@@ -1056,20 +1067,17 @@ async function filterEventsByCategories(categoryLabels) {
   -webkit-box-orient: vertical;
 }
 
-/* Mobile: esconde a descrição para economizar espaço */
 @media (max-width: 599px) {
   .featured-description {
     display: none;
   }
 }
-.featured-carousel {
-  position: relative;
-}
-/* ==================== PAGINAÇÃO SEPARADA ==================== */
+
+/* ==================== PAGINAÇÃO - BRUTAL ==================== */
 .pagination-dots {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
   margin-top: 24px;
   padding: 0 20px;
 }
@@ -1077,23 +1085,25 @@ async function filterEventsByCategories(categoryLabels) {
 .pagination-dot {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0;
+  border: 3px solid #fafafa;
   background-color: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   outline: none;
 }
 
 .pagination-dot:hover {
-  border-color: rgba(255, 255, 255, 0.8);
-  transform: scale(1.1);
+  background-color: #FFE500;
+  border-color: #FFE500;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .pagination-dot--active {
-  background-color: white;
-  border-color: white;
-  transform: scale(1.2);
+  background-color: #FFE500;
+  border-color: #1a1a1a;
+  box-shadow: 3px 3px 0px #1a1a1a;
 }
 
 .pagination-dot:focus-visible {
@@ -1101,63 +1111,50 @@ async function filterEventsByCategories(categoryLabels) {
   outline-offset: 2px;
 }
 
-/* Mobile: bolinhas minimalistas e próximas */
 @media (max-width: 599px) {
   .pagination-dots {
     gap: 12px;
     margin-top: 24px;
     padding: 0;
-    /* Remover height: 8px; que estava causando o problema */
-    align-items: center; /* Centralizar verticalmente */
+    align-items: center;
   }
 
   .pagination-dot {
     width: 12px;
     height: 12px;
-    min-width: 8px; /* Garantir largura mínima */
-    min-height: 8px; /* Garantir altura mínima */
-    border-width: 1px;
-    border-color: rgba(255, 255, 255, 0.4);
-    background-color: transparent;
-    border-radius: 50%; /* Forçar círculo perfeito */
-    box-sizing: border-box; /* Bordas dentro do tamanho */
-    flex-shrink: 0; /* Não comprimir */
-    padding: 0; /* Resetar padding padrão do botão */
-    line-height: 1; /* Resetar line-height */
-    vertical-align: middle; /* Alinhamento vertical */
+    border-width: 2px;
   }
 
   .pagination-dot--active {
-    background-color: white;
-    border-color: white;
     transform: none;
+    box-shadow: 2px 2px 0px #1a1a1a;
   }
 
   .pagination-dot:hover {
     transform: none;
-    border-color: rgba(255, 255, 255, 0.6);
   }
 }
 
-/* ================= CATEGORIAS ================= */
+/* ==================== CATEGORIAS - BRUTAL ==================== */
 .categories {
-  background-color: #2a3447;
+  background-color: #1a202c;
   margin-top: 30px;
   padding: 60px 0;
+  border-top: 3px solid #1a1a1a;
+  border-bottom: 3px solid #1a1a1a;
 }
 
-/* Mobile: menos espaçamento */
 @media (max-width: 599px) {
   .categories {
     margin-top: 32px;
     padding: 40px 0;
   }
 
-  /* Esconde a seção de categorias no mobile */
   .categories--hide-mobile {
     display: none !important;
   }
 }
+
 .categories-wrap {
   width: calc(100vw - 160px);
   max-width: 100%;
@@ -1165,7 +1162,6 @@ async function filterEventsByCategories(categoryLabels) {
   padding: 0 80px;
 }
 
-/* Mobile */
 @media (max-width: 599px) {
   .categories-wrap {
     padding: 0 16px;
@@ -1173,13 +1169,13 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
-/* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
   .categories-wrap {
     padding: 0 40px;
     width: calc(100vw - 80px);
   }
 }
+
 .cat-grid {
   display: flex;
   justify-content: center;
@@ -1190,7 +1186,6 @@ async function filterEventsByCategories(categoryLabels) {
   margin: 0 auto;
 }
 
-/* Mobile: grid 2 colunas conforme protótipo */
 @media (max-width: 599px) {
   .cat-grid {
     display: grid;
@@ -1205,8 +1200,6 @@ async function filterEventsByCategories(categoryLabels) {
     width: 100%;
     height: 56px;
     font-size: 15px;
-    border-radius: 16px !important;
-    border: 2px solid rgba(255, 255, 255, 0.25);
   }
 
   .cat-btn .q-icon {
@@ -1215,12 +1208,11 @@ async function filterEventsByCategories(categoryLabels) {
   }
 
   .cat-btn .q-btn__content {
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.2px;
   }
 }
 
-/* Tablet */
 @media (min-width: 600px) and (max-width: 1023px) {
   .cat-grid {
     gap: 12px;
@@ -1238,35 +1230,47 @@ async function filterEventsByCategories(categoryLabels) {
     margin-right: 6px;
   }
 }
+
+/* Botão de categoria - BRUTAL */
 .cat-btn {
-  border-radius: 12px !important;
+  border-radius: 0 !important;
   height: 52px;
   min-width: 180px;
-  font-weight: 600;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  font-weight: 700;
+  border: 3px solid #fafafa !important;
+  background: transparent !important;
+  transition: all 0.15s ease;
   outline: none !important;
+  box-shadow: 4px 4px 0px #1a1a1a;
 }
+
 .cat-btn:hover {
-  background: #35c7ee !important;
-  border-color: #35c7ee !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(53, 199, 238, 0.3);
+  background: #FFE500 !important;
+  border-color: #1a1a1a !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
 }
+
+.cat-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
+}
+
 .cat-btn .q-btn__content {
   font-weight: 700;
   letter-spacing: 0.3px;
   color: white !important;
 }
+
 .cat-btn:hover .q-btn__content {
-  color: white !important;
+  color: #1a1a1a !important;
 }
+
 .cat-btn .q-icon {
   margin-right: 8px;
   font-size: 20px;
 }
 
-/* Estilos para o conteúdo dos botões com ícones */
 .cat-btn-content {
   display: flex;
   align-items: center;
@@ -1279,7 +1283,6 @@ async function filterEventsByCategories(categoryLabels) {
   height: 20px;
 }
 
-/* Estilos para ícones Phosphor dentro dos botões */
 .cat-btn :deep(.phosphor-icon svg) {
   width: 20px;
   height: 20px;
@@ -1287,32 +1290,39 @@ async function filterEventsByCategories(categoryLabels) {
   color: white;
 }
 
-/* Estado ativo da categoria */
+/* Estado ativo - BRUTAL */
 .cat-btn--active {
-  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
-  border: none !important;
-  color: white !important;
+  background: #FFE500 !important;
+  border: 3px solid #1a1a1a !important;
+  color: #1a1a1a !important;
+  box-shadow: 4px 4px 0px #1a1a1a;
 }
 
 .cat-btn--active .q-btn__content {
-  color: white !important;
+  color: #1a1a1a !important;
 }
 
-/* Botão para expandir categorias */
+.cat-btn--active:hover {
+  background: #35c7ee !important;
+}
+
+/* Botão expandir - BRUTAL */
 .add-category-btn {
   width: 52px;
   height: 52px;
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  border-radius: 0 !important;
+  border: 3px solid #fafafa !important;
+  transition: all 0.15s ease;
+  box-shadow: 4px 4px 0px #1a1a1a;
 }
 
 .add-category-btn:hover {
-  background: linear-gradient(90deg, #008ec1 0%, #35c7ee 100%) !important;
-  border-color: #35c7ee !important;
+  background: #FFE500 !important;
+  border-color: #1a1a1a !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
 }
 
-/* Mobile */
 @media (max-width: 599px) {
   .add-category-btn {
     width: 48px;
@@ -1320,70 +1330,85 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
-/* ================= HERO - TIPOGRAFIA E CORES ================= */
+/* ==================== CTA BOTÃO - BRUTAL ==================== */
 .featured-cta {
-  width: 142px;
-  height: 44px;
-  border-radius: 8px;
-  min-width: 142px;
-  background-color: #ffe100 !important;
-  color: #000 !important;
+  width: 160px;
+  height: 48px;
+  border-radius: 0 !important;
+  min-width: 160px;
+  background-color: #FFE500 !important;
+  color: #1a1a1a !important;
+  border: 3px solid #1a1a1a !important;
+  box-shadow: 4px 4px 0px #1a1a1a;
+  transition: all 0.15s ease;
+}
+
+.featured-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
+}
+
+.featured-cta:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
 }
 
 .featured-cta .q-btn__content {
   font-family: 'Poppins', sans-serif;
-  font-weight: 600; /* semibold */
+  font-weight: 700;
   font-size: 14px;
-  color: #000 !important;
+  color: #1a1a1a !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Mobile: botão full width */
 @media (max-width: 599px) {
   .featured-cta {
     width: 100%;
-    height: 48px;
+    height: 52px;
     font-size: 16px;
     margin-top: 12px;
   }
 
   .featured-cta .q-btn__content {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
   }
 }
 
+/* ==================== TIPOGRAFIA - BRUTAL ==================== */
 .event-title {
   font-family: 'Poppins', sans-serif;
-  font-weight: 600; /* semibold */
-  font-size: 36px;
-  line-height: 1.2;
-  color: #1f2937;
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1.1;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 
-/* Mobile: título menor com altura fixa (2 linhas max) */
 @media (max-width: 599px) {
   .event-title {
     font-size: 20px;
-    line-height: 1.3;
-    font-weight: 700;
+    line-height: 1.2;
+    font-weight: 800;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    min-height: 62px;
-    margin-bottom: 0 !important; /* Removido espaçamento abaixo do título */
+    min-height: 52px;
+    margin-bottom: 0 !important;
   }
 }
 
 .event-meta {
   font-family: 'Poppins', sans-serif;
-  font-weight: 400; /* regular */
+  font-weight: 600;
   font-size: 16px;
-  color: #1f2937;
+  color: #1a1a1a;
 }
 
-/* Mobile: meta menor com altura fixa */
 @media (max-width: 599px) {
   .event-meta {
     font-size: 14px;
@@ -1392,7 +1417,7 @@ async function filterEventsByCategories(categoryLabels) {
 
   .event-meta .q-icon {
     font-size: 18px;
-    color: #d907f2 !important;
+    color: #d446e4 !important;
   }
 
   .event-meta span {
@@ -1402,7 +1427,6 @@ async function filterEventsByCategories(categoryLabels) {
     white-space: nowrap;
   }
 
-  /* Mostra apenas cidade-estado no mobile - SEMPRE */
   .event-location-desktop {
     display: none !important;
   }
@@ -1412,7 +1436,6 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
-/* Desktop: mostra localização completa */
 @media (min-width: 600px) {
   .event-location-desktop {
     display: block !important;
@@ -1424,27 +1447,26 @@ async function filterEventsByCategories(categoryLabels) {
 }
 
 .event-meta__icon {
-  color: #d907f2 !important; /* roxo do protótipo */
+  color: #d446e4 !important;
 }
 
-/* Força a cor nos ícones do Quasar */
 .event-meta .q-icon {
-  color: #d907f2 !important;
+  color: #d446e4 !important;
 }
 
-/* ==================== ACESSIBILIDADE - FOCUS STATES ==================== */
+/* ==================== ACESSIBILIDADE ==================== */
 .q-btn:focus-visible,
 .q-carousel__control button:focus-visible {
-  outline: 2px solid #35c7ee;
+  outline: 3px solid #FFE500;
   outline-offset: 2px;
 }
 
 .cat-btn:focus-visible {
-  outline: 3px solid #35c7ee;
+  outline: 3px solid #FFE500;
   outline-offset: 3px;
 }
 
-/* ==================== MENSAGEM DE CATEGORIA VAZIA ==================== */
+/* ==================== MENSAGEM VAZIA - BRUTAL ==================== */
 .empty-category-message {
   display: flex;
   flex-direction: column;
@@ -1453,13 +1475,17 @@ async function filterEventsByCategories(categoryLabels) {
   padding: 80px 20px;
   text-align: center;
   min-height: 300px;
+  background: #1a202c;
+  border: 3px solid #1a1a1a;
+  box-shadow: 8px 8px 0px #1a1a1a;
+  margin: 40px;
 }
 
 .sad-face {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 6rem;
-  font-weight: 400;
-  color: #ffffff;
+  font-weight: 900;
+  color: #FFE500;
   margin-bottom: 24px;
   line-height: 1;
   user-select: none;
@@ -1468,10 +1494,11 @@ async function filterEventsByCategories(categoryLabels) {
 .empty-category-title {
   font-family: 'Poppins', sans-serif;
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-weight: 800;
+  color: #fafafa;
   margin-bottom: 16px;
   line-height: 1.4;
+  text-transform: uppercase;
 }
 
 .empty-category-subtitle {
@@ -1483,27 +1510,29 @@ async function filterEventsByCategories(categoryLabels) {
 
 .category-name {
   color: #35c7ee;
-  text-transform: capitalize;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .explore-link {
-  color: #35c7ee;
-  text-decoration: underline;
-  font-weight: 600;
-  transition: color 0.2s ease;
+  color: #FFE500;
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 3px solid #FFE500;
+  transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .explore-link:hover {
-  color: #008ec1;
-  text-decoration: underline;
+  color: #35c7ee;
+  border-color: #35c7ee;
 }
 
-/* Mobile */
 @media (max-width: 599px) {
   .empty-category-message {
     padding: 60px 16px;
     min-height: 250px;
+    margin: 20px 16px;
   }
 
   .sad-face {
@@ -1520,29 +1549,32 @@ async function filterEventsByCategories(categoryLabels) {
   }
 }
 
-/* ==================== BADGE "ÚLTIMOS INGRESSOS" NO DESTAQUE ==================== */
+/* ==================== BADGE - BRUTAL ==================== */
 .featured-badge {
   position: absolute;
   top: 16px;
   left: 16px;
-  background: #45c0e7;
-  color: #ffffff;
+  background: #FFE500;
+  color: #1a1a1a;
   font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  padding: 10px 20px;
-  border-radius: 6px;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
   z-index: 5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 4px 4px 0px #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Mobile: badge menor */
 @media (max-width: 599px) {
   .featured-badge {
     top: 12px;
     left: 12px;
-    font-size: 14px;
-    padding: 8px 16px;
+    font-size: 12px;
+    padding: 6px 12px;
+    box-shadow: 3px 3px 0px #1a1a1a;
   }
 }
 </style>

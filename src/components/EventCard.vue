@@ -176,52 +176,55 @@ function handleClick(e) {
 </script>
 
 <style scoped lang="scss">
+/* ==================== BRUTAL EVENT CARD ==================== */
 .event-card-wrapper {
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
+/* Badge - BRUTAL */
 .event-card__badge {
   position: absolute;
-  top: -33px;
-  left: 18px;
-  background-image: url('/Vector.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  color: #ffffff;
+  top: -12px;
+  left: 12px;
+  background: #FFE500;
+  color: #1a1a1a;
   font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 8px 16px;
-  min-width: 160px;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 6px 12px;
+  min-width: auto;
   text-align: center;
-  z-index: 1;
-  text-transform: none;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: all 0.15s ease;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  box-shadow: 3px 3px 0px #1a1a1a;
 }
 
 .event-card--clickable:hover .event-card__badge,
 .event-card--clickable:focus-within .event-card__badge {
-  transform: translateY(-4px);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px #1a1a1a;
 }
 
+/* Card principal - BRUTAL */
 .event-card {
   display: flex;
   flex-direction: column;
-  border-radius: 24px;
+  border-radius: 0;
   background: transparent;
-  box-shadow: 0 16px -12px rgba(15, 23, 42, 0.28);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  border: 3px solid #1a1a1a;
+  box-shadow: 6px 6px 0px #1a1a1a;
+  transition: all 0.15s ease;
   overflow: hidden;
-  border: none;
   outline: none;
 }
 
@@ -229,9 +232,19 @@ function handleClick(e) {
   cursor: pointer;
 }
 
+.event-card--clickable:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 10px 10px 0px #1a1a1a;
+}
+
+.event-card--clickable:active {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px #1a1a1a;
+}
+
 .event-card:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px #35c7ee;
+  outline: 3px solid #FFE500;
+  outline-offset: 2px;
 }
 
 .event-card-wrapper:has(.event-card--carousel) {
@@ -251,60 +264,67 @@ function handleClick(e) {
   width: 100%;
 }
 
+/* Imagem - BRUTAL */
 .event-card__image {
   width: 100%;
   object-fit: cover;
-  border-radius: 24px 24px 0 0;
+  border-radius: 0;
   display: block;
   flex-shrink: 0;
+  border-bottom: 3px solid #1a1a1a;
 
   :deep(.q-img__container) {
-    border-radius: 24px 24px 0 0;
+    border-radius: 0;
   }
 
   :deep(.q-img__image) {
-    border-radius: 24px 24px 0 0;
+    border-radius: 0;
   }
 
   :deep(img) {
-    border-radius: 24px 24px 0 0;
+    border-radius: 0;
     display: block;
   }
 }
 
+/* Body - BRUTAL */
 .event-card__body {
   flex: 1;
-  padding: 15px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  color: #1f2937;
-  background: #ffffff;
-  border-radius: 0 0 24px 24px;
+  color: #1a1a1a;
+  background: #fafafa;
+  border-radius: 0;
 }
 
+/* Título - BRUTAL */
 .event-card__title {
   font-family: 'Poppins', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 800;
   line-height: 1.2;
-  color: #1f2937;
+  color: #1a1a1a;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
 }
 
+/* Meta info - BRUTAL */
 .event-card__meta {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 35px;
-  color: #000000;
+  gap: 20px;
+  color: #1a1a1a;
   font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .meta-layout--column,
@@ -316,7 +336,7 @@ function handleClick(e) {
 .meta-layout--stacked {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 
   .meta-item {
     width: 100%;
@@ -324,9 +344,9 @@ function handleClick(e) {
 }
 
 .event-card__meta--no-price {
-  font-size: 16px;
+  font-size: 14px;
   margin-top: 8px;
-  justify-content: center;
+  justify-content: flex-start;
 
   .meta-icon {
     font-size: 18px;
@@ -344,28 +364,32 @@ function handleClick(e) {
 }
 
 .meta-icon {
-  color: #d907f2;
+  color: #d446e4;
   font-size: 16px;
 }
 
 .meta-highlight {
-  color: #000000;
-  font-weight: 400;
+  color: #1a1a1a;
+  font-weight: 700;
 }
 
+/* Preços - BRUTAL */
 .event-card__price-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
+  padding-top: 8px;
+  border-top: 2px solid #1a1a1a;
+  margin-top: auto;
 }
 
 .price-full {
   font-family: 'Poppins', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  color: #000000;
-  line-height: 1.2;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.1;
 }
 
 .price-installment {
@@ -379,15 +403,16 @@ function handleClick(e) {
 .installment-value,
 .installment-info {
   font-family: 'Poppins', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   color: #008ec1;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .installment-value {
   line-height: 1.2;
 }
 
+/* ==================== RESPONSIVE - BRUTAL ==================== */
 @media (max-width: 768px) {
   .event-card-wrapper:has(.event-card--carousel) {
     flex: 0 0 280px;
@@ -395,11 +420,20 @@ function handleClick(e) {
   }
 
   .event-card__body {
-    padding: 16px 18px;
+    padding: 14px 16px;
   }
 
   .event-card__meta {
     font-size: 12px;
+  }
+
+  .event-card {
+    box-shadow: 5px 5px 0px #1a1a1a;
+  }
+
+  .event-card--clickable:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0px #1a1a1a;
   }
 }
 
@@ -417,26 +451,26 @@ function handleClick(e) {
   }
 
   .event-card__title {
-    font-size: 18px;
+    font-size: 15px;
     line-height: 1.2;
   }
 
   .event-card__meta {
-    font-size: 12px;
-    gap: 24px;
+    font-size: 11px;
+    gap: 16px;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
   }
 
   .meta-item {
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
   }
 
   .meta-icon {
-    font-size: 16px !important;
-    color: #d907f2 !important;
+    font-size: 14px !important;
+    color: #d446e4 !important;
   }
 
   .event-card__image {
@@ -444,21 +478,38 @@ function handleClick(e) {
   }
 
   .event-card__meta .meta-item span {
-    color: #000000;
-    font-weight: 400;
+    color: #1a1a1a;
+    font-weight: 600;
   }
 
   .event-card__meta--no-price {
-    font-size: 14px;
+    font-size: 13px;
     margin-top: 6px;
 
     .meta-icon {
-      font-size: 16px !important;
+      font-size: 15px !important;
     }
   }
 
   .event-card__body--no-price {
-    padding-top: 16px;
+    padding-top: 14px;
+  }
+
+  .event-card {
+    box-shadow: 4px 4px 0px #1a1a1a;
+  }
+
+  .event-card--clickable:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #1a1a1a;
+  }
+
+  .event-card__badge {
+    top: -10px;
+    left: 10px;
+    font-size: 10px;
+    padding: 4px 8px;
+    box-shadow: 2px 2px 0px #1a1a1a;
   }
 }
 </style>

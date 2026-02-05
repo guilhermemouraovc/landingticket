@@ -77,7 +77,7 @@ defineProps({
 </script>
 
 <style scoped>
-/* ==================== ANIMAÇÃO ==================== */
+/* ==================== BRUTAL SKELETON LOADER ==================== */
 @keyframes shimmer {
   0% {
     background-position: -1000px 0;
@@ -91,7 +91,7 @@ defineProps({
   width: 100%;
 }
 
-/* Base para elementos skeleton */
+/* Base para elementos skeleton - BRUTAL */
 .skeleton-image,
 .skeleton-title,
 .skeleton-text,
@@ -104,20 +104,22 @@ defineProps({
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.12) 50%,
     rgba(255, 255, 255, 0.05) 100%
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
-  border-radius: 8px;
+  border-radius: 0;
 }
 
-/* ==================== EVENT CARD ==================== */
+/* ==================== EVENT CARD - BRUTAL ==================== */
 .skeleton-event-card {
   display: flex;
   flex-direction: column;
-  border-radius: 24px;
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.03);
+  border: 3px solid rgba(26, 26, 26, 0.3);
+  box-shadow: 6px 6px 0px rgba(26, 26, 26, 0.2);
   overflow: hidden;
   flex: 0 0 320px;
   width: 320px;
@@ -127,13 +129,15 @@ defineProps({
   width: 100%;
   height: 220px;
   border-radius: 0;
+  border-bottom: 3px solid rgba(26, 26, 26, 0.3);
 }
 
 .skeleton-body {
-  padding: 20px 22px 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: rgba(250, 250, 250, 0.05);
 }
 
 .skeleton-title {
@@ -154,13 +158,15 @@ defineProps({
   width: 50%;
 }
 
-/* ==================== HERO ==================== */
+/* ==================== HERO - BRUTAL ==================== */
 .skeleton-hero {
   display: grid;
   grid-template-columns: 60% 40%;
   height: 440px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 32px;
+  border-radius: 0;
+  border: 3px solid rgba(26, 26, 26, 0.3);
+  box-shadow: 8px 8px 0px rgba(26, 26, 26, 0.2);
   overflow: hidden;
 }
 
@@ -168,6 +174,7 @@ defineProps({
   width: 100%;
   height: 100%;
   border-radius: 0;
+  border-right: 3px solid rgba(26, 26, 26, 0.3);
 }
 
 .skeleton-hero-content {
@@ -187,9 +194,11 @@ defineProps({
   width: 140px;
   height: 44px;
   margin-top: 16px;
+  border: 3px solid rgba(26, 26, 26, 0.3);
+  box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.2);
 }
 
-/* ==================== LIST ==================== */
+/* ==================== LIST - BRUTAL ==================== */
 .skeleton-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -201,7 +210,7 @@ defineProps({
   width: 100%;
 }
 
-/* ==================== CAROUSEL ==================== */
+/* ==================== CAROUSEL - BRUTAL ==================== */
 .skeleton-carousel {
   margin-top: 56px;
 }
@@ -210,7 +219,7 @@ defineProps({
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .skeleton-carousel-title {
@@ -220,7 +229,9 @@ defineProps({
 
 .skeleton-carousel-nav {
   width: 100px;
-  height: 40px;
+  height: 48px;
+  border: 3px solid rgba(26, 26, 26, 0.3);
+  box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.2);
 }
 
 .skeleton-carousel-items {
@@ -229,11 +240,17 @@ defineProps({
   overflow: hidden;
 }
 
-/* ==================== RESPONSIVIDADE ==================== */
+/* ==================== RESPONSIVIDADE - BRUTAL ==================== */
 @media (max-width: 768px) {
   .skeleton-hero {
     grid-template-columns: 1fr;
     height: 600px;
+    box-shadow: 5px 5px 0px rgba(26, 26, 26, 0.2);
+  }
+
+  .skeleton-hero-image {
+    border-right: none;
+    border-bottom: 3px solid rgba(26, 26, 26, 0.3);
   }
 
   .skeleton-hero-content {
@@ -247,6 +264,17 @@ defineProps({
   .skeleton-event-card {
     flex: 0 0 280px;
     width: 280px;
+    box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.2);
+  }
+}
+
+@media (max-width: 599px) {
+  .skeleton-event-card {
+    box-shadow: 4px 4px 0px rgba(26, 26, 26, 0.2);
+  }
+
+  .skeleton-button {
+    box-shadow: 3px 3px 0px rgba(26, 26, 26, 0.2);
   }
 }
 </style>
