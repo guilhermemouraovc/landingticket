@@ -6,6 +6,6 @@
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  window.location.href = '/landing-brutal.html'
+  window.location.href = '/anuncio-carva.html'
 })
 </script>
