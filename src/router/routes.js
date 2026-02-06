@@ -86,6 +86,11 @@ const routes = [
     component: () => import('pages/MetricsDashboardPage.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/Carva/anuncio',
+    name: 'carva-anuncio',
+    component: () => import('pages/CarvaAnuncioPage.vue'),
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
