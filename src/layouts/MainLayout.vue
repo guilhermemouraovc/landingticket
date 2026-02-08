@@ -427,9 +427,6 @@
             <div class="footer-title">Compra Segura</div>
             <div class="payment-methods">
               <div class="payment-method">
-                <img src="/BOLETO.svg" alt="Boleto" class="payment-icon" />
-              </div>
-              <div class="payment-method">
                 <img src="/VISA.svg" alt="Visa" class="payment-icon" />
               </div>
               <div class="payment-method">
