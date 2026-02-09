@@ -102,12 +102,39 @@
             <EventCard
               :event="props.row.cardDisplay"
               variant="grid"
-              admin-mode
               :clickable="false"
-              @patch="handlePatch"
-              @edit="() => openEventDialog(props.row)"
-              @delete="() => confirmDelete(props.row)"
-            />
+            >
+              <template #footer>
+                <div class="admin-card-actions">
+                  <q-btn
+                    flat
+                    dense
+                    no-caps
+                    icon="edit"
+                    label="Editar"
+                    color="cyan"
+                    @click="openEventDialog(props.row)"
+                  />
+                  <q-btn
+                    flat
+                    dense
+                    no-caps
+                    icon="delete"
+                    label="Deletar"
+                    color="negative"
+                    @click="confirmDelete(props.row)"
+                  />
+                  <q-toggle
+                    :model-value="props.row.active !== false"
+                    label="Ativo"
+                    color="cyan"
+                    dark
+                    dense
+                    @update:model-value="val => handlePatch({ id: props.row.id, active: val })"
+                  />
+                </div>
+              </template>
+            </EventCard>
           </div>
         </template>
 
@@ -468,6 +495,16 @@ async function handleLogout() {
 .admin-search :deep(.q-field--focused .q-field__control) {
   border-color: #35c7ee;
   box-shadow: 0 0 0 2px rgba(53, 199, 238, 0.2);
+}
+
+/* ========== ADMIN CARD ACTIONS ========== */
+.admin-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* ========== RESPONSIVO ========== */
