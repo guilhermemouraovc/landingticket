@@ -39,6 +39,20 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1965704837682136');
+    fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
     <style>
       * {
         box-sizing: border-box;
@@ -181,6 +195,11 @@
     </style>
   </head>
   <body class="font-poppins bg-brand-dark text-brutal-white">
+    <!-- Meta Pixel noscript fallback -->
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1965704837682136&ev=PageView&noscript=1"
+    /></noscript>
+
     <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
 
@@ -247,6 +266,7 @@
               href="https://wa.me/5581998471385?text=Gostaria%20de%20receber%20o%20cat%C3%A1logo%20de%20eventos%20da%20Ticketpe"
               target="_blank"
               class="px-8 py-4 bg-brutal-yellow text-brand-dark font-bold text-lg rounded-lg shadow-brutal hover:translate-x-1 hover:translate-y-1 transition text-center"
+              onclick="fbq('track', 'Contact', {content_name: 'Garantir Carva - Hero'});"
             >
               Garantir Carva
             </a>
@@ -529,6 +549,7 @@
             href="https://wa.me/5581998471385?text=Gostaria%20de%20receber%20o%20cat%C3%A1logo%20de%20eventos%20da%20Ticketpe"
             target="_blank"
             class="inline-block px-8 py-4 bg-brutal-yellow text-brand-dark font-bold text-lg brutal-border rounded-lg shadow-brutal hover:translate-x-1 hover:translate-y-1 transition"
+            onclick="fbq('track', 'Contact', {content_name: 'Começar Agora - How it Works'});"
           >
             Começar Agora
           </a>
@@ -778,6 +799,7 @@
               href="https://wa.me/5581998471385?text=Gostaria%20de%20receber%20o%20cat%C3%A1logo%20de%20eventos%20da%20Ticketpe"
               target="_blank"
               class="px-6 py-3 bg-brutal-yellow text-brand-dark font-bold brutal-border rounded-lg shadow-brutal hover:translate-x-1 hover:translate-y-1 transition text-center"
+              onclick="fbq('track', 'Contact', {content_name: 'Ver Eventos - Final CTA'});"
             >
               Ver Eventos
             </a>
