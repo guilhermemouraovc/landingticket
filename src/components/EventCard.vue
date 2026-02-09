@@ -11,9 +11,10 @@
       @click="handleClick"
       @touchstart.passive="handleTouchStart"
       @touchmove.passive="handleTouchMove"
-      role="button"
+      :role="clickable ? 'button' : undefined"
       :tabindex="clickable ? 0 : -1"
-      :aria-label="`Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}`"
+      :aria-label="clickable ? `Evento: ${event.title || 'Sem nome'}. ${event.date || ''}. ${event.location || ''}` : undefined"
+      :aria-disabled="clickable ? undefined : 'true'"
     >
       <q-img
         :src="event.image || defaultImage"

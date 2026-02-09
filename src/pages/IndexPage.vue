@@ -195,18 +195,6 @@
         />
 
         <EventSectionCarousel
-          section-id="previas-carnaval"
-          title="Prévias de Carnaval"
-          :items="previasCarnavalEvents"
-          see-all-label="Ver Tudo"
-          :see-all-link="{ name: 'previas-carnaval' }"
-          :default-image="DEFAULT_IMAGE"
-          :editable="isAdmin"
-          :tag-id="previasCarnavalTagId"
-          :tag-name="previasCarnavalTagName"
-        />
-
-        <EventSectionCarousel
           section-id="carnaval"
           title="Carnaval"
           :items="carnavalEvents"
@@ -294,7 +282,6 @@ const featured = ref([])
 
 // seções adicionais
 const upcomingEvents = ref([])
-const previasCarnavalEvents = ref([])
 const reveillonEvents = ref([])
 const carnavalEvents = ref([])
 const saoJoaoEvents = ref([])
@@ -302,8 +289,6 @@ const allEvents = ref([])
 const autoplayInterval = ref(3000) // em milissegundos
 
 // Tag IDs e nomes para drag-and-drop (admin edição de ordem)
-const previasCarnavalTagId = ref(null)
-const previasCarnavalTagName = ref(null)
 const carnavalTagId = ref(null)
 const carnavalTagName = ref(null)
 const festivaisTagId = ref(null)
@@ -506,7 +491,6 @@ onMounted(async () => {
   // Carrega carrosséis em paralelo
   await Promise.all([
     loadUpcomingEvents(),
-    loadPreviasCarnaval(),
     loadReveillon(),
     loadCarnaval(),
     loadFestivais(),
@@ -546,42 +530,6 @@ async function loadUpcomingEvents() {
   }
 }
 
-async function loadPreviasCarnaval() {
-  try {
-    // Busca o nome correto da tag a partir das categorias carregadas
-    let tagName = 'Prévias de Carnaval' // Nome padrão
-    let tagId = null
-
-    if (categories.value) {
-      const previasCategory = categories.value.find(
-        (c) => c.label === 'Prévias de Carnaval' || c.slug === 'previas-carnaval',
-      )
-      if (previasCategory?.tagName) {
-        tagName = previasCategory.tagName
-      }
-      if (previasCategory?.id) {
-        tagId = previasCategory.id
-      }
-    }
-
-    // Tenta diferentes variações para compatibilidade
-    let events = await fetchEventsByTagSupabase(tagName, { limit: 100 })
-
-    if (!events.length) {
-      events = await fetchEventsByTagSupabase('Prévias de Carnaval', { limit: 100 })
-    }
-
-    if (!events.length) {
-      events = await fetchEventsByTagSupabase('previas-carnaval', { limit: 100 })
-    }
-
-    previasCarnavalEvents.value = events
-    previasCarnavalTagName.value = tagName
-    previasCarnavalTagId.value = tagId
-  } catch {
-    previasCarnavalEvents.value = []
-  }
-}
 
 async function loadReveillon() {
   try {
