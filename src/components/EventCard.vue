@@ -181,6 +181,7 @@ function handleClick(e) {
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .event-card__badge {
@@ -224,6 +225,7 @@ function handleClick(e) {
   overflow: hidden;
   border: none;
   outline: none;
+  height: 100%;
 }
 
 .event-card--clickable {
@@ -335,7 +337,7 @@ function handleClick(e) {
 }
 
 .event-card__body--no-price {
-  padding-top: 20px;
+  padding-top: 15px;
 }
 
 .meta-item {
@@ -359,6 +361,7 @@ function handleClick(e) {
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
+  margin-top: auto;
 }
 
 .price-full {
@@ -459,7 +462,7 @@ function handleClick(e) {
   }
 
   .event-card__body--no-price {
-    padding-top: 16px;
+    padding-top: 12px;
   }
 }
 </style>
