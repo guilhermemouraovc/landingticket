@@ -140,7 +140,8 @@ export function useAdminEvents() {
             price_installments,
             installment_value,
             ticket_url,
-            is_active
+            is_active,
+            sold_out
           )
         `,
         )
@@ -242,6 +243,7 @@ export function useAdminEvents() {
           installment_value: day.installment_value || null,
           ticket_url: day.ticket_url || null,
           is_active: day.is_active !== undefined ? day.is_active : true,
+          sold_out: day.sold_out || false,
         }))
 
         const { error: e4 } = await supabase.from('event_days').insert(dayRecords)
@@ -394,6 +396,7 @@ export function useAdminEvents() {
                 installment_value: day.installment_value || null,
                 ticket_url: day.ticket_url || null,
                 is_active: day.is_active !== undefined ? day.is_active : true,
+                sold_out: day.sold_out || false,
               })
               .eq('id', day.id)
 
@@ -416,6 +419,7 @@ export function useAdminEvents() {
           installment_value: day.installment_value || null,
           ticket_url: day.ticket_url || null,
           is_active: day.is_active !== undefined ? day.is_active : true,
+          sold_out: day.sold_out || false,
         }))
 
         const { error: e9 } = await supabase.from('event_days').insert(dayRecords)

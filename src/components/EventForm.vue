@@ -358,6 +358,18 @@
                       :false-value="false"
                     />
                   </div>
+
+                  <!-- Esgotado -->
+                  <div class="col-12">
+                    <q-toggle
+                      v-model="day.sold_out"
+                      label="Esgotado (exibe 'Esgotado' no lugar do preço)"
+                      color="negative"
+                      icon="block"
+                      :true-value="true"
+                      :false-value="false"
+                    />
+                  </div>
                 </div>
               </q-card-section>
             </q-card>
@@ -818,6 +830,7 @@ function loadEventData() {
         installment_value: day.installment_value || null,
         ticket_url: day.ticket_url || '',
         is_active: day.is_active !== undefined ? day.is_active : true,
+        sold_out: day.sold_out || false,
       })) || [],
   }
 }
@@ -914,6 +927,7 @@ function addDayField() {
     installment_value: null,
     ticket_url: '',
     is_active: true,
+    sold_out: false,
   })
 }
 

@@ -277,6 +277,7 @@ function formatEventDays(days) {
       description: day.description,
       ticketUrl: day.ticket_url,
       dateBadge,
+      soldOut: day.sold_out || false,
       ...priceInfo,
     }
   })

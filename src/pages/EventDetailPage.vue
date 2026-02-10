@@ -144,7 +144,10 @@
                     v-for="(day, index) in event.days"
                     :key="day.id"
                     class="ticket-card"
-                    :class="{ 'ticket-card--last': index === event.days.length - 1 }"
+                    :class="{
+                      'ticket-card--last': index === event.days.length - 1,
+                      'ticket-card--sold-out': day.soldOut,
+                    }"
                   >
                     <!-- Data Header (ex: 14/02 Sábado) -->
                     <div class="ticket-card__header">
@@ -165,7 +168,10 @@
 
                     <!-- Preço -->
                     <div class="ticket-card__price">
-                      <div v-if="day.hasPrice">
+                      <div v-if="day.soldOut" class="ticket-card__sold-out-label">
+                        Esgotado
+                      </div>
+                      <div v-else-if="day.hasPrice">
                         <div class="ticket-card__price-value">
                           {{ day.formattedFullPrice }}
                         </div>
@@ -1598,6 +1604,18 @@ function getEventTags(eventData) {
   font-weight: 400;
   color: #9ca3af;
   margin-top: 4px;
+}
+
+.ticket-card--sold-out {
+  opacity: 0.5;
+}
+
+.ticket-card__sold-out-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ef4444;
+  line-height: 1.2;
 }
 
 /* Botões de navegação do carousel */
