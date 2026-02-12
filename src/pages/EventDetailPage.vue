@@ -144,10 +144,7 @@
                     v-for="(day, index) in event.days"
                     :key="day.id"
                     class="ticket-card"
-                    :class="{
-                      'ticket-card--last': index === event.days.length - 1,
-                      'ticket-card--sold-out': day.soldOut,
-                    }"
+                    :class="{ 'ticket-card--last': index === event.days.length - 1 }"
                   >
                     <!-- Data Header (ex: 14/02 Sábado) -->
                     <div class="ticket-card__header">
@@ -168,9 +165,7 @@
 
                     <!-- Preço -->
                     <div class="ticket-card__price">
-                      <div v-if="day.soldOut" class="ticket-card__sold-out-label">
-                        Esgotado
-                      </div>
+                      <div v-if="day.soldOut" class="ticket-card__sold-out-label">Esgotado</div>
                       <div v-else-if="day.hasPrice">
                         <div class="ticket-card__price-value">
                           {{ day.formattedFullPrice }}
@@ -179,7 +174,8 @@
                           v-if="day.shouldShowInstallments && day.installments"
                           class="ticket-card__price-installments"
                         >
-                          Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }} sem juros
+                          Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }} sem
+                          juros
                         </div>
                       </div>
                       <div v-else class="ticket-card__price-value">Consulte</div>
@@ -203,15 +199,17 @@
               <div class="tickets-buy-wrapper">
                 <q-btn
                   class="tickets-buy-btn"
-                  :class="{ 'btn-expired': isEventExpired }"
+                  :class="{ 'btn-expired': isEventExpired || allDaysSoldOut }"
                   color="warning"
                   text-color="black"
-                  :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
+                  :label="isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Esgotado' : 'Comprar'"
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
-                  :disable="isEventExpired"
-                  :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+                  :disable="isEventExpired || allDaysSoldOut"
+                  :aria-label="
+                    isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Todos os dias esgotados' : 'Comprar ingresso via WhatsApp'
+                  "
                   @click="openWhatsapp()"
                 />
               </div>
@@ -240,9 +238,7 @@
                   {{ event.formattedFullPrice }}
                 </div>
                 <!-- Texto alternativo quando não há parcelas -->
-                <div v-if="!event.shouldShowInstallments" class="payment-info">
-                  no PIX
-                </div>
+                <div v-if="!event.shouldShowInstallments" class="payment-info">no PIX</div>
               </div>
             </div>
 
@@ -801,6 +797,15 @@ const isEventExpired = computed(() => {
   return false
 })
 
+// Função para verificar se todos os dias estão esgotados
+const allDaysSoldOut = computed(() => {
+  if (!event.value || !event.value.days || event.value.days.length === 0) {
+    return false
+  }
+
+  return event.value.days.every(day => day.soldOut === true)
+})
+
 // Função para extrair tags do evento
 function getEventTags(eventData) {
   // Tenta extrair tags de diferentes estruturas possíveis
@@ -844,23 +849,19 @@ function getEventTags(eventData) {
   margin: 0 auto;
 }
 
-/* Hero grande com cantos arredondados e recorte */
+/* Hero grande com cantos arredondados */
 .event-hero-wrap {
-  /* Todas as bordas arredondadas */
   border-radius: 24px;
   overflow: hidden;
-  margin-bottom: 24px;
-  box-shadow: none;
+  margin: 0 auto 24px;
   position: relative;
   width: 100%;
   max-width: 100%;
-  margin: 0 auto;
 }
 
 .event-hero {
   width: 100%;
   max-width: 100%;
-  /* height: 309px; - Altura controlada pelo aspect ratio */
 }
 
 .event-hero :where(.q-img__content, .q-img__image, img) {
@@ -872,7 +873,6 @@ function getEventTags(eventData) {
 
 .event-toolbar {
   display: flex;
-  /* justify-content: flex-start; -- Removido para usar classes do Quasar no template */
   margin-bottom: 24px;
 }
 
@@ -899,28 +899,16 @@ function getEventTags(eventData) {
   line-height: 1.15;
 }
 
-/* Título do evento: Poppins Semibold 64, branco */
 .event-title {
   color: #fff !important;
-  font-family:
-    'Poppins',
-    system-ui,
-    -apple-system,
-    'Helvetica Neue',
-    Arial,
-    'Noto Sans',
-    'Liberation Sans',
-    sans-serif;
-  font-weight: 600 !important; /* semibold */
+  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600 !important;
 }
 
 .event-heading {
   gap: 16px;
-  margin-bottom: 0;
-  margin-left: -36px;
-  margin-right: -36px;
-  padding-left: 0;
-  padding-right: 0; /* Pode ajustar se necessário */
+  margin: 0 -36px;
+  padding: 0;
 }
 
 .event-highlight {
@@ -978,23 +966,17 @@ function getEventTags(eventData) {
   margin-bottom: 40px;
 }
 
-/* Remover a indentação dos meta-items */
 .meta-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: transparent !important;
   padding: 16px 0;
-  margin-left: 0; /* Garantir sem margem */
-  border-radius: 0 !important;
-  box-shadow: none !important;
 }
 
 .meta-badge {
-  /* Tile 80x80 com topo magenta e sombra */
   width: 70px;
   height: 70px;
-  background: #303b4f; /* leve contraste sobre #2A3447 */
+  background: #303b4f;
   border-radius: 16px;
   box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
   color: #ffffff;
@@ -1004,7 +986,7 @@ function getEventTags(eventData) {
 }
 
 .badge-month {
-  background: #d946ef; /* magenta */
+  background: #d946ef;
   color: #fff;
   font-weight: 800;
   font-size: 0.9rem;
@@ -1031,7 +1013,7 @@ function getEventTags(eventData) {
   background: #303b4f;
   border-radius: 16px;
   box-shadow: 0 14px 24px rgba(0, 0, 0, 0.35);
-  color: #d946ef; /* magenta no ícone */
+  color: #d946ef;
 }
 
 .meta-title {
@@ -1044,53 +1026,12 @@ function getEventTags(eventData) {
   font-size: 0.9rem;
 }
 
-/* ==================== BANNER DE EVENTO EXPIRADO ==================== */
-.expired-event-banner {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%);
-  border: 2px solid rgba(239, 68, 68, 0.5);
-  border-radius: 16px;
-  padding: 20px 24px;
-  margin-top: 24px;
-}
-
-.expired-banner-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.expired-icon {
-  color: #fca5a5;
-  flex-shrink: 0;
-}
-
-.expired-text {
-  flex: 1;
-}
-
-.expired-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #fca5a5;
-  margin-bottom: 4px;
-}
-
-.expired-subtitle {
-  font-size: 14px;
-  color: #e5e7eb;
-  font-weight: 400;
-}
-
 /* ==================== SEÇÃO DE PREÇOS ==================== */
 .pricing-section {
   display: flex;
   justify-content: flex-end;
-  margin: 24px 0;
-  margin-left: -36px;
-  margin-right: -36px;
-  padding-left: 0;
-  padding-right: 0;
+  margin: 24px -36px;
+  padding: 0;
   transform: translateY(-215px) translateX(-100px);
 }
 
@@ -1134,20 +1075,18 @@ function getEventTags(eventData) {
   font-weight: 500;
   color: #d1d5db;
   line-height: 0.5;
-  margin-top: 24px; /* Distância exata conforme protótipo */
+  margin-top: 24px;
 }
 
-/* Preço à vista destacado quando não há parcelas (eventos com preço baixo) */
 .cash-price--no-installments {
   font-family: 'Poppins', sans-serif;
   font-size: 45.18px;
-  font-weight: 600; /* Semibold */
+  font-weight: 600;
   color: white;
   line-height: 1;
   margin-top: 0;
 }
 
-/* Texto "No PIX ou no cartão" para eventos sem parcelas */
 .payment-info {
   font-family: 'Poppins', sans-serif;
   font-size: 17.57px;
@@ -1164,11 +1103,8 @@ function getEventTags(eventData) {
   font-size: 16px;
   font-weight: 600;
   line-height: 1;
-  margin-left: auto;
-  margin-right: auto;
+  margin: -130px auto 40px;
   display: block;
-  margin-top: -130px; /* Bem próximo */
-  margin-bottom: 0px;
   background-color: #ffe100 !important;
   color: black !important;
 }
@@ -1177,11 +1113,9 @@ function getEventTags(eventData) {
   background-color: #c3ac02 !important;
 }
 
-
 .event-section {
-  background: transparent; /* Sem fundo */
-  padding: 24px 0; /* Remove padding horizontal para alinhar com o título */
-  border-radius: 0; /* Remove border-radius */
+  padding: 24px 0;
+  margin-top: 24px;
 }
 
 .section-title {
@@ -1353,28 +1287,6 @@ function getEventTags(eventData) {
     font-size: 0.85rem;
   }
 
-  .expired-event-banner {
-    padding: 16px;
-    border-radius: 12px;
-    margin-top: 16px;
-  }
-
-  .expired-banner-content {
-    gap: 12px;
-  }
-
-  .expired-icon {
-    font-size: 24px;
-  }
-
-  .expired-title {
-    font-size: 16px;
-  }
-
-  .expired-subtitle {
-    font-size: 13px;
-  }
-
   /* Responsividade para seção de preços */
   .pricing-section {
     justify-content: flex-start;
@@ -1419,17 +1331,10 @@ function getEventTags(eventData) {
     margin-bottom: 0;
   }
 
-  /* Preço destacado no mobile quando não há parcelas */
   .cash-price--no-installments {
-    font-family: 'Poppins', sans-serif;
     font-size: 32px;
-    font-weight: 600;
-    color: white;
-    line-height: 1;
-    margin-top: 0;
   }
 
-  /* Texto "No PIX ou no cartão" no mobile */
   .payment-info {
     font-size: 14px;
     margin-top: 6px;
@@ -1440,21 +1345,10 @@ function getEventTags(eventData) {
     height: 48px;
     border-radius: 8px !important;
     font-size: 16px;
-    margin-top: 40px;
-    margin-bottom: 24px;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 40px 0 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .buy-btn .q-btn__content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    padding: 0;
   }
 
   .event-section {
@@ -1536,7 +1430,6 @@ function getEventTags(eventData) {
   display: none;
 }
 
-/* Card de preço individual - 270x175px conforme Figma */
 .ticket-card {
   min-width: 270px;
   max-width: 270px;
@@ -1546,9 +1439,7 @@ function getEventTags(eventData) {
   flex-direction: column;
   gap: 8px;
   padding: 24px;
-  background: transparent;
   border-right: 1px solid rgba(255, 255, 255, 0.6);
-  box-sizing: border-box;
 }
 
 .ticket-card--last {
@@ -1588,7 +1479,7 @@ function getEventTags(eventData) {
 
 /* Preço */
 .ticket-card__price {
-  margin-top: auto;
+  margin-top: 4px;
 }
 
 .ticket-card__price-value {
@@ -1606,15 +1497,11 @@ function getEventTags(eventData) {
   margin-top: 4px;
 }
 
-.ticket-card--sold-out {
-  opacity: 0.5;
-}
-
 .ticket-card__sold-out-label {
   font-family: 'Poppins', sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: #ef4444;
+  color: #ffffff;
   line-height: 1.2;
 }
 
@@ -1713,7 +1600,7 @@ function getEventTags(eventData) {
   }
 
   .carousel-btn {
-    display: none; /* Remove setas no mobile, usa scroll touch */
+    display: none;
   }
 
   .ticket-card {
@@ -1789,13 +1676,7 @@ function getEventTags(eventData) {
 .newsletter-title {
   font-size: 30px;
   font-weight: 600;
-  font-family:
-    'Poppins',
-    system-ui,
-    -apple-system,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
+  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   color: #ffffff;
   line-height: 1.4;
   margin: 0;
@@ -1827,7 +1708,6 @@ function getEventTags(eventData) {
 .newsletter-input :deep(.q-field__control) {
   background: #ffffff;
   border-radius: 8px;
-
   height: 44px;
 }
 
@@ -2125,26 +2005,20 @@ function getEventTags(eventData) {
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* Botão branco com texto preto e 40% de opacidade */
+.expired-btn,
+.btn-expired,
+.event-expired .event-card {
+  opacity: 0.4;
+}
+
 .expired-btn {
   min-width: 200px;
   height: 52px;
   border-radius: 10px !important;
   font-size: 16px;
   font-weight: 600;
-  opacity: 0.4;
   background-color: #ffffff !important;
   color: #000000 !important;
-}
-
-/* Card de evento expirado com 40% de opacidade */
-.event-expired .event-card {
-  opacity: 0.4;
-}
-
-/* Botão de compra expirado com 40% de opacidade */
-.btn-expired {
-  opacity: 0.4 !important;
 }
 
 @media (max-width: 599px) {
