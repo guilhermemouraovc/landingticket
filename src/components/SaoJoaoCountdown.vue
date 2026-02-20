@@ -51,7 +51,7 @@
         </div>
 
         <div class="sj-date-info">
-          <span class="sj-date-badge">📅 23 de Junho de 2026 — São João!</span>
+          <span class="sj-date-badge">📅 01 de Junho de 2026 — São João!</span>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ const flags = computed(() =>
 const now = ref(new Date())
 let ticker = null
 
-const targetDate = new Date('2026-06-23T00:00:00')
+const targetDate = new Date('2026-06-01T00:00:00')
 
 const daysNumber = computed(() => {
   const diff = targetDate - now.value
