@@ -4,6 +4,14 @@ import { toEventCardFromSb, toEventDetailFromSb } from 'src/utils/supabaseEventM
 import { generateSlug } from 'src/utils/stringUtils'
 import { sortEventsByPriorityAndDate } from 'src/utils/eventSorting'
 
+/**
+ * Fetches events that have all of the specified tags.
+ *
+ * @param {string[]} tagNames - Array of tag names to match; if empty, returns an empty array.
+ * @param {Object} [options] - Query options.
+ * @param {number} [options.limit=200] - Maximum number of event cards to return.
+ * @returns {Array} Array of event cards that match every tag in `tagNames`.
+ */
 export function useSupabaseEvents() {
   const loading = ref(false)
   const error = ref(null)
