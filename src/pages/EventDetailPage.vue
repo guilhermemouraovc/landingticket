@@ -202,13 +202,13 @@
                   :class="{ 'btn-expired': isEventExpired || allDaysSoldOut }"
                   color="warning"
                   text-color="black"
-                  :label="isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Esgotado' : 'Comprar'"
+                  :label="isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Esgotado' : isReservation ? 'Reservar' : 'Comprar'"
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
                   :disable="isEventExpired || allDaysSoldOut"
                   :aria-label="
-                    isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Todos os dias esgotados' : 'Comprar ingresso via WhatsApp'
+                    isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Todos os dias esgotados' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'
                   "
                   @click="openWhatsapp()"
                 />
@@ -246,15 +246,15 @@
             <q-btn
               v-if="!event.days || event.days.length === 0"
               class="buy-btn"
-              :class="{ 'btn-expired': isEventExpired }"
+              :class="{ 'btn-expired': isEventExpired, 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
-              :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
+              :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
               :disable="isEventExpired"
-              :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+              :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
               @click="openWhatsapp()"
             />
 
@@ -337,11 +337,11 @@
             class="floating-buy-btn"
             :color="isEventExpired ? 'grey-7' : 'warning'"
             text-color="black"
-            :label="isEventExpired ? 'Evento encerrado' : 'Comprar'"
+            :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
             unelevated
             no-caps
             :loading="openingWhatsapp"
-            :aria-label="isEventExpired ? 'Evento encerrado' : 'Comprar ingresso via WhatsApp'"
+            :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
             @click="isEventExpired ? goHome() : openWhatsapp()"
           />
         </div>
@@ -399,9 +399,12 @@ const openingWhatsapp = ref(false)
 const $q = useQuasar()
 
 // Função para gerar mensagem padrão do WhatsApp com nome do evento
-function getDefaultWhatsAppMessage(eventTitle, hasRef = false) {
+function getDefaultWhatsAppMessage(eventTitle, hasRef = false, isReservation = false) {
   if (hasRef) {
     return null // Será tratado pelo composable de influenciadora
+  }
+  if (isReservation) {
+    return `Olá! Gostaria de reservar ${eventTitle}`
   }
   return `Olá! Gostaria de finalizar a compra do ${eventTitle}`
 }
@@ -592,7 +595,7 @@ function openWhatsapp(customMessageOrEvent) {
   let message =
     customMessage ||
     event.value.whatsappMessage ||
-    getDefaultWhatsAppMessage(event.value.title, hasInfluencer())
+    getDefaultWhatsAppMessage(event.value.title, hasInfluencer(), isReservation.value)
 
   if (hasInfluencer()) {
     // Usa número fixo e mensagem personalizada para influenciadoras
@@ -795,6 +798,12 @@ const isEventExpired = computed(() => {
   }
 
   return false
+})
+
+// Evento sem preço = reserva (evento futuro sem venda aberta)
+const isReservation = computed(() => {
+  if (!event.value) return false
+  return !event.value.hasPrice
 })
 
 // Função para verificar se todos os dias estão esgotados
@@ -1107,6 +1116,10 @@ function getEventTags(eventData) {
   display: block;
   background-color: #ffe100 !important;
   color: black !important;
+}
+
+.buy-btn--no-price {
+  margin: 24px auto 40px;
 }
 
 .buy-btn:hover {
@@ -2005,7 +2018,6 @@ function getEventTags(eventData) {
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-.expired-btn,
 .btn-expired,
 .event-expired .event-card {
   opacity: 0.4;
@@ -2019,6 +2031,7 @@ function getEventTags(eventData) {
   font-weight: 600;
   background-color: #ffffff !important;
   color: #000000 !important;
+  opacity: 1;
 }
 
 @media (max-width: 599px) {
