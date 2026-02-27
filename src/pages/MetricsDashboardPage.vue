@@ -1,5 +1,7 @@
 <template>
   <div class="metrics-dashboard" ref="dashboardRef">
+    <SaoJoaoCountdown v-if="showSaoJoao" @close="showSaoJoao = false" />
+
     <div class="container">
       <div class="logo-container">
         <img src="/ticketpe.svg" alt="TicketPE" />
@@ -13,7 +15,11 @@
             <q-tooltip>Voltar ao Admin</q-tooltip>
           </q-btn>
           <h1>CARVA NA LADEIRA</h1>
-          <button class="reload-btn" :class="{ loading: isLoading }" @click="reloadData">
+          <div class="header-actions">
+            <button class="saojoao-btn" @click="showSaoJoao = true">
+              🎆 Contagem São João
+            </button>
+            <button class="reload-btn" :class="{ loading: isLoading }" @click="reloadData">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -28,7 +34,8 @@
               />
             </svg>
             Atualizar
-          </button>
+            </button>
+          </div>
         </div>
         <div class="last-update">{{ lastUpdate }}</div>
 
@@ -151,6 +158,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import SaoJoaoCountdown from 'src/components/SaoJoaoCountdown.vue'
+
+const showSaoJoao = ref(false)
 
 const GOOGLE_APPS_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbzh8ch_bDBx7WvohlHY945auJ3yBhbEZy_29O9F-Lj6HV-2r634w_HB_-IRDtx-Lp8W3g/exec'
@@ -755,6 +765,47 @@ h1 {
   margin-bottom: 0;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.saojoao-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #92400e 0%, #f59e0b 50%, #fbbf24 100%);
+  color: #1a0a00;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 4px 15px rgba(245, 158, 11, 0.4),
+    0 0 0 1px rgba(245, 158, 11, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+}
+
+.saojoao-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(245, 158, 11, 0.5),
+    0 0 0 2px rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, #a16207 0%, #f59e0b 50%, #fde68a 100%);
+}
+
+.saojoao-btn:active {
+  transform: translateY(0);
+}
+
 .last-update {
   font-size: 12px;
   color: #64748b;
@@ -771,6 +822,16 @@ h1 {
     font-size: 20px;
     letter-spacing: 2px;
     order: -1;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .saojoao-btn {
+    padding: 10px 14px;
+    font-size: 12px;
   }
 }
 </style>

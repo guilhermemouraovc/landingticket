@@ -327,17 +327,19 @@ function handleClick(e) {
 }
 
 .event-card__meta--no-price {
-  font-size: 16px;
-  margin-top: 8px;
-  justify-content: center;
+  font-size: 14px;
 
   .meta-icon {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
 
 .event-card__body--no-price {
   padding-top: 15px;
+
+  .event-card__meta {
+    margin-top: auto;
+  }
 }
 
 .meta-item {
@@ -453,8 +455,7 @@ function handleClick(e) {
   }
 
   .event-card__meta--no-price {
-    font-size: 14px;
-    margin-top: 6px;
+    font-size: 12px;
 
     .meta-icon {
       font-size: 16px !important;
@@ -463,6 +464,10 @@ function handleClick(e) {
 
   .event-card__body--no-price {
     padding-top: 12px;
+
+    .event-card__meta {
+      margin-top: auto;
+    }
   }
 }
 </style>
