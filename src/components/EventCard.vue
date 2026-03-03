@@ -136,10 +136,7 @@ const touchStartPos = ref({ x: 0, y: 0 })
 const isDragging = ref(false)
 
 const metaLayoutClass = computed(() => {
-  if (!props.event.hasPrice && props.showPrice && props.variant !== 'grid') {
-    return 'meta-layout--stacked'
-  }
-  return props.variant === 'grid' ? 'meta-layout--row' : 'meta-layout--column'
+  return props.variant === 'grid' ? 'meta-layout--column' : 'meta-layout--column'
 })
 
 function handleTouchStart(e) {
@@ -275,15 +272,21 @@ function handleClick(e) {
   }
 }
 
+.event-card--grid .event-card__image {
+  height: 220px !important;
+  min-height: 220px;
+}
+
 .event-card__body {
   flex: 1;
-  padding: 15px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   color: #1f2937;
   background: #ffffff;
   border-radius: 0 0 24px 24px;
+  min-height: 130px;
 }
 
 .event-card__title {
@@ -310,7 +313,11 @@ function handleClick(e) {
   font-weight: 400;
 }
 
-.meta-layout--column,
+.meta-layout--column {
+  flex-direction: column;
+  gap: 8px;
+}
+
 .meta-layout--row {
   flex-direction: row;
   flex-wrap: wrap;
@@ -416,10 +423,9 @@ function handleClick(e) {
   }
 
   .event-card__body {
-    padding: 12px 14px;
-    gap: 8px;
-    height: 167px;
-    overflow: hidden;
+    padding: 16px;
+    gap: 10px;
+    min-height: 120px;
   }
 
   .event-card__title {
