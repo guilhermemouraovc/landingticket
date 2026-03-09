@@ -52,24 +52,26 @@
         </div>
 
         <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
-          <div v-if="event.fullPrice" class="price-full">
+          <div v-if="event.formattedFullPrice" class="price-full">
             {{ event.formattedFullPrice }}
           </div>
+          <div v-if="event.formattedFullPrice" class="price-method">no Pix</div>
 
           <div
             v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
             class="price-installment"
           >
-            <span class="installment-label">{{ event.installments }}x de</span>
+            <span class="installment-label">ou {{ event.installments }}x de</span>
             <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
-            <span class="installment-info">sem juros</span>
+            <span class="installment-info">no cartão</span>
           </div>
 
           <div
-            v-else-if="event.hasPrice && !event.shouldShowInstallments"
+            v-else-if="event.formattedCardPrice && !event.shouldShowInstallments"
             class="price-installment"
           >
-            <span class="installment-info">No pix ou no cartão</span>
+            <span class="installment-label">ou {{ event.formattedCardPrice }}</span>
+            <span class="installment-info">no cartão</span>
           </div>
         </div>
 
@@ -361,6 +363,14 @@ function handleClick(e) {
   font-weight: 600;
   color: #000000;
   line-height: 1.2;
+}
+
+.price-method {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: #008ec1;
+  font-weight: 400;
+  margin-top: -4px;
 }
 
 .price-installment {
