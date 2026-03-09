@@ -170,7 +170,7 @@
                         <div v-if="day.formattedFullPrice" class="ticket-card__price-value">
                           {{ day.formattedFullPrice }}
                         </div>
-                        <div v-if="day.formattedFullPrice" class="ticket-card__price-method">
+                        <div v-if="day.formattedFullPrice && !day.shouldShowInstallments && !day.formattedCardPrice" class="ticket-card__price-method">
                           no Pix
                         </div>
                         <div

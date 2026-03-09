@@ -315,7 +315,6 @@
                       step="0.01"
                       prefix="R$"
                       hint="Valor cheio no cartão"
-                      @update:model-value="recalcDayInstallmentValue(index)"
                     >
                       <template v-slot:prepend>
                         <q-icon name="credit_card" />
@@ -332,7 +331,6 @@
                       type="number"
                       min="1"
                       hint="Parcelas no cartão"
-                      @update:model-value="recalcDayInstallmentValue(index)"
                     >
                       <template v-slot:prepend>
                         <q-icon name="filter_1" />
@@ -444,7 +442,6 @@
               type="number"
               min="1"
               hint="Número de parcelas no cartão"
-              @update:model-value="recalcInstallmentValue"
             >
               <template v-slot:prepend>
                 <q-icon name="filter_1" />
@@ -995,10 +992,23 @@ function recalcDayInstallmentValue(index) {
   }
 }
 
-// Recalcula automaticamente quando card_price muda no evento principal
+// Recalcula automaticamente quando card_price ou parcelas mudam no evento principal
 watch(
-  () => formData.value.card_price,
+  () => [formData.value.card_price, formData.value.price_installments],
   () => recalcInstallmentValue(),
+)
+
+// Recalcula automaticamente quando card_price ou parcelas mudam nos dias
+watch(
+  () => formData.value.days.map((d) => `${d.card_price}-${d.price_installments}`),
+  (newVals, oldVals) => {
+    if (!oldVals) return
+    formData.value.days.forEach((day, index) => {
+      if (newVals[index] !== oldVals[index]) {
+        recalcDayInstallmentValue(index)
+      }
+    })
+  },
 )
 
 async function handleSubmit() {
