@@ -20,7 +20,7 @@
         :src="event.image || defaultImage"
         :alt="`Imagem do evento ${event.title || 'Sem nome'}`"
         class="event-card__image"
-        :height="imageHeight"
+        :height="resolvedImageHeight"
         ratio="16/9"
         spinner-color="white"
         loading="lazy"
@@ -52,24 +52,26 @@
         </div>
 
         <div v-if="event.hasPrice && showPrice" class="event-card__price-section">
-          <div v-if="event.fullPrice" class="price-full">
+          <div v-if="event.formattedFullPrice" class="price-full">
             {{ event.formattedFullPrice }}
           </div>
+          <div v-if="event.formattedFullPrice" class="price-method">no Pix</div>
 
           <div
             v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
             class="price-installment"
           >
-            <span class="installment-label">{{ event.installments }}x de</span>
+            <span class="installment-label">ou {{ event.installments }}x de</span>
             <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
-            <span class="installment-info">sem juros</span>
+            <span class="installment-info">no cartão</span>
           </div>
 
           <div
-            v-else-if="event.hasPrice && !event.shouldShowInstallments"
+            v-else-if="event.formattedCardPrice && !event.shouldShowInstallments"
             class="price-installment"
           >
-            <span class="installment-info">No pix ou no cartão</span>
+            <span class="installment-label">ou {{ event.formattedCardPrice }}</span>
+            <span class="installment-info">no cartão</span>
           </div>
         </div>
 
@@ -93,7 +95,7 @@ const props = defineProps({
   },
   imageHeight: {
     type: String,
-    default: '220px',
+    default: null,
   },
   variant: {
     type: String,
@@ -135,9 +137,9 @@ const emit = defineEmits(['click'])
 const touchStartPos = ref({ x: 0, y: 0 })
 const isDragging = ref(false)
 
-const metaLayoutClass = computed(() => {
-  return props.variant === 'grid' ? 'meta-layout--column' : 'meta-layout--column'
-})
+const resolvedImageHeight = computed(() => props.imageHeight ?? (props.variant === 'grid' ? '220px' : '220px'))
+
+const metaLayoutClass = computed(() => 'meta-layout--column')
 
 function handleTouchStart(e) {
   isDragging.value = false
@@ -272,10 +274,6 @@ function handleClick(e) {
   }
 }
 
-.event-card--grid .event-card__image {
-  height: 220px !important;
-  min-height: 220px;
-}
 
 .event-card__body {
   flex: 1;
@@ -318,20 +316,6 @@ function handleClick(e) {
   gap: 8px;
 }
 
-.meta-layout--row {
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.meta-layout--stacked {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  .meta-item {
-    width: 100%;
-  }
-}
 
 .event-card__meta--no-price {
   font-size: 14px;
@@ -379,6 +363,14 @@ function handleClick(e) {
   font-weight: 600;
   color: #000000;
   line-height: 1.2;
+}
+
+.price-method {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: #008ec1;
+  font-weight: 400;
+  margin-top: -4px;
 }
 
 .price-installment {

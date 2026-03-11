@@ -57,35 +57,38 @@ function formatPrice(value) {
  * Inclui lógica para determinar se deve mostrar parcelas baseado no valor do ingresso
  */
 function formatPriceInfo(row) {
-  if (!row.price || row.price <= 0) {
+  const pixPrice = row.price
+  const cardPrice = row.card_price
+  const hasPrice = (pixPrice && pixPrice > 0) || (cardPrice && cardPrice > 0)
+
+  if (!hasPrice) {
     return {
       hasPrice: false,
       fullPrice: null,
+      cardPrice: null,
       installments: null,
       installmentValue: null,
       formattedFullPrice: null,
+      formattedCardPrice: null,
       formattedInstallmentValue: null,
       shouldShowInstallments: false,
     }
   }
 
-  const fullPrice = row.price
   const installments = row.price_installments || null
   const installmentValue = row.installment_value || null
 
-  // Não mostra parcelas se:
-  // - Preço for baixo (menor que R$100) - não faz sentido mostrar parcelas para valores baixos
-  // - Número de parcelas for 1 ou menos (não faz sentido mostrar "1x")
-  const PRICE_THRESHOLD = 100
   const shouldShowInstallments =
-    fullPrice >= PRICE_THRESHOLD && installments && installments > 1 && installmentValue
+    cardPrice && cardPrice > 0 && installments && installments > 1 && installmentValue
 
   return {
     hasPrice: true,
-    fullPrice,
+    fullPrice: pixPrice || null,
+    cardPrice: cardPrice || null,
     installments,
     installmentValue,
-    formattedFullPrice: formatPrice(fullPrice),
+    formattedFullPrice: pixPrice ? formatPrice(pixPrice) : null,
+    formattedCardPrice: cardPrice ? formatPrice(cardPrice) : null,
     formattedInstallmentValue: installmentValue ? formatPrice(installmentValue) : null,
     shouldShowInstallments,
   }
@@ -264,6 +267,7 @@ function formatEventDays(days) {
 
     const priceInfo = formatPriceInfo({
       price: day.price,
+      card_price: day.card_price,
       price_installments: day.price_installments,
       installment_value: day.installment_value,
     })

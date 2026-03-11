@@ -288,18 +288,36 @@
                     />
                   </div>
 
-                  <!-- Preço à Vista -->
+                  <!-- Preço à Vista (Pix) -->
                   <div class="col-12 col-md-4">
                     <q-input
                       v-model.number="day.price"
-                      label="Preço à Vista"
+                      label="Valor à Vista (Pix)"
                       outlined
                       type="number"
                       step="0.01"
                       prefix="R$"
+                      hint="Valor com desconto no Pix"
                     >
                       <template v-slot:prepend>
-                        <q-icon name="attach_money" />
+                        <q-icon name="pix" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <!-- Valor no Cartão -->
+                  <div class="col-12 col-md-4">
+                    <q-input
+                      v-model.number="day.card_price"
+                      label="Valor no Cartão"
+                      outlined
+                      type="number"
+                      step="0.01"
+                      prefix="R$"
+                      hint="Valor cheio no cartão"
+                    >
+                      <template v-slot:prepend>
+                        <q-icon name="credit_card" />
                       </template>
                     </q-input>
                   </div>
@@ -311,6 +329,8 @@
                       label="Qtd. Parcelas"
                       outlined
                       type="number"
+                      min="1"
+                      hint="Parcelas no cartão"
                     >
                       <template v-slot:prepend>
                         <q-icon name="filter_1" />
@@ -318,15 +338,18 @@
                     </q-input>
                   </div>
 
-                  <!-- Valor da Parcela -->
+                  <!-- Valor da Parcela (calculado) -->
                   <div class="col-12 col-md-4">
                     <q-input
-                      v-model.number="day.installment_value"
+                      :model-value="day.installment_value"
                       label="Valor da Parcela"
                       outlined
                       type="number"
                       step="0.01"
                       prefix="R$"
+                      readonly
+                      hint="Calculado automaticamente"
+                      bg-color="grey-2"
                     >
                       <template v-slot:prepend>
                         <q-icon name="money" />
@@ -384,14 +407,30 @@
           <div class="col-12 col-md-4">
             <q-input
               v-model.number="formData.price"
-              label="Preço à Vista"
+              label="Valor à Vista (Pix)"
               outlined
               type="number"
               step="0.01"
               prefix="R$"
+              hint="Valor com desconto no Pix"
             >
               <template v-slot:prepend>
-                <q-icon name="attach_money" />
+                <q-icon name="pix" />
+              </template>
+            </q-input>
+          </div>
+          <div class="col-12 col-md-4">
+            <q-input
+              v-model.number="formData.card_price"
+              label="Valor no Cartão"
+              outlined
+              type="number"
+              step="0.01"
+              prefix="R$"
+              hint="Valor cheio para pagamento no cartão"
+            >
+              <template v-slot:prepend>
+                <q-icon name="credit_card" />
               </template>
             </q-input>
           </div>
@@ -401,6 +440,8 @@
               label="Qtd. Parcelas"
               outlined
               type="number"
+              min="1"
+              hint="Número de parcelas no cartão"
             >
               <template v-slot:prepend>
                 <q-icon name="filter_1" />
@@ -409,12 +450,15 @@
           </div>
           <div class="col-12 col-md-4">
             <q-input
-              v-model.number="formData.installment_value"
+              :model-value="formData.installment_value"
               label="Valor da Parcela"
               outlined
               type="number"
               step="0.01"
               prefix="R$"
+              readonly
+              hint="Calculado automaticamente (Valor no Cartão ÷ Parcelas)"
+              bg-color="grey-2"
             >
               <template v-slot:prepend>
                 <q-icon name="money" />
@@ -622,20 +666,6 @@
         </div>
       </q-tab-panel>
 
-      <!-- Aba Múltiplos Dias -->
-      <q-tab-panel name="dias">
-        <div class="row items-center justify-between q-mb-md wrap q-gap-md">
-          <div class="text-subtitle1 text-primary">Dias do Evento</div>
-          <q-btn
-            color="primary"
-            icon="add"
-            label="Adicionar Dia"
-            @click="addDayField"
-            unelevated
-            :size="$q.screen.lt.sm ? 'sm' : 'md'"
-          />
-        </div>
-      </q-tab-panel>
     </q-tab-panels>
 
     <!-- Botões de Ação Fixos -->
@@ -701,6 +731,7 @@ const formData = ref({
   whatsapp_message: '',
   share_url: '',
   price: null,
+  card_price: null,
   price_installments: null,
   installment_value: null,
   currency: 'BRL',
@@ -800,6 +831,7 @@ function loadEventData() {
     whatsapp_message: event.whatsapp_message || '',
     share_url: event.share_url || '',
     price: event.price || null,
+    card_price: event.card_price || null,
     price_installments: event.price_installments || null,
     installment_value: event.installment_value || null,
     currency: event.currency || 'BRL',
@@ -826,6 +858,7 @@ function loadEventData() {
         title: day.title || '',
         description: day.description || '',
         price: day.price || null,
+        card_price: day.card_price || null,
         price_installments: day.price_installments || null,
         installment_value: day.installment_value || null,
         ticket_url: day.ticket_url || '',
@@ -850,6 +883,7 @@ function resetForm() {
     whatsapp_message: '',
     share_url: '',
     price: null,
+    card_price: null,
     price_installments: null,
     installment_value: null,
     currency: 'BRL',
@@ -923,6 +957,7 @@ function addDayField() {
     title: '',
     description: '',
     price: null,
+    card_price: null,
     price_installments: null,
     installment_value: null,
     ticket_url: '',
@@ -934,6 +969,47 @@ function addDayField() {
 function removeDayField(index) {
   formData.value.days.splice(index, 1)
 }
+
+// Recalcula installment_value do evento principal
+function recalcInstallmentValue() {
+  const cp = formData.value.card_price
+  const inst = formData.value.price_installments
+  if (cp && inst && inst > 0) {
+    formData.value.installment_value = Math.round((cp / inst) * 100) / 100
+  } else {
+    formData.value.installment_value = null
+  }
+}
+
+// Recalcula installment_value de um dia específico
+function recalcDayInstallmentValue(index) {
+  const day = formData.value.days[index]
+  if (!day) return
+  if (day.card_price && day.price_installments && day.price_installments > 0) {
+    day.installment_value = Math.round((day.card_price / day.price_installments) * 100) / 100
+  } else {
+    day.installment_value = null
+  }
+}
+
+// Recalcula automaticamente quando card_price ou parcelas mudam no evento principal
+watch(
+  () => [formData.value.card_price, formData.value.price_installments],
+  () => recalcInstallmentValue(),
+)
+
+// Recalcula automaticamente quando card_price ou parcelas mudam nos dias
+watch(
+  () => formData.value.days.map((d) => `${d.card_price}-${d.price_installments}`),
+  (newVals, oldVals) => {
+    if (!oldVals) return
+    formData.value.days.forEach((day, index) => {
+      if (newVals[index] !== oldVals[index]) {
+        recalcDayInstallmentValue(index)
+      }
+    })
+  },
+)
 
 async function handleSubmit() {
   try {

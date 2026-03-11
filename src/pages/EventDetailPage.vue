@@ -146,9 +146,9 @@
                     class="ticket-card"
                     :class="{ 'ticket-card--last': index === event.days.length - 1 }"
                   >
-                    <!-- Data Header (ex: 14/02 Sábado) -->
+                    <!-- Header: título customizado ou data formatada -->
                     <div class="ticket-card__header">
-                      {{ day.label }}
+                      {{ day.title || day.label }}
                     </div>
 
                     <!-- Meta Info (Data e Local) -->
@@ -167,15 +167,30 @@
                     <div class="ticket-card__price">
                       <div v-if="day.soldOut" class="ticket-card__sold-out-label">Esgotado</div>
                       <div v-else-if="day.hasPrice">
-                        <div class="ticket-card__price-value">
+                        <div v-if="day.formattedFullPrice" class="ticket-card__price-value">
                           {{ day.formattedFullPrice }}
+                        </div>
+                        <div
+                          v-if="
+                            day.formattedFullPrice &&
+                            !day.shouldShowInstallments &&
+                            !day.formattedCardPrice
+                          "
+                          class="ticket-card__price-method"
+                        >
+                          no Pix
                         </div>
                         <div
                           v-if="day.shouldShowInstallments && day.installments"
                           class="ticket-card__price-installments"
                         >
-                          Ou até {{ day.installments }}x {{ day.formattedInstallmentValue }} sem
-                          juros
+                          ou {{ day.installments }}x {{ day.formattedInstallmentValue }} no cartão
+                        </div>
+                        <div
+                          v-else-if="day.formattedCardPrice && !day.shouldShowInstallments"
+                          class="ticket-card__price-installments"
+                        >
+                          ou {{ day.formattedCardPrice }} no cartão
                         </div>
                       </div>
                       <div v-else class="ticket-card__price-value">Consulte</div>
@@ -202,13 +217,27 @@
                   :class="{ 'btn-expired': isEventExpired || allDaysSoldOut }"
                   color="warning"
                   text-color="black"
-                  :label="isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Esgotado' : isReservation ? 'Reservar' : 'Comprar'"
+                  :label="
+                    isEventExpired
+                      ? 'Evento encerrado'
+                      : allDaysSoldOut
+                        ? 'Esgotado'
+                        : isReservation
+                          ? 'Comprar'
+                          : 'Comprar'
+                  "
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
                   :disable="isEventExpired || allDaysSoldOut"
                   :aria-label="
-                    isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Todos os dias esgotados' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'
+                    isEventExpired
+                      ? 'Evento encerrado'
+                      : allDaysSoldOut
+                        ? 'Todos os dias esgotados'
+                        : isReservation
+                          ? 'Comprar ingresso via WhatsApp'
+                          : 'Comprar ingresso via WhatsApp'
                   "
                   @click="openWhatsapp()"
                 />
@@ -218,27 +247,31 @@
             <!-- Seção de Preços (Único Dia) -->
             <div v-else-if="event.hasPrice" class="pricing-section q-mt-xl">
               <div class="pricing-info">
-                <!-- Parcelas (apenas se relevante: preço >= R$100 e mais de 1 parcela) -->
+                <!-- Preço à vista (Pix) -->
+                <div v-if="event.formattedFullPrice" class="cash-price cash-price--no-installments">
+                  {{ event.formattedFullPrice }}
+                </div>
+                <div v-if="event.formattedFullPrice" class="payment-info">no Pix</div>
+
+                <!-- Parcelas no cartão -->
                 <div
                   v-if="
                     event.shouldShowInstallments && event.installments && event.installmentValue
                   "
                   class="installment-details"
                 >
-                  <span class="installment-prefix">{{ event.installments }}x de</span>
+                  <span class="installment-prefix">ou {{ event.installments }}x de</span>
                   <span class="installment-value">{{ event.formattedInstallmentValue }}</span>
-                  <span class="installment-suffix">sem juros</span>
-                  <!-- Preço à vista logo abaixo de "sem juros" -->
-                  <div v-if="event.fullPrice" class="cash-price">
-                    ou {{ event.formattedFullPrice }} à vista
-                  </div>
+                  <span class="installment-suffix">no cartão</span>
                 </div>
-                <!-- Preço à vista destacado quando não há parcelas -->
-                <div v-else-if="event.fullPrice" class="cash-price cash-price--no-installments">
-                  {{ event.formattedFullPrice }}
+                <!-- Valor cheio no cartão sem parcelas -->
+                <div
+                  v-else-if="event.formattedCardPrice && !event.shouldShowInstallments"
+                  class="installment-details"
+                >
+                  <span class="installment-prefix">ou {{ event.formattedCardPrice }}</span>
+                  <span class="installment-suffix">no cartão</span>
                 </div>
-                <!-- Texto alternativo quando não há parcelas -->
-                <div v-if="!event.shouldShowInstallments" class="payment-info">no PIX</div>
               </div>
             </div>
 
@@ -249,12 +282,18 @@
               :class="{ 'btn-expired': isEventExpired, 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
-              :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
+              :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Comprar' : 'Comprar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
               :disable="isEventExpired"
-              :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
+              :aria-label="
+                isEventExpired
+                  ? 'Evento encerrado'
+                  : isReservation
+                    ? 'Comprar ingresso via WhatsApp'
+                    : 'Comprar ingresso via WhatsApp'
+              "
               @click="openWhatsapp()"
             />
 
@@ -325,11 +364,12 @@
             <div class="floating-buy-title">{{ event.title }}</div>
             <div class="floating-buy-price">
               <span class="floating-price-value">{{ event.formattedFullPrice || 'Consulte' }}</span>
+              <span v-if="event.formattedFullPrice" class="floating-price-method">no Pix</span>
               <span
                 v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
                 class="floating-price-installments"
               >
-                Ou até {{ event.installments }}x {{ event.formattedInstallmentValue }} sem juros
+                ou {{ event.installments }}x {{ event.formattedInstallmentValue }} no cartão
               </span>
             </div>
           </div>
@@ -337,11 +377,17 @@
             class="floating-buy-btn"
             :color="isEventExpired ? 'grey-7' : 'warning'"
             text-color="black"
-            :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
+            :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Comprar' : 'Comprar'"
             unelevated
             no-caps
             :loading="openingWhatsapp"
-            :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
+            :aria-label="
+              isEventExpired
+                ? 'Evento encerrado'
+                : isReservation
+                  ? 'Comprar ingresso via WhatsApp'
+                  : 'Comprar ingresso via WhatsApp'
+            "
             @click="isEventExpired ? goHome() : openWhatsapp()"
           />
         </div>
@@ -404,7 +450,7 @@ function getDefaultWhatsAppMessage(eventTitle, hasRef = false, isReservation = f
     return null // Será tratado pelo composable de influenciadora
   }
   if (isReservation) {
-    return `Olá! Gostaria de reservar ${eventTitle}`
+    return `Olá! Gostaria de comprar ${eventTitle}`
   }
   return `Olá! Gostaria de finalizar a compra do ${eventTitle}`
 }
@@ -812,7 +858,7 @@ const allDaysSoldOut = computed(() => {
     return false
   }
 
-  return event.value.days.every(day => day.soldOut === true)
+  return event.value.days.every((day) => day.soldOut === true)
 })
 
 // Função para extrair tags do evento
@@ -910,7 +956,13 @@ function getEventTags(eventData) {
 
 .event-title {
   color: #fff !important;
-  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   font-weight: 600 !important;
 }
 
@@ -1503,6 +1555,13 @@ function getEventTags(eventData) {
   line-height: 1.2;
 }
 
+.ticket-card__price-method {
+  font-size: 13px;
+  font-weight: 400;
+  color: #35c7ee;
+  margin-top: 2px;
+}
+
 .ticket-card__price-installments {
   font-size: 13px;
   font-weight: 400;
@@ -1689,7 +1748,13 @@ function getEventTags(eventData) {
 .newsletter-title {
   font-size: 30px;
   font-weight: 600;
-  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   color: #ffffff;
   line-height: 1.4;
   margin: 0;
@@ -1890,6 +1955,12 @@ function getEventTags(eventData) {
   font-size: 24px;
   font-weight: 700;
   color: #ffffff;
+}
+
+.floating-price-method {
+  font-size: 12px;
+  font-weight: 400;
+  color: #35c7ee;
 }
 
 .floating-price-installments {
