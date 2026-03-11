@@ -46,10 +46,7 @@ A página inicial exibe eventos em carrosséis organizados por data:
 ```vue
 <!-- Exemplo de uso do EventCard -->
 <template>
-  <EventCard
-    :event="eventData"
-    @click="navigateToEvent"
-  />
+  <EventCard :event="eventData" @click="navigateToEvent" />
 </template>
 
 <script setup>
@@ -60,8 +57,8 @@ const eventData = {
   location: 'Olinda - PE',
   cityState: 'Olinda - PE',
   image: 'https://...',
-  price: 150.00,
-  hasPrice: true
+  price: 150.0,
+  hasPrice: true,
 }
 
 function navigateToEvent(event) {
@@ -103,10 +100,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 import { supabase } from 'boot/supabase'
 
 // Buscar eventos
-const { data, error } = await supabase
-  .from('events')
-  .select('*')
-  .eq('active', true)
+const { data, error } = await supabase.from('events').select('*').eq('active', true)
 ```
 
 ## Configuração
@@ -139,9 +133,9 @@ module.exports = {
         secondary: '#26A69A',
         accent: '#9C27B0',
         // ... outras cores
-      }
-    }
-  }
+      },
+    },
+  },
 }
 ```
 
@@ -150,8 +144,8 @@ Ou use variáveis CSS:
 ```css
 /* src/css/app.scss */
 :root {
-  --primary-color: #1976D2;
-  --secondary-color: #26A69A;
+  --primary-color: #1976d2;
+  --secondary-color: #26a69a;
 }
 ```
 
@@ -172,6 +166,7 @@ Componente para exibir cards de eventos:
 ```
 
 **Props:**
+
 - `event` (Object, obrigatório): Dados do evento
 - `variant` (String): 'carousel' ou 'grid'
 - `clickable` (Boolean): Se o card é clicável
@@ -206,10 +201,10 @@ async function createEvent(eventData) {
         description: 'Descrição do evento',
         date: '2025-06-23',
         location: 'Recife - PE',
-        price: 150.00,
+        price: 150.0,
         image_url: 'https://...',
-        active: true
-      }
+        active: true,
+      },
     ])
     .select()
 
@@ -234,7 +229,7 @@ const router = useRouter()
 function goToEventDetail(eventId) {
   router.push({
     name: 'event-detail',
-    params: { id: eventId }
+    params: { id: eventId },
   })
 }
 
@@ -242,7 +237,7 @@ function goToEventDetail(eventId) {
 function searchEvents(term) {
   router.push({
     name: 'search',
-    query: { q: term }
+    query: { q: term },
   })
 }
 
@@ -262,15 +257,13 @@ export function useErrorHandler() {
   function handleError(error, customMessage = null) {
     console.error('Erro:', error)
 
-    const message = customMessage ||
-                   error.message ||
-                   'Ocorreu um erro inesperado'
+    const message = customMessage || error.message || 'Ocorreu um erro inesperado'
 
     $q.notify({
       type: 'negative',
       message: message,
       position: 'top',
-      timeout: 3000
+      timeout: 3000,
     })
   }
 
@@ -434,15 +427,11 @@ export function useEventCache() {
     }
 
     // Buscar do Supabase se não estiver em cache
-    const { data } = await supabase
-      .from('events')
-      .select('*')
-      .eq('id', eventId)
-      .single()
+    const { data } = await supabase.from('events').select('*').eq('id', eventId).single()
 
     eventCache.set(eventId, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     })
 
     return data
@@ -469,19 +458,19 @@ export default {
       meta: {
         description: {
           name: 'description',
-          content: 'Compre ingressos para o Festival de São João em Olinda'
+          content: 'Compre ingressos para o Festival de São João em Olinda',
         },
         ogTitle: {
           property: 'og:title',
-          content: 'Festival de São João - LandingTicket'
+          content: 'Festival de São João - LandingTicket',
         },
         ogImage: {
           property: 'og:image',
-          content: 'https://exemplo.com/imagem.jpg'
-        }
-      }
+          content: 'https://exemplo.com/imagem.jpg',
+        },
+      },
     })
-  }
+  },
 }
 ```
 
@@ -492,6 +481,7 @@ export default {
 **Problema:** O cliente Supabase não foi configurado corretamente.
 
 **Solução:**
+
 ```bash
 # Verificar se as variáveis de ambiente estão definidas
 cat .env
@@ -506,6 +496,7 @@ cat .env
 **Problema:** Política CORS bloqueando requisições.
 
 **Solução:**
+
 ```javascript
 // Configurar no Supabase Dashboard
 // Settings → API → CORS Allowed Origins
@@ -523,6 +514,7 @@ export default boot(({ app }) => {
 **Problema:** Erro durante o build na Vercel.
 
 **Solução:**
+
 ```bash
 # Verificar versão do Node.js no vercel.json
 {

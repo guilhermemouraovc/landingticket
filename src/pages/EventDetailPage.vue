@@ -170,7 +170,14 @@
                         <div v-if="day.formattedFullPrice" class="ticket-card__price-value">
                           {{ day.formattedFullPrice }}
                         </div>
-                        <div v-if="day.formattedFullPrice && !day.shouldShowInstallments && !day.formattedCardPrice" class="ticket-card__price-method">
+                        <div
+                          v-if="
+                            day.formattedFullPrice &&
+                            !day.shouldShowInstallments &&
+                            !day.formattedCardPrice
+                          "
+                          class="ticket-card__price-method"
+                        >
                           no Pix
                         </div>
                         <div
@@ -210,13 +217,27 @@
                   :class="{ 'btn-expired': isEventExpired || allDaysSoldOut }"
                   color="warning"
                   text-color="black"
-                  :label="isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Esgotado' : isReservation ? 'Reservar' : 'Comprar'"
+                  :label="
+                    isEventExpired
+                      ? 'Evento encerrado'
+                      : allDaysSoldOut
+                        ? 'Esgotado'
+                        : isReservation
+                          ? 'Comprar'
+                          : 'Comprar'
+                  "
                   unelevated
                   no-caps
                   :loading="openingWhatsapp"
                   :disable="isEventExpired || allDaysSoldOut"
                   :aria-label="
-                    isEventExpired ? 'Evento encerrado' : allDaysSoldOut ? 'Todos os dias esgotados' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'
+                    isEventExpired
+                      ? 'Evento encerrado'
+                      : allDaysSoldOut
+                        ? 'Todos os dias esgotados'
+                        : isReservation
+                          ? 'Comprar ingresso via WhatsApp'
+                          : 'Comprar ingresso via WhatsApp'
                   "
                   @click="openWhatsapp()"
                 />
@@ -234,7 +255,9 @@
 
                 <!-- Parcelas no cartão -->
                 <div
-                  v-if="event.shouldShowInstallments && event.installments && event.installmentValue"
+                  v-if="
+                    event.shouldShowInstallments && event.installments && event.installmentValue
+                  "
                   class="installment-details"
                 >
                   <span class="installment-prefix">ou {{ event.installments }}x de</span>
@@ -259,12 +282,18 @@
               :class="{ 'btn-expired': isEventExpired, 'buy-btn--no-price': !event.hasPrice }"
               color="warning"
               text-color="black"
-              :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
+              :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Comprar' : 'Comprar'"
               unelevated
               no-caps
               :loading="openingWhatsapp"
               :disable="isEventExpired"
-              :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
+              :aria-label="
+                isEventExpired
+                  ? 'Evento encerrado'
+                  : isReservation
+                    ? 'Comprar ingresso via WhatsApp'
+                    : 'Comprar ingresso via WhatsApp'
+              "
               @click="openWhatsapp()"
             />
 
@@ -348,11 +377,17 @@
             class="floating-buy-btn"
             :color="isEventExpired ? 'grey-7' : 'warning'"
             text-color="black"
-            :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar' : 'Comprar'"
+            :label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Comprar' : 'Comprar'"
             unelevated
             no-caps
             :loading="openingWhatsapp"
-            :aria-label="isEventExpired ? 'Evento encerrado' : isReservation ? 'Reservar ingresso via WhatsApp' : 'Comprar ingresso via WhatsApp'"
+            :aria-label="
+              isEventExpired
+                ? 'Evento encerrado'
+                : isReservation
+                  ? 'Comprar ingresso via WhatsApp'
+                  : 'Comprar ingresso via WhatsApp'
+            "
             @click="isEventExpired ? goHome() : openWhatsapp()"
           />
         </div>
@@ -415,7 +450,7 @@ function getDefaultWhatsAppMessage(eventTitle, hasRef = false, isReservation = f
     return null // Será tratado pelo composable de influenciadora
   }
   if (isReservation) {
-    return `Olá! Gostaria de reservar ${eventTitle}`
+    return `Olá! Gostaria de comprar ${eventTitle}`
   }
   return `Olá! Gostaria de finalizar a compra do ${eventTitle}`
 }
@@ -823,7 +858,7 @@ const allDaysSoldOut = computed(() => {
     return false
   }
 
-  return event.value.days.every(day => day.soldOut === true)
+  return event.value.days.every((day) => day.soldOut === true)
 })
 
 // Função para extrair tags do evento
@@ -921,7 +956,13 @@ function getEventTags(eventData) {
 
 .event-title {
   color: #fff !important;
-  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   font-weight: 600 !important;
 }
 
@@ -1707,7 +1748,13 @@ function getEventTags(eventData) {
 .newsletter-title {
   font-size: 30px;
   font-weight: 600;
-  font-family: 'Poppins', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   color: #ffffff;
   line-height: 1.4;
   margin: 0;
