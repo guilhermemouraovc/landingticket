@@ -396,6 +396,7 @@ export function useAdminEvents() {
                 title: day.title || null,
                 description: day.description || null,
                 price: day.price || null,
+                card_price: day.card_price || null,
                 price_installments: day.price_installments || null,
                 installment_value: day.installment_value || null,
                 ticket_url: day.ticket_url || null,
