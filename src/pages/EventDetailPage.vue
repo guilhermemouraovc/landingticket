@@ -171,11 +171,7 @@
                           {{ day.formattedFullPrice }}
                         </div>
                         <div
-                          v-if="
-                            day.formattedFullPrice &&
-                            !day.shouldShowInstallments &&
-                            !day.formattedCardPrice
-                          "
+                          v-if="day.formattedFullPrice"
                           class="ticket-card__price-method"
                         >
                           no Pix
@@ -299,12 +295,12 @@
 
             <div v-if="event.additionalInfo" class="event-section q-mt-md">
               <div class="section-title">Atrações</div>
-              <p class="section-text" v-html="event.additionalInfo"></p>
+              <p class="section-text" v-html="safeAdditionalInfo"></p>
             </div>
 
             <div class="event-section q-mt-md">
               <div class="section-title">Descrição do Evento</div>
-              <p class="section-text" v-html="event.description"></p>
+              <p class="section-text" v-html="safeDescription"></p>
             </div>
           </div>
         </q-card>
@@ -421,6 +417,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+import DOMPurify from 'dompurify'
 import { useRoute, useRouter } from 'vue-router'
 import { useSupabaseEvents } from 'src/composables/useSupabaseEvents'
 import { useInfluencerTracking } from 'src/composables/useInfluencerTracking'
@@ -473,6 +470,12 @@ const { hasInfluencer, getWhatsAppMessage, getInfluencerPhone, saveInfluencer } 
 // Estado base da tela
 const error = ref('')
 const event = ref(null)
+const safeDescription = computed(() =>
+  event.value ? DOMPurify.sanitize(event.value.description) : ''
+)
+const safeAdditionalInfo = computed(() =>
+  event.value ? DOMPurify.sanitize(event.value.additionalInfo) : ''
+)
 const selectedDay = ref(null)
 const ticketsContainer = ref(null)
 
